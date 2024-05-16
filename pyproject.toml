@@ -28,13 +28,16 @@ dev = [
     "ruff",
     "types-pyyaml"
 ]
+
 docker = [
     "docker"
 ]
+
 aws = [
     "docker",
     "boto3"
 ]
+
 k8s = [
     "docker",
     "kubernetes"
@@ -125,4 +128,5 @@ module = [
   "yfinance.*",
   "youtube_transcript_api.*",
 ]
+
 ignore_missing_imports = true
