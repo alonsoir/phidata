@@ -39,7 +39,9 @@ def authenticate_user() -> None:
 
     auth_server_port = get_port_for_auth_server()
     redirect_uri = "http%3A%2F%2Flocalhost%3A{}%2F".format(auth_server_port)
-    auth_url = "{}?source=cli&action=signin&redirecturi={}".format(phi_cli_settings.signin_url, redirect_uri)
+    auth_url = "{}?source=cli&action=signin&redirecturi={}".format(
+        phi_cli_settings.signin_url, redirect_uri
+    )
     print_info("\nYour browser will be opened to visit:\n{}".format(auth_url))
     typer_launch(auth_url)
     print_info("\nWaiting for a response from browser...\n")
@@ -50,7 +52,9 @@ def authenticate_user() -> None:
         return
 
     phi_config: Optional[PhiCliConfig] = PhiCliConfig.from_saved_config()
-    existing_user: Optional[UserSchema] = phi_config.user if phi_config is not None else None
+    existing_user: Optional[UserSchema] = (
+        phi_config.user if phi_config is not None else None
+    )
     try:
         user: Optional[UserSchema] = authenticate_and_get_user(
             tmp_auth_token=tmp_auth_token, existing_user=existing_user
@@ -98,7 +102,9 @@ def initialize_phi(reset: bool = False, login: bool = False) -> bool:
                 delete_from_fs(PHI_CLI_DIR)
             except Exception as e:
                 logger.exception(e)
-                raise Exception(f"Something went wrong, please delete {PHI_CLI_DIR} and run again")
+                raise Exception(
+                    f"Something went wrong, please delete {PHI_CLI_DIR} and run again"
+                )
             PHI_CLI_DIR.mkdir(parents=True, exist_ok=True)
     else:
         PHI_CLI_DIR.mkdir(parents=True)
@@ -145,7 +151,9 @@ def sign_in_using_cli() -> None:
         logger.error("Incorrect email or password")
 
     try:
-        user: Optional[UserSchema] = sign_in_user(EmailPasswordAuthSchema(email=email_raw, password=pass_raw))
+        user: Optional[UserSchema] = sign_in_user(
+            EmailPasswordAuthSchema(email=email_raw, password=pass_raw)
+        )
     except Exception as e:
         logger.exception(e)
         logger.error("Could not authenticate, please try again")
@@ -196,11 +204,13 @@ def start_resources(
         return
 
     # Get resource groups to deploy
-    resource_groups_to_create: List[InfraResources] = WorkspaceConfig.get_resources_from_file(
-        resource_file=resources_file_path,
-        env=target_env,
-        infra=target_infra,
-        order="create",
+    resource_groups_to_create: List[InfraResources] = (
+        WorkspaceConfig.get_resources_from_file(
+            resource_file=resources_file_path,
+            env=target_env,
+            infra=target_infra,
+            order="create",
+        )
     )
 
     # Track number of resource groups created
@@ -229,7 +239,9 @@ def start_resources(
             num_rgs_created += 1
         num_resources_created += _num_resources_created
         num_resources_to_create += _num_resources_to_create
-        logger.debug(f"Deployed {num_resources_created} resources in {num_rgs_created} resource groups")
+        logger.debug(
+            f"Deployed {num_resources_created} resources in {num_rgs_created} resource groups"
+        )
 
     if dry_run:
         return
@@ -237,7 +249,9 @@ def start_resources(
     if num_resources_created == 0:
         return
 
-    print_heading(f"\n--**-- ResourceGroups deployed: {num_rgs_created}/{num_rgs_to_create}\n")
+    print_heading(
+        f"\n--**-- ResourceGroups deployed: {num_rgs_created}/{num_rgs_to_create}\n"
+    )
     if num_resources_created != num_resources_to_create:
         logger.error("Some resources failed to create, please check logs")
 
@@ -271,11 +285,13 @@ def stop_resources(
         return
 
     # Get resource groups to shutdown
-    resource_groups_to_shutdown: List[InfraResources] = WorkspaceConfig.get_resources_from_file(
-        resource_file=resources_file_path,
-        env=target_env,
-        infra=target_infra,
-        order="create",
+    resource_groups_to_shutdown: List[InfraResources] = (
+        WorkspaceConfig.get_resources_from_file(
+            resource_file=resources_file_path,
+            env=target_env,
+            infra=target_infra,
+            order="create",
+        )
     )
 
     # Track number of resource groups deleted
@@ -303,7 +319,9 @@ def stop_resources(
             num_rgs_shutdown += 1
         num_resources_shutdown += _num_resources_shutdown
         num_resources_to_shutdown += _num_resources_to_shutdown
-        logger.debug(f"Deleted {num_resources_shutdown} resources in {num_rgs_shutdown} resource groups")
+        logger.debug(
+            f"Deleted {num_resources_shutdown} resources in {num_rgs_shutdown} resource groups"
+        )
 
     if dry_run:
         return
@@ -311,7 +329,9 @@ def stop_resources(
     if num_resources_shutdown == 0:
         return
 
-    print_heading(f"\n--**-- ResourceGroups deleted: {num_rgs_shutdown}/{num_rgs_to_shutdown}\n")
+    print_heading(
+        f"\n--**-- ResourceGroups deleted: {num_rgs_shutdown}/{num_rgs_to_shutdown}\n"
+    )
     if num_resources_shutdown != num_resources_to_shutdown:
         logger.error("Some resources failed to delete, please check logs")
 
@@ -345,11 +365,13 @@ def patch_resources(
         return
 
     # Get resource groups to update
-    resource_groups_to_patch: List[InfraResources] = WorkspaceConfig.get_resources_from_file(
-        resource_file=resources_file_path,
-        env=target_env,
-        infra=target_infra,
-        order="create",
+    resource_groups_to_patch: List[InfraResources] = (
+        WorkspaceConfig.get_resources_from_file(
+            resource_file=resources_file_path,
+            env=target_env,
+            infra=target_infra,
+            order="create",
+        )
     )
 
     num_rgs_patched = 0
@@ -376,7 +398,9 @@ def patch_resources(
             num_rgs_patched += 1
         num_resources_patched += _num_resources_patched
         num_resources_to_patch += _num_resources_to_patch
-        logger.debug(f"Patched {num_resources_patched} resources in {num_rgs_patched} resource groups")
+        logger.debug(
+            f"Patched {num_resources_patched} resources in {num_rgs_patched} resource groups"
+        )
 
     if dry_run:
         return
@@ -384,6 +408,8 @@ def patch_resources(
     if num_resources_patched == 0:
         return
 
-    print_heading(f"\n--**-- ResourceGroups patched: {num_rgs_patched}/{num_rgs_to_patch}\n")
+    print_heading(
+        f"\n--**-- ResourceGroups patched: {num_rgs_patched}/{num_rgs_to_patch}\n"
+    )
     if num_resources_patched != num_resources_to_patch:
         logger.error("Some resources failed to patch, please check logs")

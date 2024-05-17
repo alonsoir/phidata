@@ -28,12 +28,16 @@ class ServiceAccount(K8sResource):
 
     # AutomountServiceAccountToken indicates whether pods running as this service account
     # should have an API token automatically mounted. Can be overridden at the pod level.
-    automount_service_account_token: Optional[bool] = Field(None, alias="automountServiceAccountToken")
+    automount_service_account_token: Optional[bool] = Field(
+        None, alias="automountServiceAccountToken"
+    )
     # ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images in pods
     # that reference this ServiceAccount. ImagePullSecrets are distinct from Secrets because Secrets can be mounted
     # in the pod, but ImagePullSecrets are only accessed by the kubelet.
     # More info: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
-    image_pull_secrets: Optional[List[LocalObjectReference]] = Field(None, alias="imagePullSecrets")
+    image_pull_secrets: Optional[List[LocalObjectReference]] = Field(
+        None, alias="imagePullSecrets"
+    )
     # Secrets is the list of secrets allowed to be used by pods running using this ServiceAccount.
     # More info: https://kubernetes.io/docs/concepts/configuration/secret
     secrets: Optional[List[ObjectReference]] = None
@@ -105,11 +109,13 @@ class ServiceAccount(K8sResource):
         namespace = self.get_namespace()
 
         logger.debug("Creating: {}".format(self.get_resource_name()))
-        v1_service_account: V1ServiceAccount = core_v1_api.create_namespaced_service_account(
-            body=k8s_object,
-            namespace=namespace,
-            async_req=self.async_req,
-            pretty=self.pretty,
+        v1_service_account: V1ServiceAccount = (
+            core_v1_api.create_namespaced_service_account(
+                body=k8s_object,
+                namespace=namespace,
+                async_req=self.async_req,
+                pretty=self.pretty,
+            )
         )
         # logger.debug("Created: {}".format(v1_service_account))
         if v1_service_account.metadata.creation_timestamp is not None:
@@ -148,12 +154,14 @@ class ServiceAccount(K8sResource):
         namespace = self.get_namespace()
         logger.debug("Updating: {}".format(sa_name))
 
-        v1_service_account: V1ServiceAccount = core_v1_api.patch_namespaced_service_account(
-            name=sa_name,
-            namespace=namespace,
-            body=k8s_object,
-            async_req=self.async_req,
-            pretty=self.pretty,
+        v1_service_account: V1ServiceAccount = (
+            core_v1_api.patch_namespaced_service_account(
+                name=sa_name,
+                namespace=namespace,
+                body=k8s_object,
+                async_req=self.async_req,
+                pretty=self.pretty,
+            )
         )
         # logger.debug("Updated:\n{}".format(pformat(v1_service_account.to_dict(), indent=2)))
         if v1_service_account.metadata.creation_timestamp is not None:

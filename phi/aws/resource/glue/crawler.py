@@ -101,7 +101,9 @@ class GlueCrawler(AwsResource):
                 if s3_target.event_queue_arn is not None:
                     _new_s3_target_dict["EventQueueArn"] = s3_target.event_queue_arn
                 if s3_target.dlq_event_queue_arn is not None:
-                    _new_s3_target_dict["DlqEventQueueArn"] = s3_target.dlq_event_queue_arn
+                    _new_s3_target_dict["DlqEventQueueArn"] = (
+                        s3_target.dlq_event_queue_arn
+                    )
 
                 new_s3_targets_list.append(_new_s3_target_dict)
 
@@ -148,11 +150,15 @@ class GlueCrawler(AwsResource):
             if self.lineage_configuration:
                 not_null_args["LineageConfiguration"] = self.lineage_configuration
             if self.lake_formation_configuration:
-                not_null_args["LakeFormationConfiguration"] = self.lake_formation_configuration
+                not_null_args["LakeFormationConfiguration"] = (
+                    self.lake_formation_configuration
+                )
             if self.configuration:
                 not_null_args["Configuration"] = self.configuration
             if self.crawler_security_configuration:
-                not_null_args["CrawlerSecurityConfiguration"] = self.crawler_security_configuration
+                not_null_args["CrawlerSecurityConfiguration"] = (
+                    self.crawler_security_configuration
+                )
             if self.tags:
                 not_null_args["Tags"] = self.tags
 
@@ -201,8 +207,12 @@ class GlueCrawler(AwsResource):
             # logger.debug(f"GlueCrawler: {get_crawler_response}")
             # logger.debug(f"GlueCrawler type: {type(get_crawler_response)}")
 
-            self.creation_time = get_crawler_response.get("Crawler", {}).get("CreationTime", None)
-            self.last_crawl = get_crawler_response.get("Crawler", {}).get("LastCrawl", None)
+            self.creation_time = get_crawler_response.get("Crawler", {}).get(
+                "CreationTime", None
+            )
+            self.last_crawl = get_crawler_response.get("Crawler", {}).get(
+                "LastCrawl", None
+            )
             logger.debug(f"GlueCrawler creation_time: {self.creation_time}")
             logger.debug(f"GlueCrawler last_crawl: {self.last_crawl}")
             if self.creation_time is not None:
@@ -258,11 +268,15 @@ class GlueCrawler(AwsResource):
                 # logger.debug(f"start_crawler_response: {start_crawler_response}")
             except service_client.exceptions.CrawlerRunningException:
                 # reference: https://github.com/boto/boto3/issues/1606
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} already running")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} already running"
+                )
                 return True
 
             if start_crawler_response is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} started")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} started"
+                )
                 return True
 
         except Exception as e:

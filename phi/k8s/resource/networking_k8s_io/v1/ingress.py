@@ -167,7 +167,9 @@ class Ingress(K8sResource):
         ingress_list: Optional[V1IngressList] = None
         if namespace:
             logger.debug(f"Getting ingress for ns: {namespace}")
-            ingress_list = networking_v1_api.list_namespaced_ingress(namespace=namespace)
+            ingress_list = networking_v1_api.list_namespaced_ingress(
+                namespace=namespace
+            )
         else:
             logger.debug("Getting ingress for all namespaces")
             ingress_list = networking_v1_api.list_ingress_for_all_namespaces()
@@ -212,7 +214,9 @@ class Ingress(K8sResource):
         if active_resources is None:
             return None
 
-        active_resources_dict = {_ingress.metadata.name: _ingress for _ingress in active_resources}
+        active_resources_dict = {
+            _ingress.metadata.name: _ingress for _ingress in active_resources
+        }
 
         ingress_name = self.get_resource_name()
         if ingress_name in active_resources_dict:

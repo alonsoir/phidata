@@ -98,7 +98,9 @@ class LoadBalancer(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be created.")
-                waiter = self.get_service_client(aws_client).get_waiter("load_balancer_exists")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "load_balancer_exists"
+                )
                 waiter.wait(
                     Names=[self.get_resource_name()],
                     WaiterConfig={
@@ -112,7 +114,9 @@ class LoadBalancer(AwsResource):
         # Read the LoadBalancer
         elb = self._read(aws_client)
         if elb is None:
-            logger.error(f"Error reading {self.get_resource_type()}. Please get DNS name manually.")
+            logger.error(
+                f"Error reading {self.get_resource_type()}. Please get DNS name manually."
+            )
         else:
             dns_name = elb.get("DNSName", None)
             print_info(f"LoadBalancer DNS: {self.protocol.lower()}://{dns_name}")
@@ -130,7 +134,9 @@ class LoadBalancer(AwsResource):
 
         service_client = self.get_service_client(aws_client)
         try:
-            describe_response = service_client.describe_load_balancers(Names=[self.name])
+            describe_response = service_client.describe_load_balancers(
+                Names=[self.name]
+            )
             logger.debug(f"Describe Response: {describe_response}")
             resource_list = describe_response.get("LoadBalancers", None)
 
@@ -159,7 +165,9 @@ class LoadBalancer(AwsResource):
             if lb_arn is None:
                 logger.warning(f"{self.get_resource_type()} not found.")
                 return True
-            delete_response = service_client.delete_load_balancer(LoadBalancerArn=lb_arn)
+            delete_response = service_client.delete_load_balancer(
+                LoadBalancerArn=lb_arn
+            )
             logger.debug(f"Delete Response: {delete_response}")
             return True
         except Exception as e:
@@ -173,7 +181,9 @@ class LoadBalancer(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("load_balancers_deleted")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "load_balancers_deleted"
+                )
                 waiter.wait(
                     Names=[self.get_resource_name()],
                     WaiterConfig={

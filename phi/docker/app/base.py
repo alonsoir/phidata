@@ -118,27 +118,48 @@ class DockerApp(AppBase):
             workspace_parent=workspace_parent_in_container,
         )
 
-        if self.workspace_settings is not None and self.workspace_settings.scripts_dir is not None:
-            self.container_context.scripts_dir = f"{workspace_root_in_container}/{self.workspace_settings.scripts_dir}"
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.scripts_dir is not None
+        ):
+            self.container_context.scripts_dir = (
+                f"{workspace_root_in_container}/{self.workspace_settings.scripts_dir}"
+            )
 
-        if self.workspace_settings is not None and self.workspace_settings.storage_dir is not None:
-            self.container_context.storage_dir = f"{workspace_root_in_container}/{self.workspace_settings.storage_dir}"
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.storage_dir is not None
+        ):
+            self.container_context.storage_dir = (
+                f"{workspace_root_in_container}/{self.workspace_settings.storage_dir}"
+            )
 
-        if self.workspace_settings is not None and self.workspace_settings.workflows_dir is not None:
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.workflows_dir is not None
+        ):
             self.container_context.workflows_dir = (
                 f"{workspace_root_in_container}/{self.workspace_settings.workflows_dir}"
             )
 
-        if self.workspace_settings is not None and self.workspace_settings.workspace_dir is not None:
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.workspace_dir is not None
+        ):
             self.container_context.workspace_dir = (
                 f"{workspace_root_in_container}/{self.workspace_settings.workspace_dir}"
             )
 
-        if self.workspace_settings is not None and self.workspace_settings.ws_schema is not None:
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.ws_schema is not None
+        ):
             self.container_context.workspace_schema = self.workspace_settings.ws_schema
 
         if self.requirements_file is not None:
-            self.container_context.requirements_file = f"{workspace_root_in_container}/{self.requirements_file}"
+            self.container_context.requirements_file = (
+                f"{workspace_root_in_container}/{self.requirements_file}"
+            )
 
         return self.container_context
 
@@ -166,7 +187,8 @@ class DockerApp(AppBase):
                 "PRINT_ENV_ON_LOAD": str(self.print_env_on_load),
                 "RESOURCES_DIR_CONTAINER_PATH": str(self.resources_dir_container_path),
                 PHI_RUNTIME_ENV_VAR: "docker",
-                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file or "",
+                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file
+                or "",
                 SCRIPTS_DIR_ENV_VAR: container_context.scripts_dir or "",
                 STORAGE_DIR_ENV_VAR: container_context.storage_dir or "",
                 WORKFLOWS_DIR_ENV_VAR: container_context.workflows_dir or "",
@@ -178,9 +200,13 @@ class DockerApp(AppBase):
         try:
             if container_context.workspace_schema is not None:
                 if container_context.workspace_schema.id_workspace is not None:
-                    container_env[WORKSPACE_ID_ENV_VAR] = str(container_context.workspace_schema.id_workspace) or ""
+                    container_env[WORKSPACE_ID_ENV_VAR] = (
+                        str(container_context.workspace_schema.id_workspace) or ""
+                    )
                 if container_context.workspace_schema.ws_hash is not None:
-                    container_env[WORKSPACE_HASH_ENV_VAR] = container_context.workspace_schema.ws_hash
+                    container_env[WORKSPACE_HASH_ENV_VAR] = (
+                        container_context.workspace_schema.ws_hash
+                    )
         except Exception:
             pass
 
@@ -188,10 +214,17 @@ class DockerApp(AppBase):
             python_path = self.python_path
             if python_path is None:
                 python_path = container_context.workspace_root
-                if self.mount_resources and self.resources_dir_container_path is not None:
-                    python_path = "{}:{}".format(python_path, self.resources_dir_container_path)
+                if (
+                    self.mount_resources
+                    and self.resources_dir_container_path is not None
+                ):
+                    python_path = "{}:{}".format(
+                        python_path, self.resources_dir_container_path
+                    )
                 if self.add_python_paths is not None:
-                    python_path = "{}:{}".format(python_path, ":".join(self.add_python_paths))
+                    python_path = "{}:{}".format(
+                        python_path, ":".join(self.add_python_paths)
+                    )
             if python_path is not None:
                 container_env[PYTHONPATH_ENV_VAR] = python_path
 
@@ -201,22 +234,30 @@ class DockerApp(AppBase):
         # Update the container env using env_file
         env_data_from_file = self.get_env_file_data()
         if env_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in env_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in env_data_from_file.items() if v is not None}
+            )
 
         # Update the container env using secrets_file
         secret_data_from_file = self.get_secret_file_data()
         if secret_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in secret_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in secret_data_from_file.items() if v is not None}
+            )
 
         # Update the container env with user provided env_vars
         # this overwrites any existing variables with the same key
         if self.env_vars is not None and isinstance(self.env_vars, dict):
-            container_env.update({k: str(v) for k, v in self.env_vars.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in self.env_vars.items() if v is not None}
+            )
 
         # logger.debug("Container Environment: {}".format(container_env))
         return container_env
 
-    def get_container_volumes(self, container_context: ContainerContext) -> Dict[str, dict]:
+    def get_container_volumes(
+        self, container_context: ContainerContext
+    ) -> Dict[str, dict]:
         from phi.utils.defaults import get_default_volume_name
 
         if self.workspace_root is None:
@@ -248,7 +289,9 @@ class DockerApp(AppBase):
 
         # Create App Volume
         if self.create_volume:
-            volume_host = self.volume_name or get_default_volume_name(self.get_app_name())
+            volume_host = self.volume_name or get_default_volume_name(
+                self.get_app_name()
+            )
             if self.volume_dir is not None:
                 volume_host = str(self.workspace_root.joinpath(self.volume_dir))
             logger.debug(f"Mounting: {volume_host}")
@@ -291,7 +334,9 @@ class DockerApp(AppBase):
             return self.command.strip().split(" ")
         return self.command
 
-    def build_resources(self, build_context: DockerBuildContext) -> List["DockerResource"]:
+    def build_resources(
+        self, build_context: DockerBuildContext
+    ) -> List["DockerResource"]:
         from phi.docker.resource.base import DockerResource
         from phi.docker.resource.network import DockerNetwork
         from phi.docker.resource.container import DockerContainer
@@ -304,10 +349,14 @@ class DockerApp(AppBase):
         logger.debug(f"ContainerContext: {container_context.model_dump_json(indent=2)}")
 
         # -*- Get Container Environment
-        container_env: Dict[str, str] = self.get_container_env(container_context=container_context)
+        container_env: Dict[str, str] = self.get_container_env(
+            container_context=container_context
+        )
 
         # -*- Get Container Volumes
-        container_volumes = self.get_container_volumes(container_context=container_context)
+        container_volumes = self.get_container_volumes(
+            container_context=container_context
+        )
 
         # -*- Get Container Ports
         container_ports: Dict[str, int] = self.get_container_ports()

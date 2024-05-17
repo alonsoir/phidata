@@ -164,9 +164,13 @@ class CacheCluster(AwsResource):
         if self.az_mode is not None:
             not_null_args["AZMode"] = self.az_mode
         if self.preferred_availability_zone is not None:
-            not_null_args["PreferredAvailabilityZone"] = self.preferred_availability_zone
+            not_null_args["PreferredAvailabilityZone"] = (
+                self.preferred_availability_zone
+            )
         if self.preferred_availability_zones is not None:
-            not_null_args["PreferredAvailabilityZones"] = self.preferred_availability_zones
+            not_null_args["PreferredAvailabilityZones"] = (
+                self.preferred_availability_zones
+            )
         if self.num_cache_nodes is not None:
             not_null_args["NumCacheNodes"] = self.num_cache_nodes
         if self.cache_node_type is not None:
@@ -186,7 +190,9 @@ class CacheCluster(AwsResource):
         if self.snapshot_name is not None:
             not_null_args["SnapshotName"] = self.snapshot_name
         if self.preferred_maintenance_window is not None:
-            not_null_args["PreferredMaintenanceWindow"] = self.preferred_maintenance_window
+            not_null_args["PreferredMaintenanceWindow"] = (
+                self.preferred_maintenance_window
+            )
         if self.port is not None:
             not_null_args["Port"] = self.port
         if self.notification_topic_arn is not None:
@@ -206,7 +212,9 @@ class CacheCluster(AwsResource):
         if self.preferred_outpost_arns is not None:
             not_null_args["PreferredOutpostArns"] = self.preferred_outpost_arns
         if self.log_delivery_configurations is not None:
-            not_null_args["LogDeliveryConfigurations"] = self.log_delivery_configurations
+            not_null_args["LogDeliveryConfigurations"] = (
+                self.log_delivery_configurations
+            )
         if self.transit_encryption_enabled is not None:
             not_null_args["TransitEncryptionEnabled"] = self.transit_encryption_enabled
         if self.network_type is not None:
@@ -239,7 +247,9 @@ class CacheCluster(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be active.")
-                waiter = self.get_service_client(aws_client).get_waiter("cache_cluster_available")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "cache_cluster_available"
+                )
                 waiter.wait(
                     CacheClusterId=self.get_cache_cluster_id(),
                     WaiterConfig={
@@ -265,7 +275,9 @@ class CacheCluster(AwsResource):
         service_client = self.get_service_client(aws_client)
         try:
             cache_cluster_id = self.get_cache_cluster_id()
-            describe_response = service_client.describe_cache_clusters(CacheClusterId=cache_cluster_id)
+            describe_response = service_client.describe_cache_clusters(
+                CacheClusterId=cache_cluster_id
+            )
             logger.debug(f"CacheCluster: {describe_response}")
             resource_list = describe_response.get("CacheClusters", None)
 
@@ -310,7 +322,9 @@ class CacheCluster(AwsResource):
         if self.security_group_ids is not None:
             not_null_args["SecurityGroupIds"] = self.security_group_ids
         if self.preferred_maintenance_window is not None:
-            not_null_args["PreferredMaintenanceWindow"] = self.preferred_maintenance_window
+            not_null_args["PreferredMaintenanceWindow"] = (
+                self.preferred_maintenance_window
+            )
         if self.notification_topic_arn is not None:
             not_null_args["NotificationTopicArn"] = self.notification_topic_arn
         if self.cache_parameter_group_name is not None:
@@ -334,7 +348,9 @@ class CacheCluster(AwsResource):
         if self.auth_token_update_strategy is not None:
             not_null_args["AuthTokenUpdateStrategy"] = self.auth_token_update_strategy
         if self.log_delivery_configurations is not None:
-            not_null_args["LogDeliveryConfigurations"] = self.log_delivery_configurations
+            not_null_args["LogDeliveryConfigurations"] = (
+                self.log_delivery_configurations
+            )
 
         service_client = self.get_service_client(aws_client)
         try:
@@ -388,7 +404,9 @@ class CacheCluster(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("cache_cluster_deleted")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "cache_cluster_deleted"
+                )
                 waiter.wait(
                     CacheClusterId=self.get_cache_cluster_id(),
                     WaiterConfig={
@@ -401,7 +419,9 @@ class CacheCluster(AwsResource):
                 logger.error(e)
         return True
 
-    def get_cache_endpoint(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_cache_endpoint(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         """Returns the CacheCluster endpoint
 
         Args:
@@ -422,8 +442,12 @@ class CacheCluster(AwsResource):
                     _cluster_identifier = resource.get("CacheClusterId", None)
                     if _cluster_identifier == cache_cluster_id:
                         for node in resource.get("CacheNodes", []):
-                            cache_endpoint = node.get("Endpoint", {}).get("Address", None)
-                            if cache_endpoint is not None and isinstance(cache_endpoint, str):
+                            cache_endpoint = node.get("Endpoint", {}).get(
+                                "Address", None
+                            )
+                            if cache_endpoint is not None and isinstance(
+                                cache_endpoint, str
+                            ):
                                 return cache_endpoint
                         break
         except Exception as e:
@@ -431,7 +455,9 @@ class CacheCluster(AwsResource):
             logger.error(e)
         return cache_endpoint
 
-    def get_cache_port(self, aws_client: Optional[AwsApiClient] = None) -> Optional[int]:
+    def get_cache_port(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[int]:
         """Returns the CacheCluster port
 
         Args:

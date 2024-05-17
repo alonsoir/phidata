@@ -50,7 +50,9 @@ class CreateStorageClass(CreateK8sResource):
             else:
                 raise Exception(f"{self.storage_class_type} not found")
         else:
-            raise Exception(f"No provisioner or StorageClassType found for {self.storage_class_name}")
+            raise Exception(
+                f"No provisioner or StorageClassType found for {self.storage_class_name}"
+            )
 
         # if the parameters are provided use those
         if self.parameters is not None:
@@ -64,7 +66,9 @@ class CreateStorageClass(CreateK8sResource):
             else:
                 raise Exception(f"{self.storage_class_type} not found")
         else:
-            raise Exception(f"No parameters or StorageClassType found for {self.storage_class_name}")
+            raise Exception(
+                f"No parameters or StorageClassType found for {self.storage_class_name}"
+            )
 
         _storage_class = StorageClass(
             name=self.storage_class_name,
@@ -82,5 +86,7 @@ class CreateStorageClass(CreateK8sResource):
             volume_binding_mode=self.volume_binding_mode,
         )
 
-        logger.debug(f"StorageClass {self.storage_class_name}:\n{_storage_class.json(exclude_defaults=True, indent=2)}")
+        logger.debug(
+            f"StorageClass {self.storage_class_name}:\n{_storage_class.json(exclude_defaults=True, indent=2)}"
+        )
         return _storage_class

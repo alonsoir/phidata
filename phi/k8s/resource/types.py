@@ -2,7 +2,9 @@ from collections import OrderedDict
 from typing import Dict, List, Type, Union
 
 from phi.k8s.resource.apiextensions_k8s_io.v1.custom_object import CustomObject
-from phi.k8s.resource.apiextensions_k8s_io.v1.custom_resource_definition import CustomResourceDefinition
+from phi.k8s.resource.apiextensions_k8s_io.v1.custom_resource_definition import (
+    CustomResourceDefinition,
+)
 from phi.k8s.resource.apps.v1.deployment import Deployment
 from phi.k8s.resource.core.v1.config_map import ConfigMap
 from phi.k8s.resource.core.v1.container import Container
@@ -14,7 +16,9 @@ from phi.k8s.resource.core.v1.secret import Secret
 from phi.k8s.resource.core.v1.service import Service
 from phi.k8s.resource.core.v1.service_account import ServiceAccount
 from phi.k8s.resource.base import K8sResource, K8sObject
-from phi.k8s.resource.rbac_authorization_k8s_io.v1.cluste_role_binding import ClusterRoleBinding
+from phi.k8s.resource.rbac_authorization_k8s_io.v1.cluste_role_binding import (
+    ClusterRoleBinding,
+)
 from phi.k8s.resource.rbac_authorization_k8s_io.v1.cluster_role import ClusterRole
 from phi.k8s.resource.storage_k8s_io.v1.storage_class import StorageClass
 
@@ -89,5 +93,8 @@ K8sResourceAliasToTypeMap: Dict[str, Type[Union[K8sResource, K8sObject]]] = dict
 # lower weight K8sResource(s) get installed first
 # i.e. Namespace is installed first, then Secret... and so on
 K8sResourceInstallOrder: Dict[str, int] = OrderedDict(
-    {resource_type.__name__: idx for idx, resource_type in enumerate(K8sResourceTypeList, start=1)}
+    {
+        resource_type.__name__: idx
+        for idx, resource_type in enumerate(K8sResourceTypeList, start=1)
+    }
 )

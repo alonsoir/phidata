@@ -55,9 +55,9 @@ class PersistentVolumeSpec(K8sObject):
     #   - `"Retain"` means the volume will be left in its current phase (Released) for manual reclamation
     #           by the administrator.
     #   The default policy is Retain.
-    persistent_volume_reclaim_policy: Optional[Literal["Delete", "Recycle", "Retain"]] = Field(
-        None, alias="persistentVolumeReclaimPolicy"
-    )
+    persistent_volume_reclaim_policy: Optional[
+        Literal["Delete", "Recycle", "Retain"]
+    ] = Field(None, alias="persistentVolumeReclaimPolicy")
     # Name of StorageClass to which this persistent volume belongs.
     # Empty value means that this volume does not belong to any StorageClass.
     storage_class_name: Optional[str] = Field(None, alias="storageClassName")
@@ -76,7 +76,9 @@ class PersistentVolumeSpec(K8sObject):
     # GCEPersistentDisk represents a GCE Disk resource that is attached to a
     # kubelet's host machine and then exposed to the pod. Provisioned by an admin.
     # More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
-    gce_persistent_disk: Optional[GcePersistentDiskVolumeSource] = Field(None, alias="gcePersistentDisk")
+    gce_persistent_disk: Optional[GcePersistentDiskVolumeSource] = Field(
+        None, alias="gcePersistentDisk"
+    )
     # NFS represents an NFS mount on the host. Provisioned by an admin.
     # More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
     nfs: Optional[NFSVolumeSource] = None
@@ -106,8 +108,14 @@ class PersistentVolumeSpec(K8sObject):
             host_path=self.host_path.get_k8s_object() if self.host_path else None,
             nfs=self.nfs.get_k8s_object() if self.nfs else None,
             claim_ref=self.claim_ref.get_k8s_object() if self.claim_ref else None,
-            gce_persistent_disk=self.gce_persistent_disk.get_k8s_object() if self.gce_persistent_disk else None,
-            node_affinity=self.node_affinity.get_k8s_object() if self.node_affinity else None,
+            gce_persistent_disk=(
+                self.gce_persistent_disk.get_k8s_object()
+                if self.gce_persistent_disk
+                else None
+            ),
+            node_affinity=(
+                self.node_affinity.get_k8s_object() if self.node_affinity else None
+            ),
         )
         return _v1_persistent_volume_spec
 
@@ -167,7 +175,9 @@ class PersistentVolume(K8sResource):
             namespace: NOT USED.
         """
         core_v1_api: CoreV1Api = k8s_client.core_v1_api
-        pv_list: Optional[V1PersistentVolumeList] = core_v1_api.list_persistent_volume(**kwargs)
+        pv_list: Optional[V1PersistentVolumeList] = core_v1_api.list_persistent_volume(
+            **kwargs
+        )
         pvs: Optional[List[V1PersistentVolume]] = None
         if pv_list:
             pvs = pv_list.items

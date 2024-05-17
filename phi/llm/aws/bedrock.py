@@ -59,7 +59,9 @@ class AwsBedrock(LLM):
         if self.aws_client is not None:
             return self.aws_client
 
-        self.aws_client = AwsApiClient(aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile())
+        self.aws_client = AwsApiClient(
+            aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile()
+        )
         return self.aws_client
 
     @property
@@ -77,7 +79,9 @@ class AwsBedrock(LLM):
             return self._bedrock_runtime_client
 
         boto3_session: session = self.get_aws_client().boto3_session
-        self._bedrock_runtime_client = boto3_session.client(service_name="bedrock-runtime")
+        self._bedrock_runtime_client = boto3_session.client(
+            service_name="bedrock-runtime"
+        )
         return self._bedrock_runtime_client
 
     @property
@@ -99,7 +103,9 @@ class AwsBedrock(LLM):
         return [model_summary["modelId"] for model_summary in model_summaries]
 
     def get_model_details(self) -> Dict[str, Any]:
-        model_details: dict = self.bedrock_client.get_foundation_model(modelIdentifier=self.model)
+        model_details: dict = self.bedrock_client.get_foundation_model(
+            modelIdentifier=self.model
+        )
 
         if model_details is None or "modelDetails" not in model_details:
             return {}

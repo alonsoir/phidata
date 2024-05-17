@@ -76,10 +76,17 @@ class EksCluster(AwsResource):
     # Each tag consists of a key and an optional value. You define both.
     tags: Optional[Dict[str, str]] = None
     # The encryption configuration for the cluster.
-    encryption_config: Optional[List[Dict[str, Union[List[str], Dict[str, str]]]]] = None
+    encryption_config: Optional[List[Dict[str, Union[List[str], Dict[str, str]]]]] = (
+        None
+    )
 
     # EKS Addons
-    addons: List[Union[str, EksAddon]] = ["aws-ebs-csi-driver", "aws-efs-csi-driver", "vpc-cni", "coredns"]
+    addons: List[Union[str, EksAddon]] = [
+        "aws-ebs-csi-driver",
+        "aws-efs-csi-driver",
+        "vpc-cni",
+        "coredns",
+    ]
 
     # Kubeconfig
     # If True, updates the kubeconfig on create/delete
@@ -138,7 +145,9 @@ class EksCluster(AwsResource):
             vpc_stack = self.get_vpc_stack()
             try:
                 vpc_stack.create(aws_client)
-                resources_vpc_config = self.get_eks_resources_vpc_config(aws_client, vpc_stack)
+                resources_vpc_config = self.get_eks_resources_vpc_config(
+                    aws_client, vpc_stack
+                )
             except Exception as e:
                 logger.error("Stack creation failed, please fix and try again")
                 logger.error(e)
@@ -193,7 +202,9 @@ class EksCluster(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be active.")
-                waiter = self.get_service_client(aws_client).get_waiter("cluster_active")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "cluster_active"
+                )
                 waiter.wait(
                     name=self.name,
                     WaiterConfig={
@@ -279,7 +290,9 @@ class EksCluster(AwsResource):
             try:
                 eks_iam_role.delete(aws_client)
             except Exception as e:
-                logger.error("IamRole deletion failed, please try again or delete manually")
+                logger.error(
+                    "IamRole deletion failed, please try again or delete manually"
+                )
                 logger.error(e)
 
         # Step 2: Delete the CloudFormationStack if needed
@@ -288,7 +301,9 @@ class EksCluster(AwsResource):
             try:
                 vpc_stack.delete(aws_client)
             except Exception as e:
-                logger.error("Stack deletion failed, please try again or delete manually")
+                logger.error(
+                    "Stack deletion failed, please try again or delete manually"
+                )
                 logger.error(e)
 
         # Step 3: Delete the EksCluster
@@ -309,7 +324,9 @@ class EksCluster(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("cluster_deleted")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "cluster_deleted"
+                )
                 waiter.wait(
                     name=self.name,
                     WaiterConfig={
@@ -367,14 +384,21 @@ class EksCluster(AwsResource):
             wait_for_delete=self.wait_for_delete,
         )
 
-    def get_subnets(self, aws_client: AwsApiClient, vpc_stack: Optional[CloudFormationStack] = None) -> List[str]:
+    def get_subnets(
+        self, aws_client: AwsApiClient, vpc_stack: Optional[CloudFormationStack] = None
+    ) -> List[str]:
         subnet_ids: List[str] = []
 
         # Option 1: Get subnets from the resources_vpc_config provided by the user
-        if self.resources_vpc_config is not None and "subnetIds" in self.resources_vpc_config:
+        if (
+            self.resources_vpc_config is not None
+            and "subnetIds" in self.resources_vpc_config
+        ):
             subnet_ids = self.resources_vpc_config["subnetIds"]
             if not isinstance(subnet_ids, list):
-                raise TypeError(f"resources_vpc_config.subnetIds must be a list of strings, not {type(subnet_ids)}")
+                raise TypeError(
+                    f"resources_vpc_config.subnetIds must be a list of strings, not {type(subnet_ids)}"
+                )
             return subnet_ids
 
         # Option 2: Get subnets from the cloudformation VPC stack
@@ -382,12 +406,16 @@ class EksCluster(AwsResource):
             vpc_stack = self.get_vpc_stack()
 
         if self.use_public_subnets:
-            public_subnets: Optional[List[str]] = vpc_stack.get_public_subnets(aws_client)
+            public_subnets: Optional[List[str]] = vpc_stack.get_public_subnets(
+                aws_client
+            )
             if public_subnets is not None:
                 subnet_ids.extend(public_subnets)
 
         if self.use_private_subnets:
-            private_subnets: Optional[List[str]] = vpc_stack.get_private_subnets(aws_client)
+            private_subnets: Optional[List[str]] = vpc_stack.get_private_subnets(
+                aws_client
+            )
             if private_subnets is not None:
                 subnet_ids.extend(private_subnets)
 
@@ -401,7 +429,8 @@ class EksCluster(AwsResource):
             subnet_ids = [
                 subnet_id
                 for subnet_id in subnet_ids
-                if Subnet(name=subnet_id).get_availability_zone(aws_client=aws_client) in azs_filter
+                if Subnet(name=subnet_id).get_availability_zone(aws_client=aws_client)
+                in azs_filter
             ]
         return subnet_ids
 
@@ -422,10 +451,20 @@ class EksCluster(AwsResource):
         # # logger.debug(f"vpc_physical_resource_id: {vpc_physical_resource_id}")
 
         # get the ControlPlaneSecurityGroup physical_resource_id
-        sg_stack_resource = vpc_stack.get_stack_resource(aws_client, "ControlPlaneSecurityGroup")
-        sg_physical_resource_id = sg_stack_resource.physical_resource_id if sg_stack_resource is not None else None
-        security_group_ids = [sg_physical_resource_id] if sg_physical_resource_id is not None else []
-        if self.add_security_groups is not None and isinstance(self.add_security_groups, list):
+        sg_stack_resource = vpc_stack.get_stack_resource(
+            aws_client, "ControlPlaneSecurityGroup"
+        )
+        sg_physical_resource_id = (
+            sg_stack_resource.physical_resource_id
+            if sg_stack_resource is not None
+            else None
+        )
+        security_group_ids = (
+            [sg_physical_resource_id] if sg_physical_resource_id is not None else []
+        )
+        if self.add_security_groups is not None and isinstance(
+            self.add_security_groups, list
+        ):
             security_group_ids.extend(self.add_security_groups)
         logger.debug(f"security_group_ids: {security_group_ids}")
 
@@ -456,22 +495,31 @@ class EksCluster(AwsResource):
             - Public subnets from the VPC stack
         """
         # Option 1: Get subnets from the resources_vpc_config provided by the user
-        if self.resources_vpc_config is not None and "subnetIds" in self.resources_vpc_config:
+        if (
+            self.resources_vpc_config is not None
+            and "subnetIds" in self.resources_vpc_config
+        ):
             subnet_ids = self.resources_vpc_config["subnetIds"]
             if not isinstance(subnet_ids, list):
-                raise TypeError(f"resources_vpc_config.subnetIds must be a list of strings, not {type(subnet_ids)}")
+                raise TypeError(
+                    f"resources_vpc_config.subnetIds must be a list of strings, not {type(subnet_ids)}"
+                )
             return subnet_ids
 
         # Option 2: Get private subnets from the VPC stack
         vpc_stack = self.get_vpc_stack()
         if self.use_private_subnets:
-            private_subnets: Optional[List[str]] = vpc_stack.get_private_subnets(aws_client)
+            private_subnets: Optional[List[str]] = vpc_stack.get_private_subnets(
+                aws_client
+            )
             if private_subnets is not None:
                 return private_subnets
 
         # Option 3: Get public subnets from the VPC stack
         if self.use_public_subnets:
-            public_subnets: Optional[List[str]] = vpc_stack.get_public_subnets(aws_client)
+            public_subnets: Optional[List[str]] = vpc_stack.get_public_subnets(
+                aws_client
+            )
             if public_subnets is not None:
                 return public_subnets
         return []
@@ -494,7 +542,11 @@ class EksCluster(AwsResource):
 
         # Step 2: Get EksCluster cert, endpoint & arn
         try:
-            cluster_cert = eks_cluster.get("cluster", {}).get("certificateAuthority", {}).get("data", None)
+            cluster_cert = (
+                eks_cluster.get("cluster", {})
+                .get("certificateAuthority", {})
+                .get("data", None)
+            )
             logger.debug(f"cluster_cert: {cluster_cert}")
 
             cluster_endpoint = eks_cluster.get("cluster", {}).get("endpoint", None)

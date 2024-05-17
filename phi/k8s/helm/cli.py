@@ -5,7 +5,9 @@ from phi.cli.console import print_info
 from phi.utils.log import logger
 
 
-def run_shell_command(args: List[str], display_result: bool = True, display_error: bool = True) -> CompletedProcess:
+def run_shell_command(
+    args: List[str], display_result: bool = True, display_error: bool = True
+) -> CompletedProcess:
     logger.debug(f"Running command: {args}")
     result = run(args, capture_output=True, text=True)
     if result.returncode != 0:

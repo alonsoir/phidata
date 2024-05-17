@@ -29,7 +29,9 @@ class Volume(K8sObject):
     name: str
 
     ## Volume Sources
-    aws_elastic_block_store: Optional[AwsElasticBlockStoreVolumeSource] = Field(None, alias="awsElasticBlockStore")
+    aws_elastic_block_store: Optional[AwsElasticBlockStoreVolumeSource] = Field(
+        None, alias="awsElasticBlockStore"
+    )
     # ConfigMap represents a configMap that should populate this volume
     config_map: Optional[ConfigMapVolumeSource] = Field(None, alias="configMap")
     # EmptyDir represents a temporary directory that shares a pod's lifetime.
@@ -38,7 +40,9 @@ class Volume(K8sObject):
     # GCEPersistentDisk represents a GCE Disk resource that is attached to a
     # kubelet's host machine and then exposed to the pod. Provisioned by an admin.
     # More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
-    gce_persistent_disk: Optional[GcePersistentDiskVolumeSource] = Field(None, alias="gcePersistentDisk")
+    gce_persistent_disk: Optional[GcePersistentDiskVolumeSource] = Field(
+        None, alias="gcePersistentDisk"
+    )
     # GitRepo represents a git repository at a particular revision.
     # DEPRECATED: GitRepo is deprecated.
     # To provision a container with a git repo, mount an EmptyDir into an InitContainer
@@ -51,7 +55,9 @@ class Volume(K8sObject):
     host_path: Optional[HostPathVolumeSource] = Field(None, alias="hostPath")
     # PersistentVolumeClaimVolumeSource represents a reference to a PersistentVolumeClaim in the same namespace.
     # More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
-    persistent_volume_claim: Optional[PersistentVolumeClaimVolumeSource] = Field(None, alias="persistentVolumeClaim")
+    persistent_volume_claim: Optional[PersistentVolumeClaimVolumeSource] = Field(
+        None, alias="persistentVolumeClaim"
+    )
     # Secret represents a secret that should populate this volume.
     # More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
     secret: Optional[SecretVolumeSource] = None
@@ -61,9 +67,11 @@ class Volume(K8sObject):
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_volume.py
         _v1_volume = V1Volume(
             name=self.name,
-            aws_elastic_block_store=self.aws_elastic_block_store.get_k8s_object()
-            if self.aws_elastic_block_store
-            else None,
+            aws_elastic_block_store=(
+                self.aws_elastic_block_store.get_k8s_object()
+                if self.aws_elastic_block_store
+                else None
+            ),
             # azure_disk=None,
             # azure_file=None,
             # cephfs=None,
@@ -76,15 +84,21 @@ class Volume(K8sObject):
             # fc=None,
             # flex_volume=None,
             # flocker=None,
-            gce_persistent_disk=self.gce_persistent_disk.get_k8s_object() if self.gce_persistent_disk else None,
+            gce_persistent_disk=(
+                self.gce_persistent_disk.get_k8s_object()
+                if self.gce_persistent_disk
+                else None
+            ),
             git_repo=self.git_repo.get_k8s_object() if self.git_repo else None,
             # glusterfs=None,
             host_path=self.host_path.get_k8s_object() if self.host_path else None,
             # iscsi=None,
             # nfs=None,
-            persistent_volume_claim=self.persistent_volume_claim.get_k8s_object()
-            if self.persistent_volume_claim
-            else None,
+            persistent_volume_claim=(
+                self.persistent_volume_claim.get_k8s_object()
+                if self.persistent_volume_claim
+                else None
+            ),
             # photon_persistent_disk=None,
             # portworx_volume=None,
             # projected=None,

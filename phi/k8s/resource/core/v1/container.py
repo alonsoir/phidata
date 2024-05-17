@@ -59,7 +59,9 @@ class Probe(K8sObject):
     # The value zero indicates stop immediately via the kill signal (no opportunity to shut down).
     # This is a beta field and requires enabling ProbeTerminationGracePeriod feature gate.
     # Minimum value is 1. spec.terminationGracePeriodSeconds is used if unset.
-    termination_grace_period_seconds: Optional[int] = Field(None, alias="terminationGracePeriodSeconds")
+    termination_grace_period_seconds: Optional[int] = Field(
+        None, alias="terminationGracePeriodSeconds"
+    )
     # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
     # More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
     timeout_seconds: Optional[int] = Field(None, alias="timeoutSeconds")
@@ -181,19 +183,33 @@ class EnvVarSource(K8sObject):
 
     resource_type: str = "EnvVarSource"
 
-    config_map_key_ref: Optional[ConfigMapKeySelector] = Field(None, alias="configMapKeyRef")
+    config_map_key_ref: Optional[ConfigMapKeySelector] = Field(
+        None, alias="configMapKeyRef"
+    )
     field_ref: Optional[ObjectFieldSelector] = Field(None, alias="fieldRef")
-    resource_field_ref: Optional[ResourceFieldSelector] = Field(None, alias="resourceFieldRef")
+    resource_field_ref: Optional[ResourceFieldSelector] = Field(
+        None, alias="resourceFieldRef"
+    )
     secret_key_ref: Optional[SecretKeySelector] = Field(None, alias="secretKeyRef")
 
     def get_k8s_object(self) -> V1EnvVarSource:
         # Return a V1EnvVarSource object
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_env_var_source.py
         _v1_env_var_source = V1EnvVarSource(
-            config_map_key_ref=self.config_map_key_ref.get_k8s_object() if self.config_map_key_ref else None,
+            config_map_key_ref=(
+                self.config_map_key_ref.get_k8s_object()
+                if self.config_map_key_ref
+                else None
+            ),
             field_ref=self.field_ref.get_k8s_object() if self.field_ref else None,
-            resource_field_ref=self.resource_field_ref.get_k8s_object() if self.resource_field_ref else None,
-            secret_key_ref=self.secret_key_ref.get_k8s_object() if self.secret_key_ref else None,
+            resource_field_ref=(
+                self.resource_field_ref.get_k8s_object()
+                if self.resource_field_ref
+                else None
+            ),
+            secret_key_ref=(
+                self.secret_key_ref.get_k8s_object() if self.secret_key_ref else None
+            ),
         )
         return _v1_env_var_source
 
@@ -281,7 +297,9 @@ class EnvFromSource(K8sObject):
         # Return a V1EnvFromSource object
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_env_from_source.py
         _v1_env_from_source = V1EnvFromSource(
-            config_map_ref=self.config_map_ref.get_k8s_object() if self.config_map_ref else None,
+            config_map_ref=(
+                self.config_map_ref.get_k8s_object() if self.config_map_ref else None
+            ),
             prefix=self.prefix,
             secret_ref=self.secret_ref.get_k8s_object() if self.secret_ref else None,
         )
@@ -429,10 +447,14 @@ class Container(K8sObject):
             env=_env,
             env_from=_env_from,
             image=self.image,
-            image_pull_policy=self.image_pull_policy.value if self.image_pull_policy else None,
+            image_pull_policy=(
+                self.image_pull_policy.value if self.image_pull_policy else None
+            ),
             name=self.name,
             ports=_ports,
-            readiness_probe=self.readiness_probe.get_k8s_object() if self.readiness_probe else None,
+            readiness_probe=(
+                self.readiness_probe.get_k8s_object() if self.readiness_probe else None
+            ),
             resources=self.resources.get_k8s_object() if self.resources else None,
             volume_mounts=_volume_mounts,
         )

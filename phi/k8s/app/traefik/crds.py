@@ -59,7 +59,9 @@ ingressroute_crd = CreateCustomResourceDefinition(
                                     "type": "object",
                                     "required": ["kind", "match"],
                                     "properties": {
-                                        "kind": V1JSONSchemaProps(type="string", enum=["Rule"]),
+                                        "kind": V1JSONSchemaProps(
+                                            type="string", enum=["Rule"]
+                                        ),
                                         "match": V1JSONSchemaProps(
                                             type="string",
                                         ),
@@ -1077,7 +1079,9 @@ middleware_crd = CreateCustomResourceDefinition(
                             ),
                             "plugin": V1JSONSchemaProps(
                                 type="object",
-                                additional_properties={"x-kubernetes-preserve-unknown-fields": True},
+                                additional_properties={
+                                    "x-kubernetes-preserve-unknown-fields": True
+                                },
                             ),
                             "rateLimit": V1JSONSchemaProps(
                                 description="RateLimit holds the rate limiting configuration for a given router.",

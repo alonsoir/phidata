@@ -266,7 +266,9 @@ class DockerImage(DockerResource):
                         live_log.stop()
 
                         # Render error table
-                        error_table = Table(show_edge=False, show_header=False, show_lines=False)
+                        error_table = Table(
+                            show_edge=False, show_header=False, show_lines=False
+                        )
                         for line in build_log_to_show_on_error:
                             error_table.add_row(line, style="dim")
                         error_table.add_row(stream, style="bold red")
@@ -305,10 +307,14 @@ class DockerImage(DockerResource):
                         if push_output.get("error", None) is not None:
                             logger.error(push_output["error"])
                             logger.error(f"Push failed for {self.get_image_str()}")
-                            logger.error("If you are using a private registry, make sure you are logged in")
+                            logger.error(
+                                "If you are using a private registry, make sure you are logged in"
+                            )
                             return None
 
-                        if self.print_push_output and push_output.get("status", None) in (
+                        if self.print_push_output and push_output.get(
+                            "status", None
+                        ) in (
                             "Pushing",
                             "Pushed",
                         ):
@@ -378,7 +384,9 @@ class DockerImage(DockerResource):
         logger.debug("Reading: {}".format(self.get_image_str()))
         try:
             _api_client: DockerClient = docker_client.api_client
-            image_object: Optional[List[Image]] = _api_client.images.get(name=self.get_image_str())
+            image_object: Optional[List[Image]] = _api_client.images.get(
+                name=self.get_image_str()
+            )
             if image_object is not None and isinstance(image_object, Image):
                 logger.debug("Image found: {}".format(image_object))
                 self.active_resource = image_object
@@ -430,12 +438,18 @@ class DockerImage(DockerResource):
         if not self.force:
             # If use_cache is True and image is active then return True
             if self.use_cache and self.is_active(docker_client=docker_client):
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} already exists")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} already exists"
+                )
                 return True
 
         resource_created = self._create(docker_client=docker_client)
         if resource_created:
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} created")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} created"
+            )
             return True
-        logger.error(f"Failed to create {self.get_resource_type()}: {self.get_resource_name()}")
+        logger.error(
+            f"Failed to create {self.get_resource_type()}: {self.get_resource_name()}"
+        )
         return False

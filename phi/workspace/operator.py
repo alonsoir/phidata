@@ -40,7 +40,11 @@ TEMPLATE_TO_REPO_MAP: Dict[WorkspaceStarterTemplate, str] = {
 }
 
 
-def create_workspace(name: Optional[str] = None, template: Optional[str] = None, url: Optional[str] = None) -> bool:
+def create_workspace(
+    name: Optional[str] = None,
+    template: Optional[str] = None,
+    url: Optional[str] = None,
+) -> bool:
     """Creates a new workspace.
 
     This function clones a template or url on the users machine at the path:
@@ -85,11 +89,20 @@ def create_workspace(name: Optional[str] = None, template: Optional[str] = None,
             # Display available starter templates and ask user to select one
             print_info("Select starter template or press Enter for default (ai-app)")
             for template_id, template_name in enumerate(templates, start=1):
-                print_info("  [b][{}][/b] {}".format(template_id, WorkspaceStarterTemplate(template_name).value))
+                print_info(
+                    "  [b][{}][/b] {}".format(
+                        template_id, WorkspaceStarterTemplate(template_name).value
+                    )
+                )
 
             # Get starter template from the user
             template_choices = [str(idx) for idx, _ in enumerate(templates, start=1)]
-            template_inp_raw = Prompt.ask("Template Number", choices=template_choices, default="1", show_choices=False)
+            template_inp_raw = Prompt.ask(
+                "Template Number",
+                choices=template_choices,
+                default="1",
+                show_choices=False,
+            )
             # Convert input to int
             template_inp = str_to_int(template_inp_raw)
 
@@ -99,7 +112,9 @@ def create_workspace(name: Optional[str] = None, template: Optional[str] = None,
         elif template.lower() in WorkspaceStarterTemplate.__members__.values():
             ws_template = WorkspaceStarterTemplate(template)
         else:
-            raise Exception(f"{template} is not a supported template, please choose from: {templates}")
+            raise Exception(
+                f"{template} is not a supported template, please choose from: {templates}"
+            )
 
         logger.debug(f"Selected Template: {ws_template.value}")
         repo_to_clone = TEMPLATE_TO_REPO_MAP.get(ws_template)
@@ -114,7 +129,9 @@ def create_workspace(name: Optional[str] = None, template: Optional[str] = None,
             default_ws_name = TEMPLATE_TO_NAME_MAP.get(ws_template, "ai-app")
         logger.debug(f"asking for ws name with default: {default_ws_name}")
         # Ask user for workspace name if not provided
-        ws_dir_name = Prompt.ask("Workspace Name", default=default_ws_name, console=console)
+        ws_dir_name = Prompt.ask(
+            "Workspace Name", default=default_ws_name, console=console
+        )
 
     if ws_dir_name is None:
         logger.error("Workspace name is required")
@@ -126,7 +143,9 @@ def create_workspace(name: Optional[str] = None, template: Optional[str] = None,
     # Check if we can create the workspace in the current dir
     ws_root_path: Path = current_dir.joinpath(ws_dir_name)
     if ws_root_path.exists():
-        logger.error(f"Directory {ws_root_path} exists, please delete directory or choose another name for workspace")
+        logger.error(
+            f"Directory {ws_root_path} exists, please delete directory or choose another name for workspace"
+        )
         return False
 
     print_info(f"Creating {str(ws_root_path)}")
@@ -159,7 +178,9 @@ def create_workspace(name: Optional[str] = None, template: Optional[str] = None,
         # workspace_dir_path is the path to the ws_root/workspace dir
         workspace_dir_path: Path = get_workspace_dir_path(ws_root_path)
         workspace_secrets_dir = workspace_dir_path.joinpath("secrets").resolve()
-        workspace_example_secrets_dir = workspace_dir_path.joinpath("example_secrets").resolve()
+        workspace_example_secrets_dir = workspace_dir_path.joinpath(
+            "example_secrets"
+        ).resolve()
 
         print_info(f"Creating {str(workspace_secrets_dir)}")
         copytree(
@@ -168,7 +189,9 @@ def create_workspace(name: Optional[str] = None, template: Optional[str] = None,
         )
     except Exception as e:
         logger.warning(f"Could not create workspace/secrets: {e}")
-        logger.warning("Please manually copy workspace/example_secrets to workspace/secrets")
+        logger.warning(
+            "Please manually copy workspace/example_secrets to workspace/secrets"
+        )
 
     print_info(f"Your new workspace is available at {str(ws_root_path)}\n")
     return setup_workspace(ws_root_path=ws_root_path)
@@ -203,7 +226,9 @@ def setup_workspace(ws_root_path: Path) -> bool:
     ######################################################
     # 1.1 Check ws_root_path is available
     ######################################################
-    _ws_is_valid: bool = ws_root_path is not None and ws_root_path.exists() and ws_root_path.is_dir()
+    _ws_is_valid: bool = (
+        ws_root_path is not None and ws_root_path.exists() and ws_root_path.is_dir()
+    )
     if not _ws_is_valid:
         logger.error("Invalid directory: {}".format(ws_root_path))
         return False
@@ -229,7 +254,9 @@ def setup_workspace(ws_root_path: Path) -> bool:
     # 1.3 Validate WorkspaceConfig is available
     ######################################################
     logger.debug(f"Checking for a workspace at {ws_root_path}")
-    ws_config: Optional[WorkspaceConfig] = phi_config.get_ws_config_by_path(ws_root_path)
+    ws_config: Optional[WorkspaceConfig] = phi_config.get_ws_config_by_path(
+        ws_root_path
+    )
     if ws_config is None:
         # This happens if
         # - The user is setting up a workspace not previously setup on this machine
@@ -314,7 +341,9 @@ def setup_workspace(ws_root_path: Path) -> bool:
                 ),
             )
             if ws_schema is not None:
-                ws_config = phi_config.update_ws_config(ws_root_path=ws_root_path, ws_schema=ws_schema)
+                ws_config = phi_config.update_ws_config(
+                    ws_root_path=ws_root_path, ws_schema=ws_schema
+                )
             else:
                 logger.debug("Failed to sync workspace with api. Please setup again")
 
@@ -338,7 +367,9 @@ def setup_workspace(ws_root_path: Path) -> bool:
 
             if updated_workspace_schema is not None:
                 # Update the ws_schema for this workspace.
-                ws_config = phi_config.update_ws_config(ws_root_path=ws_root_path, ws_schema=updated_workspace_schema)
+                ws_config = phi_config.update_ws_config(
+                    ws_root_path=ws_root_path, ws_schema=updated_workspace_schema
+                )
             else:
                 logger.debug("Failed to sync workspace with api. Please setup again")
 
@@ -363,7 +394,9 @@ def setup_workspace(ws_root_path: Path) -> bool:
             )
             if updated_workspace_schema is not None:
                 # Update the ws_schema for this workspace.
-                ws_config = phi_config.update_ws_config(ws_root_path=ws_root_path, ws_schema=updated_workspace_schema)
+                ws_config = phi_config.update_ws_config(
+                    ws_root_path=ws_root_path, ws_schema=updated_workspace_schema
+                )
             else:
                 logger.debug("Failed to sync workspace with api. Please setup again")
 
@@ -453,7 +486,9 @@ def start_workspace(
             num_rgs_created += 1
         num_resources_created += _num_resources_created
         num_resources_to_create += _num_resources_to_create
-        logger.debug(f"Deployed {num_resources_created} resources in {num_rgs_created} resource groups")
+        logger.debug(
+            f"Deployed {num_resources_created} resources in {num_rgs_created} resource groups"
+        )
 
     if dry_run:
         return
@@ -461,7 +496,9 @@ def start_workspace(
     if num_resources_created == 0:
         return
 
-    print_heading(f"\n--**-- ResourceGroups deployed: {num_rgs_created}/{num_rgs_to_create}\n")
+    print_heading(
+        f"\n--**-- ResourceGroups deployed: {num_rgs_created}/{num_rgs_to_create}\n"
+    )
 
     workspace_event_status = "in_progress"
     if num_resources_created == num_resources_to_create:
@@ -470,7 +507,11 @@ def start_workspace(
         logger.error("Some resources failed to create, please check logs")
         workspace_event_status = "failed"
 
-    if phi_config.user is not None and ws_config.ws_schema is not None and ws_config.ws_schema.id_workspace is not None:
+    if (
+        phi_config.user is not None
+        and ws_config.ws_schema is not None
+        and ws_config.ws_schema.id_workspace is not None
+    ):
         # Log workspace start event
         log_workspace_event(
             user=phi_config.user,
@@ -544,7 +585,9 @@ def stop_workspace(
             num_rgs_deleted += 1
         num_resources_deleted += _num_resources_deleted
         num_resources_to_delete += _num_resources_to_delete
-        logger.debug(f"Deleted {num_resources_deleted} resources in {num_rgs_deleted} resource groups")
+        logger.debug(
+            f"Deleted {num_resources_deleted} resources in {num_rgs_deleted} resource groups"
+        )
 
     if dry_run:
         return
@@ -552,7 +595,9 @@ def stop_workspace(
     if num_resources_deleted == 0:
         return
 
-    print_heading(f"\n--**-- ResourceGroups deleted: {num_rgs_deleted}/{num_rgs_to_delete}\n")
+    print_heading(
+        f"\n--**-- ResourceGroups deleted: {num_rgs_deleted}/{num_rgs_to_delete}\n"
+    )
 
     workspace_event_status = "in_progress"
     if num_resources_to_delete == num_resources_deleted:
@@ -561,7 +606,11 @@ def stop_workspace(
         logger.error("Some resources failed to delete, please check logs")
         workspace_event_status = "failed"
 
-    if phi_config.user is not None and ws_config.ws_schema is not None and ws_config.ws_schema.id_workspace is not None:
+    if (
+        phi_config.user is not None
+        and ws_config.ws_schema is not None
+        and ws_config.ws_schema.id_workspace is not None
+    ):
         # Log workspace stop event
         log_workspace_event(
             user=phi_config.user,
@@ -636,7 +685,9 @@ def update_workspace(
             num_rgs_updated += 1
         num_resources_updated += _num_resources_updated
         num_resources_to_update += _num_resources_to_update
-        logger.debug(f"Updated {num_resources_updated} resources in {num_rgs_updated} resource groups")
+        logger.debug(
+            f"Updated {num_resources_updated} resources in {num_rgs_updated} resource groups"
+        )
 
     if dry_run:
         return
@@ -644,7 +695,9 @@ def update_workspace(
     if num_resources_updated == 0:
         return
 
-    print_heading(f"\n--**-- ResourceGroups updated: {num_rgs_updated}/{num_rgs_to_update}\n")
+    print_heading(
+        f"\n--**-- ResourceGroups updated: {num_rgs_updated}/{num_rgs_to_update}\n"
+    )
 
     workspace_event_status = "in_progress"
     if num_resources_updated == num_resources_to_update:
@@ -653,7 +706,11 @@ def update_workspace(
         logger.error("Some resources failed to update, please check logs")
         workspace_event_status = "failed"
 
-    if phi_config.user is not None and ws_config.ws_schema is not None and ws_config.ws_schema.id_workspace is not None:
+    if (
+        phi_config.user is not None
+        and ws_config.ws_schema is not None
+        and ws_config.ws_schema.id_workspace is not None
+    ):
         # Log workspace start event
         log_workspace_event(
             user=phi_config.user,
@@ -675,7 +732,9 @@ def update_workspace(
         )
 
 
-def delete_workspace(phi_config: PhiCliConfig, ws_to_delete: Optional[List[Path]]) -> None:
+def delete_workspace(
+    phi_config: PhiCliConfig, ws_to_delete: Optional[List[Path]]
+) -> None:
     if ws_to_delete is None or len(ws_to_delete) == 0:
         print_heading("No workspaces to delete")
         return
@@ -718,13 +777,17 @@ def set_workspace_as_active(ws_dir_name: Optional[str]) -> None:
         ws_root_path = Path(".").resolve()
     else:
         # If the user provides a workspace name manually, we find the dir for that ws
-        ws_config: Optional[WorkspaceConfig] = phi_config.get_ws_config_by_dir_name(ws_dir_name)
+        ws_config: Optional[WorkspaceConfig] = phi_config.get_ws_config_by_dir_name(
+            ws_dir_name
+        )
         if ws_config is None:
             logger.error(f"Could not find workspace {ws_dir_name}")
             return
         ws_root_path = ws_config.ws_root_path
 
-    ws_dir_is_valid: bool = ws_root_path is not None and ws_root_path.exists() and ws_root_path.is_dir()
+    ws_dir_is_valid: bool = (
+        ws_root_path is not None and ws_root_path.exists() and ws_root_path.is_dir()
+    )
     if not ws_dir_is_valid:
         logger.error("Invalid workspace directory: {}".format(ws_root_path))
         return
@@ -733,11 +796,15 @@ def set_workspace_as_active(ws_dir_name: Optional[str]) -> None:
     # 1.3 Validate PhiWsData is available i.e. a workspace is available at this directory
     ######################################################
     logger.debug(f"Checking for a workspace at path: {ws_root_path}")
-    active_ws_config: Optional[WorkspaceConfig] = phi_config.get_ws_config_by_path(ws_root_path)
+    active_ws_config: Optional[WorkspaceConfig] = phi_config.get_ws_config_by_path(
+        ws_root_path
+    )
     if active_ws_config is None:
         # This happens when the workspace is not yet setup
         print_info(f"Could not find a workspace at path: {ws_root_path}")
-        print_info("If this workspace has not been setup, please run `phi ws setup` from the workspace directory")
+        print_info(
+            "If this workspace has not been setup, please run `phi ws setup` from the workspace directory"
+        )
         return
 
     print_heading(f"Setting workspace {active_ws_config.ws_root_path.stem} as active")
@@ -756,7 +823,9 @@ def set_workspace_as_active(ws_dir_name: Optional[str]) -> None:
     if phi_config.user is not None:
         ws_schema: Optional[WorkspaceSchema] = active_ws_config.ws_schema
         if ws_schema is None:
-            logger.warning(f"Please setup {active_ws_config.ws_root_path.stem} by running `phi ws setup`")
+            logger.warning(
+                f"Please setup {active_ws_config.ws_root_path.stem} by running `phi ws setup`"
+            )
         else:
             from phi.api.workspace import update_primary_workspace_for_user
 
@@ -770,7 +839,8 @@ def set_workspace_as_active(ws_dir_name: Optional[str]) -> None:
             if updated_workspace_schema is not None:
                 # Update the ws_schema for this workspace.
                 phi_config.update_ws_config(
-                    ws_root_path=active_ws_config.ws_root_path, ws_schema=updated_workspace_schema
+                    ws_root_path=active_ws_config.ws_root_path,
+                    ws_schema=updated_workspace_schema,
                 )
 
     ######################################################

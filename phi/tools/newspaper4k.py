@@ -7,7 +7,9 @@ from phi.utils.log import logger
 try:
     import newspaper
 except ImportError:
-    raise ImportError("`newspaper4k` not installed. Please run `pip install newspaper4k lxml_html_clean`.")
+    raise ImportError(
+        "`newspaper4k` not installed. Please run `pip install newspaper4k lxml_html_clean`."
+    )
 
 
 class Newspaper4k(Toolkit):
@@ -48,7 +50,11 @@ class Newspaper4k(Toolkit):
 
             try:
                 if article.publish_date:
-                    article_data["publish_date"] = article.publish_date.isoformat() if article.publish_date else None
+                    article_data["publish_date"] = (
+                        article.publish_date.isoformat()
+                        if article.publish_date
+                        else None
+                    )
             except Exception:
                 pass
 

@@ -35,7 +35,9 @@ class FastApi(AwsApp):
     uvicorn_log_level: Optional[str] = None
     web_concurrency: Optional[int] = None
 
-    def get_container_env(self, container_context: ContainerContext, build_context: AwsBuildContext) -> Dict[str, str]:
+    def get_container_env(
+        self, container_context: ContainerContext, build_context: AwsBuildContext
+    ) -> Dict[str, str]:
         container_env: Dict[str, str] = super().get_container_env(
             container_context=container_context, build_context=build_context
         )

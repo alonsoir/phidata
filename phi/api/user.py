@@ -28,7 +28,9 @@ def user_ping() -> bool:
     return False
 
 
-def authenticate_and_get_user(tmp_auth_token: str, existing_user: Optional[UserSchema] = None) -> Optional[UserSchema]:
+def authenticate_and_get_user(
+    tmp_auth_token: str, existing_user: Optional[UserSchema] = None
+) -> Optional[UserSchema]:
     if not phi_cli_settings.api_enabled:
         return None
 
@@ -47,7 +49,9 @@ def authenticate_and_get_user(tmp_auth_token: str, existing_user: Optional[UserS
             }
     with api.Client() as api_client:
         try:
-            r: Response = api_client.post(ApiRoutes.USER_CLI_AUTH, headers=auth_header, json=anon_user)
+            r: Response = api_client.post(
+                ApiRoutes.USER_CLI_AUTH, headers=auth_header, json=anon_user
+            )
             if invalid_response(r):
                 return None
 
@@ -78,7 +82,9 @@ def sign_in_user(sign_in_data: EmailPasswordAuthSchema) -> Optional[UserSchema]:
     logger.debug("--o-o-- Signing in user")
     with api.Client() as api_client:
         try:
-            r: Response = api_client.post(ApiRoutes.USER_SIGN_IN, json=sign_in_data.model_dump())
+            r: Response = api_client.post(
+                ApiRoutes.USER_SIGN_IN, json=sign_in_data.model_dump()
+            )
             if invalid_response(r):
                 return None
 
@@ -115,7 +121,8 @@ def user_is_authenticated() -> bool:
     with api.AuthenticatedClient() as api_client:
         try:
             r: Response = api_client.post(
-                ApiRoutes.USER_AUTHENTICATE, json=user.model_dump(include={"id_user", "email"})
+                ApiRoutes.USER_AUTHENTICATE,
+                json=user.model_dump(include={"id_user", "email"}),
             )
             if invalid_response(r):
                 return False
@@ -141,7 +148,8 @@ def create_anon_user() -> Optional[UserSchema]:
     with api.Client() as api_client:
         try:
             r: Response = api_client.post(
-                ApiRoutes.USER_CREATE, json={"user": {"email": "anon", "username": "anon", "is_bot": True}}
+                ApiRoutes.USER_CREATE,
+                json={"user": {"email": "anon", "username": "anon", "is_bot": True}},
             )
             if invalid_response(r):
                 return None

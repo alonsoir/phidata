@@ -102,7 +102,9 @@ class Secret(K8sResource):
         if active_resources is None:
             return None
 
-        active_resources_dict = {_secret.metadata.name: _secret for _secret in active_resources}
+        active_resources_dict = {
+            _secret.metadata.name: _secret for _secret in active_resources
+        }
 
         secret_name = self.get_resource_name()
         if secret_name in active_resources_dict:

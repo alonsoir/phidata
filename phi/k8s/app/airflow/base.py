@@ -106,7 +106,11 @@ class AirflowBase(K8sApp):
     load_examples: bool = False
 
     def get_db_user(self) -> Optional[str]:
-        return self.db_user or self.get_secret_from_file("DATABASE_USER") or self.get_secret_from_file("DB_USER")
+        return (
+            self.db_user
+            or self.get_secret_from_file("DATABASE_USER")
+            or self.get_secret_from_file("DB_USER")
+        )
 
     def get_db_password(self) -> Optional[str]:
         return (
@@ -116,13 +120,25 @@ class AirflowBase(K8sApp):
         )
 
     def get_db_database(self) -> Optional[str]:
-        return self.db_database or self.get_secret_from_file("DATABASE_DB") or self.get_secret_from_file("DB_DATABASE")
+        return (
+            self.db_database
+            or self.get_secret_from_file("DATABASE_DB")
+            or self.get_secret_from_file("DB_DATABASE")
+        )
 
     def get_db_driver(self) -> Optional[str]:
-        return self.db_driver or self.get_secret_from_file("DATABASE_DRIVER") or self.get_secret_from_file("DB_DRIVER")
+        return (
+            self.db_driver
+            or self.get_secret_from_file("DATABASE_DRIVER")
+            or self.get_secret_from_file("DB_DRIVER")
+        )
 
     def get_db_host(self) -> Optional[str]:
-        return self.db_host or self.get_secret_from_file("DATABASE_HOST") or self.get_secret_from_file("DB_HOST")
+        return (
+            self.db_host
+            or self.get_secret_from_file("DATABASE_HOST")
+            or self.get_secret_from_file("DB_HOST")
+        )
 
     def get_db_port(self) -> Optional[int]:
         return (
@@ -177,7 +193,8 @@ class AirflowBase(K8sApp):
                 "MOUNT_WORKSPACE": str(self.mount_workspace),
                 "PRINT_ENV_ON_LOAD": str(self.print_env_on_load),
                 PHI_RUNTIME_ENV_VAR: "kubernetes",
-                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file or "",
+                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file
+                or "",
                 SCRIPTS_DIR_ENV_VAR: container_context.scripts_dir or "",
                 STORAGE_DIR_ENV_VAR: container_context.storage_dir or "",
                 WORKFLOWS_DIR_ENV_VAR: container_context.workflows_dir or "",
@@ -201,18 +218,26 @@ class AirflowBase(K8sApp):
         try:
             if container_context.workspace_schema is not None:
                 if container_context.workspace_schema.id_workspace is not None:
-                    container_env[WORKSPACE_ID_ENV_VAR] = str(container_context.workspace_schema.id_workspace) or ""
+                    container_env[WORKSPACE_ID_ENV_VAR] = (
+                        str(container_context.workspace_schema.id_workspace) or ""
+                    )
                 if container_context.workspace_schema.ws_hash is not None:
-                    container_env[WORKSPACE_HASH_ENV_VAR] = container_context.workspace_schema.ws_hash
+                    container_env[WORKSPACE_HASH_ENV_VAR] = (
+                        container_context.workspace_schema.ws_hash
+                    )
         except Exception:
             pass
 
         if self.set_python_path:
             python_path = self.python_path
             if python_path is None:
-                python_path = f"{container_context.workspace_root}:{self.get_airflow_home()}"
+                python_path = (
+                    f"{container_context.workspace_root}:{self.get_airflow_home()}"
+                )
                 if self.add_python_paths is not None:
-                    python_path = "{}:{}".format(python_path, ":".join(self.add_python_paths))
+                    python_path = "{}:{}".format(
+                        python_path, ":".join(self.add_python_paths)
+                    )
             if python_path is not None:
                 container_env[PYTHONPATH_ENV_VAR] = python_path
 
@@ -220,7 +245,9 @@ class AirflowBase(K8sApp):
         self.set_aws_env_vars(env_dict=container_env)
 
         # Set the AIRFLOW__CORE__DAGS_FOLDER
-        container_env[AIRFLOW_DAGS_FOLDER_ENV_VAR] = f"{container_context.workspace_root}/{self.airflow_dags_dir}"
+        container_env[AIRFLOW_DAGS_FOLDER_ENV_VAR] = (
+            f"{container_context.workspace_root}/{self.airflow_dags_dir}"
+        )
 
         # Set the AIRFLOW_ENV
         if self.airflow_env is not None:
@@ -261,7 +288,9 @@ class AirflowBase(K8sApp):
                 db_port = self.db_app.get_db_port()
             if db_driver is None:
                 db_driver = self.db_app.get_db_driver()
-        db_connection_url = f"{db_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
+        db_connection_url = (
+            f"{db_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
+        )
 
         # Set the AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
         if "None" not in db_connection_url:
@@ -278,12 +307,12 @@ class AirflowBase(K8sApp):
         if self.executor == "CeleryExecutor":
             # Airflow celery result backend
             celery_result_backend_driver = self.db_result_backend_driver or db_driver
-            celery_result_backend_url = (
-                f"{celery_result_backend_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
-            )
+            celery_result_backend_url = f"{celery_result_backend_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
             # Set the AIRFLOW__CELERY__RESULT_BACKEND
             if "None" not in celery_result_backend_url:
-                container_env["AIRFLOW__CELERY__RESULT_BACKEND"] = celery_result_backend_url
+                container_env["AIRFLOW__CELERY__RESULT_BACKEND"] = (
+                    celery_result_backend_url
+                )
 
             # Airflow celery broker url
             _redis_pass = self.get_redis_password()
@@ -293,7 +322,9 @@ class AirflowBase(K8sApp):
             redis_port = self.get_redis_port()
             redis_driver = self.get_redis_driver()
             if self.redis_app is not None and isinstance(self.redis_app, DbApp):
-                logger.debug(f"Reading redis connection details from: {self.redis_app.name}")
+                logger.debug(
+                    f"Reading redis connection details from: {self.redis_app.name}"
+                )
                 if redis_password is None:
                     redis_password = self.redis_app.get_db_password()
                 if redis_schema is None:
@@ -320,12 +351,16 @@ class AirflowBase(K8sApp):
         # Update the container env using env_file
         env_data_from_file = self.get_env_file_data()
         if env_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in env_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in env_data_from_file.items() if v is not None}
+            )
 
         # Update the container env with user provided env_vars
         # this overwrites any existing variables with the same key
         if self.env_vars is not None and isinstance(self.env_vars, dict):
-            container_env.update({k: str(v) for k, v in self.env_vars.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in self.env_vars.items() if v is not None}
+            )
 
         # logger.debug("Container Environment: {}".format(container_env))
         return container_env

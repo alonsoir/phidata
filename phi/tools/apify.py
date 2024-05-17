@@ -7,7 +7,9 @@ from phi.utils.log import logger
 try:
     from apify_client import ApifyClient
 except ImportError:
-    raise ImportError("`apify_client` not installed. Please install using `pip install apify-client`")
+    raise ImportError(
+        "`apify_client` not installed. Please install using `pip install apify-client`"
+    )
 
 
 class ApifyTools(Toolkit):
@@ -28,7 +30,9 @@ class ApifyTools(Toolkit):
         if web_scraper:
             self.register(self.web_scrapper)
 
-    def website_content_crawler(self, urls: List[str], timeout: Optional[int] = 60) -> str:
+    def website_content_crawler(
+        self, urls: List[str], timeout: Optional[int] = 60
+    ) -> str:
         """
         Crawls a website using Apify's website-content-crawler actor.
 
@@ -51,7 +55,9 @@ class ApifyTools(Toolkit):
 
         run_input = {"startUrls": formatted_urls}
 
-        run = client.actor("apify/website-content-crawler").call(run_input=run_input, timeout_secs=timeout)
+        run = client.actor("apify/website-content-crawler").call(
+            run_input=run_input, timeout_secs=timeout
+        )
 
         results: str = ""
 
@@ -107,7 +113,9 @@ class ApifyTools(Toolkit):
             "startUrls": formatted_urls,
         }
 
-        run = client.actor("apify/web-scraper").call(run_input=run_input, timeout_secs=timeout)
+        run = client.actor("apify/web-scraper").call(
+            run_input=run_input, timeout_secs=timeout
+        )
 
         results: str = ""
 

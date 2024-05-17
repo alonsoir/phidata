@@ -40,7 +40,9 @@ class CreateDeployment(CreateK8sResource):
     pod_annotations: Optional[Dict[str, str]] = None
     topology_spread_key: Optional[str] = None
     topology_spread_max_skew: Optional[int] = None
-    topology_spread_when_unsatisfiable: Optional[Union[str, Literal["DoNotSchedule", "ScheduleAnyway"]]] = None
+    topology_spread_when_unsatisfiable: Optional[
+        Union[str, Literal["DoNotSchedule", "ScheduleAnyway"]]
+    ] = None
     # If True, recreate the resource on update
     # Used for deployments with EBS volumes
     recreate_on_update: bool = False
@@ -75,7 +77,9 @@ class CreateDeployment(CreateK8sResource):
             init_containers = []
             for ic in self.init_containers:
                 _init_container = ic.create()
-                if _init_container is not None and isinstance(_init_container, Container):
+                if _init_container is not None and isinstance(
+                    _init_container, Container
+                ):
                     init_containers.append(_init_container)
 
         topology_spread_constraints: Optional[List[TopologySpreadConstraint]] = None

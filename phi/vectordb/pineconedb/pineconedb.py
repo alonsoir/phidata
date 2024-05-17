@@ -239,7 +239,9 @@ class PineconeDB(VectorDb):
             NotImplementedError: This method is not supported by Pinecone.
 
         """
-        raise NotImplementedError("Pinecone does not support insert operations. Use upsert instead.")
+        raise NotImplementedError(
+            "Pinecone does not support insert operations. Use upsert instead."
+        )
 
     def search(
         self,
@@ -279,7 +281,11 @@ class PineconeDB(VectorDb):
         )
         return [
             Document(
-                content=(result.metadata.get("text", "") if result.metadata is not None else ""),
+                content=(
+                    result.metadata.get("text", "")
+                    if result.metadata is not None
+                    else ""
+                ),
                 id=result.id,
                 embedding=result.values,
                 meta_data=result.metadata,

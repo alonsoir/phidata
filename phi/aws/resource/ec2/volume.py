@@ -66,7 +66,9 @@ class EbsVolume(AwsResource):
     # Magnetic: standard
     #
     # Default: gp2
-    volume_type: Optional[Literal["standard", "io_1", "io_2", "gp_2", "sc_1", "st_1", "gp_3"]] = None
+    volume_type: Optional[
+        Literal["standard", "io_1", "io_2", "gp_2", "sc_1", "st_1", "gp_3"]
+    ] = None
     # Checks whether you have the required permissions for the action, without actually making the request,
     # and provides an error response. If you have the required permissions, the error response is DryRunOperation.
     # Otherwise, it is UnauthorizedOperation .
@@ -165,7 +167,9 @@ class EbsVolume(AwsResource):
             try:
                 if self.volume_id is not None:
                     print_info(f"Waiting for {self.get_resource_type()} to be created.")
-                    waiter = self.get_service_client(aws_client).get_waiter("volume_available")
+                    waiter = self.get_service_client(aws_client).get_waiter(
+                        "volume_available"
+                    )
                     waiter.wait(
                         VolumeIds=[self.volume_id],
                         WaiterConfig={
@@ -247,7 +251,9 @@ class EbsVolume(AwsResource):
             for attachment in volume.get("Attachments", []):
                 device = attachment.get("Device", None)
                 instance_id = attachment.get("InstanceId", None)
-                print_info(f"Detaching volume from device: {device}, instance_id: {instance_id}")
+                print_info(
+                    f"Detaching volume from device: {device}, instance_id: {instance_id}"
+                )
                 service_client.detach_volume(
                     Device=device,
                     InstanceId=instance_id,

@@ -3,7 +3,9 @@ from phi.tools import Toolkit
 try:
     from newspaper import Article
 except ImportError:
-    raise ImportError("`newspaper3k` not installed. Please run `pip install newspaper3k lxml_html_clean`.")
+    raise ImportError(
+        "`newspaper3k` not installed. Please run `pip install newspaper3k lxml_html_clean`."
+    )
 
 
 class NewspaperToolkit(Toolkit):

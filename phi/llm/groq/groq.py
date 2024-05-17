@@ -11,7 +11,11 @@ from phi.utils.tools import get_function_call_for_tool_call
 try:
     from groq import Groq as GroqClient
     from groq.types.chat.chat_completion import ChatCompletion, ChoiceMessage
-    from groq.lib.chat_completion_chunk import ChatCompletionChunk, ChoiceDelta, ChoiceDeltaToolCall
+    from groq.lib.chat_completion_chunk import (
+        ChatCompletionChunk,
+        ChoiceDelta,
+        ChoiceDeltaToolCall,
+    )
 except ImportError:
     logger.error("`groq` not installed")
     raise
@@ -185,8 +189,13 @@ class Groq(LLM):
             role=response_message.role or "assistant",
             content=response_message.content,
         )
-        if response_message.tool_calls is not None and len(response_message.tool_calls) > 0:
-            assistant_message.tool_calls = [t.model_dump() for t in response_message.tool_calls]
+        if (
+            response_message.tool_calls is not None
+            and len(response_message.tool_calls) > 0
+        ):
+            assistant_message.tool_calls = [
+                t.model_dump() for t in response_message.tool_calls
+            ]
 
         # -*- Update usage metrics
         # Add response time to metrics
@@ -203,25 +212,42 @@ class Groq(LLM):
         assistant_message.log()
 
         # -*- Parse and run tool calls
-        if assistant_message.tool_calls is not None and len(assistant_message.tool_calls) > 0:
+        if (
+            assistant_message.tool_calls is not None
+            and len(assistant_message.tool_calls) > 0
+        ):
             final_response = ""
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
                 _tool_call_id = tool_call.get("id")
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
                     messages.append(
-                        Message(role="tool", tool_call_id=_tool_call_id, content="Could not find function to call.")
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content="Could not find function to call.",
+                        )
                     )
                     continue
                 if _function_call.error is not None:
-                    messages.append(Message(role="tool", tool_call_id=_tool_call_id, content=_function_call.error))
+                    messages.append(
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content=_function_call.error,
+                        )
+                    )
                     continue
                 function_calls_to_run.append(_function_call)
 
             if self.show_tool_calls:
                 if len(function_calls_to_run) == 1:
-                    final_response += f"\n - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    final_response += (
+                        f"\n - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    )
                 elif len(function_calls_to_run) > 1:
                     final_response += "\nRunning:"
                     for _f in function_calls_to_run:
@@ -259,7 +285,9 @@ class Groq(LLM):
             if assistant_message_role is None and response_delta.role is not None:
                 assistant_message_role = response_delta.role
             response_content: Optional[str] = response_delta.content
-            response_tool_calls: Optional[List[ChoiceDeltaToolCall]] = response_delta.tool_calls
+            response_tool_calls: Optional[List[ChoiceDeltaToolCall]] = (
+                response_delta.tool_calls
+            )
 
             # -*- Return content if present, otherwise get tool call
             if response_content is not None:
@@ -282,7 +310,9 @@ class Groq(LLM):
             assistant_message.content = assistant_message_content
         # -*- Add tool calls to assistant message
         if assistant_message_tool_calls is not None:
-            assistant_message.tool_calls = [t.model_dump() for t in assistant_message_tool_calls]
+            assistant_message.tool_calls = [
+                t.model_dump() for t in assistant_message_tool_calls
+            ]
 
         # -*- Update usage metrics
         # Add response time to metrics
@@ -296,18 +326,33 @@ class Groq(LLM):
         assistant_message.log()
 
         # -*- Parse and run tool calls
-        if assistant_message.tool_calls is not None and len(assistant_message.tool_calls) > 0:
+        if (
+            assistant_message.tool_calls is not None
+            and len(assistant_message.tool_calls) > 0
+        ):
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
                 _tool_call_id = tool_call.get("id")
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
                     messages.append(
-                        Message(role="tool", tool_call_id=_tool_call_id, content="Could not find function to call.")
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content="Could not find function to call.",
+                        )
                     )
                     continue
                 if _function_call.error is not None:
-                    messages.append(Message(role="tool", tool_call_id=_tool_call_id, content=_function_call.error))
+                    messages.append(
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content=_function_call.error,
+                        )
+                    )
                     continue
                 function_calls_to_run.append(_function_call)
 

@@ -52,4 +52,7 @@ assistant = Assistant(
 )
 
 # Use the assistant to generate and print a response to a query, formatted in Markdown
-assistant.print_response("What is the first step of making Gluai Buat Chi from the knowledge base?", markdown=True)
+assistant.print_response(
+    "What is the first step of making Gluai Buat Chi from the knowledge base?",
+    markdown=True,
+)

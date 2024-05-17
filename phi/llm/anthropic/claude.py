@@ -176,9 +176,13 @@ class Claude(LLM):
             final_response = remove_function_calls_from_string(assistant_message.content)  # type: ignore
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
-                    messages.append(Message(role="user", content="Could not find function to call."))
+                    messages.append(
+                        Message(role="user", content="Could not find function to call.")
+                    )
                     continue
                 if _function_call.error is not None:
                     messages.append(Message(role="user", content=_function_call.error))
@@ -187,14 +191,18 @@ class Claude(LLM):
 
             if self.show_tool_calls:
                 if len(function_calls_to_run) == 1:
-                    final_response += f" - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    final_response += (
+                        f" - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    )
                 elif len(function_calls_to_run) > 1:
                     final_response += "Running:"
                     for _f in function_calls_to_run:
                         final_response += f"\n - {_f.get_call_str()}"
                     final_response += "\n\n"
 
-            function_call_results = self.run_function_calls(function_calls_to_run, role="user")
+            function_call_results = self.run_function_calls(
+                function_calls_to_run, role="user"
+            )
             if len(function_call_results) > 0:
                 fc_responses = "<function_results>"
 
@@ -238,7 +246,9 @@ class Claude(LLM):
                     assistant_message_content += stream_delta
 
                 # Detect if response is a tool call
-                if not response_is_tool_call and ("<function" in stream_delta or "<invoke" in stream_delta):
+                if not response_is_tool_call and (
+                    "<function" in stream_delta or "<invoke" in stream_delta
+                ):
                     response_is_tool_call = True
                     # logger.debug(f"Response is tool call: {response_is_tool_call}")
 
@@ -282,7 +292,10 @@ class Claude(LLM):
 
         # Check if the response contains tool calls
         try:
-            if "<invoke>" in assistant_message_content and "</invoke>" in assistant_message_content:
+            if (
+                "<invoke>" in assistant_message_content
+                and "</invoke>" in assistant_message_content
+            ):
                 # List of tool calls added to the assistant message
                 tool_calls: List[Dict[str, Any]] = []
                 # Break the response into tool calls
@@ -292,7 +305,10 @@ class Claude(LLM):
                     if tool_call_response != tool_call_responses[-1]:
                         tool_call_response += "</invoke>"
 
-                    if "<invoke>" in tool_call_response and "</invoke>" in tool_call_response:
+                    if (
+                        "<invoke>" in tool_call_response
+                        and "</invoke>" in tool_call_response
+                    ):
                         # Extract tool call string from response
                         tool_call_dict = extract_tool_from_xml(tool_call_response)
                         tool_call_name = tool_call_dict.get("tool_name")
@@ -312,7 +328,9 @@ class Claude(LLM):
                 if len(tool_calls) > 0:
                     assistant_message.tool_calls = tool_calls
         except Exception:
-            logger.warning(f"Could not parse tool calls from response: {assistant_message_content}")
+            logger.warning(
+                f"Could not parse tool calls from response: {assistant_message_content}"
+            )
             pass
 
         # -*- Update usage metrics
@@ -330,9 +348,13 @@ class Claude(LLM):
         if assistant_message.tool_calls is not None and self.run_tools:
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
-                    messages.append(Message(role="user", content="Could not find function to call."))
+                    messages.append(
+                        Message(role="user", content="Could not find function to call.")
+                    )
                     continue
                 if _function_call.error is not None:
                     messages.append(Message(role="user", content=_function_call.error))
@@ -348,7 +370,9 @@ class Claude(LLM):
                         yield f"\n - {_f.get_call_str()}"
                     yield "\n\n"
 
-            function_call_results = self.run_function_calls(function_calls_to_run, role="user")
+            function_call_results = self.run_function_calls(
+                function_calls_to_run, role="user"
+            )
             # Add results of the function calls to the messages
             if len(function_call_results) > 0:
                 fc_responses = "<function_results>"
@@ -390,7 +414,9 @@ class Claude(LLM):
                 _function_def = _function.get_definition_for_prompt_dict()
                 if _function_def:
                     tool_call_prompt += "\n<tool_description>"
-                    tool_call_prompt += f"\n<tool_name>{_function_def.get('name')}</tool_name>"
+                    tool_call_prompt += (
+                        f"\n<tool_name>{_function_def.get('name')}</tool_name>"
+                    )
                     tool_call_prompt += f"\n<description>{_function_def.get('description')}</description>"
                     arguments = _function_def.get("arguments")
                     if arguments:
@@ -399,7 +425,9 @@ class Claude(LLM):
                             tool_call_prompt += "\n<parameter>"
                             tool_call_prompt += f"\n<name>{arg}</name>"
                             if isinstance(arguments.get(arg).get("type"), str):
-                                tool_call_prompt += f"\n<type>{arguments.get(arg).get('type')}</type>"
+                                tool_call_prompt += (
+                                    f"\n<type>{arguments.get(arg).get('type')}</type>"
+                                )
                             else:
                                 tool_call_prompt += f"\n<type>{arguments.get(arg).get('type')[0]}</type>"
                             tool_call_prompt += "\n</parameter>"

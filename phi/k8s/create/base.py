@@ -43,5 +43,7 @@ class CreateK8sResource(PhiBase):
         updated_resource = _resource.model_copy(update=diff_fields)
         # logger.debug(f"Created resource: {updated_resource.__class__.__name__}: {updated_resource.model_dump()}")
 
-        logger.debug(f"Created: {updated_resource.__class__.__name__} | {updated_resource.get_resource_name()}")
+        logger.debug(
+            f"Created: {updated_resource.__class__.__name__} | {updated_resource.get_resource_name()}"
+        )
         return updated_resource

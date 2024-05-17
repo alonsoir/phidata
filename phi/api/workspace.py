@@ -25,7 +25,8 @@ def get_primary_workspace(user: UserSchema) -> Optional[WorkspaceSchema]:
     with api.AuthenticatedClient() as api_client:
         try:
             r: Response = api_client.post(
-                ApiRoutes.WORKSPACE_READ_PRIMARY, json=user.model_dump(include={"id_user", "email"})
+                ApiRoutes.WORKSPACE_READ_PRIMARY,
+                json=user.model_dump(include={"id_user", "email"}),
             )
             if invalid_response(r):
                 return None
@@ -34,7 +35,9 @@ def get_primary_workspace(user: UserSchema) -> Optional[WorkspaceSchema]:
             if response_json is None:
                 return None
 
-            primary_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(response_json)
+            primary_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(
+                response_json
+            )
             if primary_workspace is not None:
                 return primary_workspace
         except Exception as e:
@@ -50,7 +53,8 @@ def get_available_workspaces(user: UserSchema) -> Optional[List[WorkspaceSchema]
     with api.AuthenticatedClient() as api_client:
         try:
             r: Response = api_client.post(
-                ApiRoutes.WORKSPACE_READ_AVAILABLE, json=user.model_dump(include={"id_user", "email"})
+                ApiRoutes.WORKSPACE_READ_AVAILABLE,
+                json=user.model_dump(include={"id_user", "email"}),
             )
             if invalid_response(r):
                 return None
@@ -71,7 +75,9 @@ def get_available_workspaces(user: UserSchema) -> Optional[List[WorkspaceSchema]
     return None
 
 
-def create_workspace_for_user(user: UserSchema, workspace: WorkspaceCreate) -> Optional[WorkspaceSchema]:
+def create_workspace_for_user(
+    user: UserSchema, workspace: WorkspaceCreate
+) -> Optional[WorkspaceSchema]:
     if not phi_cli_settings.api_enabled:
         return None
 
@@ -92,7 +98,9 @@ def create_workspace_for_user(user: UserSchema, workspace: WorkspaceCreate) -> O
             if response_json is None:
                 return None
 
-            created_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(response_json)
+            created_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(
+                response_json
+            )
             if created_workspace is not None:
                 return created_workspace
         except Exception as e:
@@ -100,7 +108,9 @@ def create_workspace_for_user(user: UserSchema, workspace: WorkspaceCreate) -> O
     return None
 
 
-def update_workspace_for_user(user: UserSchema, workspace: WorkspaceUpdate) -> Optional[WorkspaceSchema]:
+def update_workspace_for_user(
+    user: UserSchema, workspace: WorkspaceUpdate
+) -> Optional[WorkspaceSchema]:
     if not phi_cli_settings.api_enabled:
         return None
 
@@ -121,7 +131,9 @@ def update_workspace_for_user(user: UserSchema, workspace: WorkspaceUpdate) -> O
             if response_json is None:
                 return None
 
-            updated_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(response_json)
+            updated_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(
+                response_json
+            )
             if updated_workspace is not None:
                 return updated_workspace
         except Exception as e:
@@ -129,7 +141,9 @@ def update_workspace_for_user(user: UserSchema, workspace: WorkspaceUpdate) -> O
     return None
 
 
-def update_primary_workspace_for_user(user: UserSchema, workspace: UpdatePrimaryWorkspace) -> Optional[WorkspaceSchema]:
+def update_primary_workspace_for_user(
+    user: UserSchema, workspace: UpdatePrimaryWorkspace
+) -> Optional[WorkspaceSchema]:
     if not phi_cli_settings.api_enabled:
         return None
 
@@ -150,7 +164,9 @@ def update_primary_workspace_for_user(user: UserSchema, workspace: UpdatePrimary
             if response_json is None:
                 return None
 
-            updated_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(response_json)
+            updated_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(
+                response_json
+            )
             if updated_workspace is not None:
                 return updated_workspace
         except Exception as e:
@@ -158,7 +174,9 @@ def update_primary_workspace_for_user(user: UserSchema, workspace: UpdatePrimary
     return None
 
 
-def delete_workspace_for_user(user: UserSchema, workspace: WorkspaceDelete) -> Optional[WorkspaceSchema]:
+def delete_workspace_for_user(
+    user: UserSchema, workspace: WorkspaceDelete
+) -> Optional[WorkspaceSchema]:
     if not phi_cli_settings.api_enabled:
         return None
 
@@ -179,7 +197,9 @@ def delete_workspace_for_user(user: UserSchema, workspace: WorkspaceDelete) -> O
             if response_json is None:
                 return None
 
-            updated_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(response_json)
+            updated_workspace: WorkspaceSchema = WorkspaceSchema.model_validate(
+                response_json
+            )
             if updated_workspace is not None:
                 return updated_workspace
         except Exception as e:
@@ -208,7 +228,10 @@ def log_workspace_event(user: UserSchema, workspace_event: WorkspaceEvent) -> bo
             if response_json is None:
                 return False
 
-            if isinstance(response_json, dict) and response_json.get("status") == "success":
+            if (
+                isinstance(response_json, dict)
+                and response_json.get("status") == "success"
+            ):
                 return True
             return False
         except Exception as e:

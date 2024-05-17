@@ -28,5 +28,8 @@ DockerResourceTypeList: List[Type[DockerResource]] = [
 # lower weight DockerResource(s) get installed first
 # i.e. Networks are installed first, Images, then Volumes ... and so on
 DockerResourceInstallOrder: Dict[str, int] = OrderedDict(
-    {resource_type.__name__: idx for idx, resource_type in enumerate(DockerResourceTypeList, start=1)}
+    {
+        resource_type.__name__: idx
+        for idx, resource_type in enumerate(DockerResourceTypeList, start=1)
+    }
 )

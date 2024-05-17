@@ -82,14 +82,20 @@ class TraefikRouter(K8sApp):
     create_service: bool = True
 
     def get_dashboard_auth_users(self) -> Optional[str]:
-        return self.dashboard_auth_users or self.get_secret_from_file("DASHBOARD_AUTH_USERS")
+        return self.dashboard_auth_users or self.get_secret_from_file(
+            "DASHBOARD_AUTH_USERS"
+        )
 
     def get_ingress_rules(self) -> List[Any]:
         from kubernetes.client.models.v1_ingress_rule import V1IngressRule
         from kubernetes.client.models.v1_ingress_backend import V1IngressBackend
-        from kubernetes.client.models.v1_ingress_service_backend import V1IngressServiceBackend
+        from kubernetes.client.models.v1_ingress_service_backend import (
+            V1IngressServiceBackend,
+        )
         from kubernetes.client.models.v1_http_ingress_path import V1HTTPIngressPath
-        from kubernetes.client.models.v1_http_ingress_rule_value import V1HTTPIngressRuleValue
+        from kubernetes.client.models.v1_http_ingress_rule_value import (
+            V1HTTPIngressRuleValue,
+        )
         from kubernetes.client.models.v1_service_port import V1ServicePort
 
         ingress_rules = [
@@ -103,8 +109,16 @@ class TraefikRouter(K8sApp):
                                 service=V1IngressServiceBackend(
                                     name=self.get_service_name(),
                                     port=V1ServicePort(
-                                        name=self.https_key if self.https_enabled else self.http_key,
-                                        port=self.https_service_port if self.https_enabled else self.http_service_port,
+                                        name=(
+                                            self.https_key
+                                            if self.https_enabled
+                                            else self.http_key
+                                        ),
+                                        port=(
+                                            self.https_service_port
+                                            if self.https_enabled
+                                            else self.http_service_port
+                                        ),
                                     ),
                                 )
                             ),
@@ -181,18 +195,30 @@ class TraefikRouter(K8sApp):
             container_args.append("--accesslog")
 
         if self.http_enabled:
-            container_args.append(f"--entrypoints.{self.http_key}.Address=:{self.http_service_port}")
+            container_args.append(
+                f"--entrypoints.{self.http_key}.Address=:{self.http_service_port}"
+            )
             if self.enable_http_proxy_protocol:
-                container_args.append(f"--entrypoints.{self.http_key}.proxyProtocol.insecure=true")
+                container_args.append(
+                    f"--entrypoints.{self.http_key}.proxyProtocol.insecure=true"
+                )
             if self.enable_http_forward_headers:
-                container_args.append(f"--entrypoints.{self.http_key}.forwardedHeaders.insecure=true")
+                container_args.append(
+                    f"--entrypoints.{self.http_key}.forwardedHeaders.insecure=true"
+                )
 
         if self.https_enabled:
-            container_args.append(f"--entrypoints.{self.https_key}.Address=:{self.https_service_port}")
+            container_args.append(
+                f"--entrypoints.{self.https_key}.Address=:{self.https_service_port}"
+            )
             if self.enable_https_proxy_protocol:
-                container_args.append(f"--entrypoints.{self.https_key}.proxyProtocol.insecure=true")
+                container_args.append(
+                    f"--entrypoints.{self.https_key}.proxyProtocol.insecure=true"
+                )
             if self.enable_https_forward_headers:
-                container_args.append(f"--entrypoints.{self.https_key}.forwardedHeaders.insecure=true")
+                container_args.append(
+                    f"--entrypoints.{self.https_key}.forwardedHeaders.insecure=true"
+                )
             if self.forward_http_to_https:
                 container_args.extend(
                     [
@@ -261,8 +287,12 @@ class TraefikRouter(K8sApp):
 
         return ports
 
-    def add_app_resources(self, namespace: str, service_account_name: Optional[str]) -> List[Any]:
-        from phi.k8s.create.apiextensions_k8s_io.v1.custom_object import CreateCustomObject
+    def add_app_resources(
+        self, namespace: str, service_account_name: Optional[str]
+    ) -> List[Any]:
+        from phi.k8s.create.apiextensions_k8s_io.v1.custom_object import (
+            CreateCustomObject,
+        )
 
         app_resources = self.add_resources or []
 
@@ -343,14 +373,16 @@ class TraefikRouter(K8sApp):
                         {
                             "kind": "Rule",
                             "match": f"Host(`traefik.{self.domain_name}`)",
-                            "middlewares": [
-                                {
-                                    "name": dashboard_auth_middleware.name,
-                                    "namespace": namespace,
-                                },
-                            ]
-                            if dashboard_auth_middleware is not None
-                            else [],
+                            "middlewares": (
+                                [
+                                    {
+                                        "name": dashboard_auth_middleware.name,
+                                        "namespace": namespace,
+                                    },
+                                ]
+                                if dashboard_auth_middleware is not None
+                                else []
+                            ),
                             "services": [
                                 {
                                     "kind": "TraefikService",

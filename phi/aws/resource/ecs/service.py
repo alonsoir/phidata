@@ -129,7 +129,9 @@ class EcsService(AwsResource):
             not_null_args["cluster"] = cluster_name
 
         network_configuration = self.network_configuration
-        if network_configuration is None and (self.subnets is not None or self.security_groups is not None):
+        if network_configuration is None and (
+            self.subnets is not None or self.security_groups is not None
+        ):
             aws_vpc_config: Dict[str, Any] = {}
             if self.subnets is not None:
                 subnet_ids = []
@@ -154,7 +156,9 @@ class EcsService(AwsResource):
             not_null_args["networkConfiguration"] = network_configuration
 
         if self.service_connect_configuration is not None:
-            not_null_args["serviceConnectConfiguration"] = self.service_connect_configuration
+            not_null_args["serviceConnectConfiguration"] = (
+                self.service_connect_configuration
+            )
 
         if self.service_registries is not None:
             not_null_args["serviceRegistries"] = self.service_registries
@@ -177,7 +181,9 @@ class EcsService(AwsResource):
         if self.placement_strategy is not None:
             not_null_args["placementStrategy"] = self.placement_strategy
         if self.health_check_grace_period_seconds is not None:
-            not_null_args["healthCheckGracePeriodSeconds"] = self.health_check_grace_period_seconds
+            not_null_args["healthCheckGracePeriodSeconds"] = (
+                self.health_check_grace_period_seconds
+            )
         if self.scheduling_strategy is not None:
             not_null_args["schedulingStrategy"] = self.scheduling_strategy
         if self.deployment_controller is not None:
@@ -228,8 +234,12 @@ class EcsService(AwsResource):
             try:
                 cluster_name = self.get_ecs_cluster_name()
                 if cluster_name is not None:
-                    print_info(f"Waiting for {self.get_resource_type()} to be available.")
-                    waiter = self.get_service_client(aws_client).get_waiter("services_stable")
+                    print_info(
+                        f"Waiting for {self.get_resource_type()} to be available."
+                    )
+                    waiter = self.get_service_client(aws_client).get_waiter(
+                        "services_stable"
+                    )
                     waiter.wait(
                         cluster=cluster_name,
                         services=[self.get_ecs_service_name()],
@@ -261,7 +271,9 @@ class EcsService(AwsResource):
         service_client = self.get_service_client(aws_client)
         try:
             service_name: str = self.get_ecs_service_name()
-            describe_response = service_client.describe_services(services=[service_name], **not_null_args)
+            describe_response = service_client.describe_services(
+                services=[service_name], **not_null_args
+            )
             logger.debug(f"EcsService: {describe_response}")
             resource_list = describe_response.get("services", None)
 
@@ -315,7 +327,9 @@ class EcsService(AwsResource):
                 cluster_name = self.get_ecs_cluster_name()
                 if cluster_name is not None:
                     print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                    waiter = self.get_service_client(aws_client).get_waiter("services_inactive")
+                    waiter = self.get_service_client(aws_client).get_waiter(
+                        "services_inactive"
+                    )
                     waiter.wait(
                         cluster=cluster_name,
                         services=[self.get_ecs_service_name()],
@@ -348,7 +362,9 @@ class EcsService(AwsResource):
             not_null_args["cluster"] = cluster_name
 
         network_configuration = self.network_configuration
-        if network_configuration is None and (self.subnets is not None or self.security_groups is not None):
+        if network_configuration is None and (
+            self.subnets is not None or self.security_groups is not None
+        ):
             aws_vpc_config: Dict[str, Any] = {}
             if self.subnets is not None:
                 subnet_ids = []
@@ -387,7 +403,9 @@ class EcsService(AwsResource):
         if self.force_new_deployment is not None:
             not_null_args["forceNewDeployment"] = self.force_new_deployment
         if self.health_check_grace_period_seconds is not None:
-            not_null_args["healthCheckGracePeriodSeconds"] = self.health_check_grace_period_seconds
+            not_null_args["healthCheckGracePeriodSeconds"] = (
+                self.health_check_grace_period_seconds
+            )
         if self.enable_execute_command is not None:
             not_null_args["enableExecuteCommand"] = self.enable_execute_command
         if self.enable_ecsmanaged_tags is not None:
@@ -411,7 +429,9 @@ class EcsService(AwsResource):
 
             self.active_resource = update_response.get("service", None)
             if self.active_resource is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} updated")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} updated"
+                )
                 return True
         except Exception as e:
             logger.error(f"{self.get_resource_type()} could not be updated.")

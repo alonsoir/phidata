@@ -39,4 +39,6 @@ class TraefikRouter(DockerApp):
     insecure_api_access: bool = False
 
     def get_dashboard_auth_users(self) -> Optional[str]:
-        return self.dashboard_auth_users or self.get_secret_from_file("DASHBOARD_AUTH_USERS")
+        return self.dashboard_auth_users or self.get_secret_from_file(
+            "DASHBOARD_AUTH_USERS"
+        )

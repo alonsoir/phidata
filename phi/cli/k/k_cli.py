@@ -37,11 +37,15 @@ def save(
         None,
         help="Resource filter. Format - ENV:GROUP:NAME:TYPE",
     ),
-    env_filter: Optional[str] = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to deploy."),
+    env_filter: Optional[str] = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to deploy."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter resource using name."),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter resource using name."
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -96,7 +100,8 @@ def save(
                 + f"is not the Active Workspace ({active_ws_dir_name})"
             )
             update_active_workspace = typer.confirm(
-                f"Update active workspace to {ws_at_current_path_dir_name}", default=True
+                f"Update active workspace to {ws_at_current_path_dir_name}",
+                default=True,
             )
             if update_active_workspace:
                 phi_config.set_active_ws_dir(ws_at_current_path.ws_root_path)
@@ -110,7 +115,9 @@ def save(
     # derive env:infra:name:type:group from ws_filter
     if resource_filter is not None:
         if not isinstance(resource_filter, str):
-            raise TypeError(f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}")
+            raise TypeError(
+                f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}"
+            )
         (
             target_env,
             target_group,
@@ -121,7 +128,11 @@ def save(
     # derive env:infra:name:type:group from command options
     if target_env is None and env_filter is not None and isinstance(env_filter, str):
         target_env = env_filter
-    if target_group is None and group_filter is not None and isinstance(group_filter, str):
+    if (
+        target_group is None
+        and group_filter is not None
+        and isinstance(group_filter, str)
+    ):
         target_group = group_filter
     if target_name is None and name_filter is not None and isinstance(name_filter, str):
         target_name = name_filter

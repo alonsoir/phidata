@@ -132,7 +132,10 @@ class EcsTaskDefinition(AwsResource):
         if self.network_mode is not None:
             not_null_args["networkMode"] = self.network_mode
         if self.containers is not None:
-            container_definitions = [c.get_container_definition(aws_client=aws_client) for c in self.containers]
+            container_definitions = [
+                c.get_container_definition(aws_client=aws_client)
+                for c in self.containers
+            ]
             not_null_args["containerDefinitions"] = container_definitions
         if self.volumes is not None:
             volume_definitions = [v.get_volume_definition() for v in self.volumes]
@@ -186,7 +189,9 @@ class EcsTaskDefinition(AwsResource):
         logger.debug(f"Reading {self.get_resource_type()}: {self.get_resource_name()}")
         service_client = self.get_service_client(aws_client)
         try:
-            describe_response = service_client.describe_task_definition(taskDefinition=self.get_task_family())
+            describe_response = service_client.describe_task_definition(
+                taskDefinition=self.get_task_family()
+            )
             logger.debug(f"EcsTaskDefinition: {describe_response}")
             resource = describe_response.get("taskDefinition", None)
             if resource is not None:
@@ -212,7 +217,9 @@ class EcsTaskDefinition(AwsResource):
             try:
                 task_role.delete(aws_client)
             except Exception as e:
-                logger.error("IamRole deletion failed, please try again or delete manually")
+                logger.error(
+                    "IamRole deletion failed, please try again or delete manually"
+                )
                 logger.error(e)
 
         # Step 2: Delete the execution role
@@ -221,20 +228,26 @@ class EcsTaskDefinition(AwsResource):
             try:
                 execution_role.delete(aws_client)
             except Exception as e:
-                logger.error("IamRole deletion failed, please try again or delete manually")
+                logger.error(
+                    "IamRole deletion failed, please try again or delete manually"
+                )
                 logger.error(e)
 
         service_client = self.get_service_client(aws_client)
         self.active_resource = None
         try:
             # Get the task definition revisions
-            list_response = service_client.list_task_definitions(familyPrefix=self.get_task_family(), sort="DESC")
+            list_response = service_client.list_task_definitions(
+                familyPrefix=self.get_task_family(), sort="DESC"
+            )
             logger.debug(f"EcsTaskDefinition: {list_response}")
             task_definition_arns = list_response.get("taskDefinitionArns", [])
             if task_definition_arns:
                 # Delete all revisions
                 for task_definition_arn in task_definition_arns:
-                    service_client.deregister_task_definition(taskDefinition=task_definition_arn)
+                    service_client.deregister_task_definition(
+                        taskDefinition=task_definition_arn
+                    )
                 print_info(f"EcsTaskDefinition deleted: {self.get_resource_name()}")
                 return True
         except Exception as e:
@@ -254,7 +267,9 @@ class EcsTaskDefinition(AwsResource):
             "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
             "arn:aws:iam::aws:policy/CloudWatchFullAccess",
         ]
-        if self.add_policy_arns_to_task_role is not None and isinstance(self.add_policy_arns_to_task_role, list):
+        if self.add_policy_arns_to_task_role is not None and isinstance(
+            self.add_policy_arns_to_task_role, list
+        ):
             policy_arns.extend(self.add_policy_arns_to_task_role)
 
         policies = []

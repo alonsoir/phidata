@@ -39,7 +39,9 @@ class Streamlit(AwsApp):
     streamlit_browser_server_port: Optional[str] = None
     streamlit_browser_server_address: Optional[str] = None
 
-    def get_container_env(self, container_context: ContainerContext, build_context: AwsBuildContext) -> Dict[str, str]:
+    def get_container_env(
+        self, container_context: ContainerContext, build_context: AwsBuildContext
+    ) -> Dict[str, str]:
         container_env: Dict[str, str] = super().get_container_env(
             container_context=container_context, build_context=build_context
         )
@@ -53,21 +55,33 @@ class Streamlit(AwsApp):
             container_env["STREAMLIT_SERVER_PORT"] = str(streamlit_server_port)
 
         if self.streamlit_server_headless is not None:
-            container_env["STREAMLIT_SERVER_HEADLESS"] = str(self.streamlit_server_headless)
+            container_env["STREAMLIT_SERVER_HEADLESS"] = str(
+                self.streamlit_server_headless
+            )
 
         if self.streamlit_server_run_on_save is not None:
-            container_env["STREAMLIT_SERVER_RUN_ON_SAVE"] = str(self.streamlit_server_run_on_save)
+            container_env["STREAMLIT_SERVER_RUN_ON_SAVE"] = str(
+                self.streamlit_server_run_on_save
+            )
 
         if self.streamlit_server_max_upload_size is not None:
-            container_env["STREAMLIT_SERVER_MAX_UPLOAD_SIZE"] = str(self.streamlit_server_max_upload_size)
+            container_env["STREAMLIT_SERVER_MAX_UPLOAD_SIZE"] = str(
+                self.streamlit_server_max_upload_size
+            )
 
         if self.streamlit_browser_gather_usage_stats is not None:
-            container_env["STREAMLIT_BROWSER_GATHER_USAGE_STATS"] = str(self.streamlit_browser_gather_usage_stats)
+            container_env["STREAMLIT_BROWSER_GATHER_USAGE_STATS"] = str(
+                self.streamlit_browser_gather_usage_stats
+            )
 
         if self.streamlit_browser_server_port is not None:
-            container_env["STREAMLIT_BROWSER_SERVER_PORT"] = self.streamlit_browser_server_port
+            container_env["STREAMLIT_BROWSER_SERVER_PORT"] = (
+                self.streamlit_browser_server_port
+            )
 
         if self.streamlit_browser_server_address is not None:
-            container_env["STREAMLIT_BROWSER_SERVER_ADDRESS"] = self.streamlit_browser_server_address
+            container_env["STREAMLIT_BROWSER_SERVER_ADDRESS"] = (
+                self.streamlit_browser_server_address
+            )
 
         return container_env

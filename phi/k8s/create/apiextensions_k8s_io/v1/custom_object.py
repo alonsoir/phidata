@@ -55,7 +55,9 @@ class CreateCustomObject(CreateK8sResource):
         try:
             api_version_enum = ApiVersion.from_str(api_group_version_str)
         except NotImplementedError:
-            raise NotImplementedError(f"{api_group_version_str} is not a supported API version")
+            raise NotImplementedError(
+                f"{api_group_version_str} is not a supported API version"
+            )
 
         kind_str: str = self.crd.names.kind
         kind_enum = None

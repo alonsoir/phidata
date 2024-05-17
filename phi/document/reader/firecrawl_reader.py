@@ -32,9 +32,15 @@ class FirecrawlReader(Reader):
 
         documents = []
         if self.chunk:
-            documents.extend(self.chunk_document(Document(name=url, id=url, meta_data=metadata, content=content)))
+            documents.extend(
+                self.chunk_document(
+                    Document(name=url, id=url, meta_data=metadata, content=content)
+                )
+            )
         else:
-            documents.append(Document(name=url, id=url, meta_data=metadata, content=content))
+            documents.append(
+                Document(name=url, id=url, meta_data=metadata, content=content)
+            )
         return documents
 
     def read(self, url: str) -> List[Document]:

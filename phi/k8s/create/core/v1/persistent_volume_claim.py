@@ -47,7 +47,9 @@ class CreatePVC(CreateK8sResource):
             ),
             spec=PersistentVolumeClaimSpec(
                 access_modes=self.access_modes,
-                resources=ResourceRequirements(requests={"storage": self.request_storage}),
+                resources=ResourceRequirements(
+                    requests={"storage": self.request_storage}
+                ),
                 storage_class_name=self.storage_class_name,
             ),
         )

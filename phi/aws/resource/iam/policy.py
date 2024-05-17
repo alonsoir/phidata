@@ -80,7 +80,9 @@ class IamPolicy(AwsResource):
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be created.")
                 if self.arn is not None:
-                    waiter = self.get_service_client(aws_client).get_waiter("policy_exists")
+                    waiter = self.get_service_client(aws_client).get_waiter(
+                        "policy_exists"
+                    )
                     waiter.wait(
                         PolicyArn=self.arn,
                         WaiterConfig={

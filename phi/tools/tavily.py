@@ -8,7 +8,9 @@ from phi.utils.log import logger
 try:
     from tavily import TavilyClient
 except ImportError:
-    raise ImportError("`tavily-python` not installed. Please install using `pip install tavily-python`")
+    raise ImportError(
+        "`tavily-python` not installed. Please install using `pip install tavily-python`"
+    )
 
 
 class TavilyTools(Toolkit):
@@ -53,7 +55,10 @@ class TavilyTools(Toolkit):
         """
 
         response = self.client.search(
-            query=query, search_depth=self.search_depth, include_answer=self.include_answer, max_results=max_results
+            query=query,
+            search_depth=self.search_depth,
+            include_answer=self.include_answer,
+            max_results=max_results,
         )
 
         clean_response: Dict[str, Any] = {"query": query}
@@ -100,5 +105,8 @@ class TavilyTools(Toolkit):
         """
 
         return self.client.get_search_context(
-            query=query, search_depth=self.search_depth, max_tokens=self.max_tokens, include_answer=self.include_answer
+            query=query,
+            search_depth=self.search_depth,
+            max_tokens=self.max_tokens,
+            include_answer=self.include_answer,
         )

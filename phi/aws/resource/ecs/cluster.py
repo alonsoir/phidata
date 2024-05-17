@@ -61,7 +61,9 @@ class EcsCluster(AwsResource):
         if self.capacity_providers is not None:
             not_null_args["capacityProviders"] = self.capacity_providers
         if self.default_capacity_provider_strategy is not None:
-            not_null_args["defaultCapacityProviderStrategy"] = self.default_capacity_provider_strategy
+            not_null_args["defaultCapacityProviderStrategy"] = (
+                self.default_capacity_provider_strategy
+            )
         if self.service_connect_namespace is not None:
             not_null_args["serviceConnectDefaults"] = {
                 "namespace": self.service_connect_namespace,
@@ -99,7 +101,9 @@ class EcsCluster(AwsResource):
         service_client = self.get_service_client(aws_client)
         try:
             cluster_name = self.get_ecs_cluster_name()
-            describe_response = service_client.describe_clusters(clusters=[cluster_name])
+            describe_response = service_client.describe_clusters(
+                clusters=[cluster_name]
+            )
             logger.debug(f"EcsCluster: {describe_response}")
             resource_list = describe_response.get("clusters", None)
 
@@ -130,7 +134,9 @@ class EcsCluster(AwsResource):
         self.active_resource = None
 
         try:
-            delete_response = service_client.delete_cluster(cluster=self.get_ecs_cluster_name())
+            delete_response = service_client.delete_cluster(
+                cluster=self.get_ecs_cluster_name()
+            )
             logger.debug(f"EcsCluster: {delete_response}")
             return True
         except Exception as e:

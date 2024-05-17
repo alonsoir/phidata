@@ -187,7 +187,8 @@ class AirflowBase(DockerApp):
                 "PRINT_ENV_ON_LOAD": str(self.print_env_on_load),
                 "RESOURCES_DIR_CONTAINER_PATH": str(self.resources_dir_container_path),
                 PHI_RUNTIME_ENV_VAR: "docker",
-                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file or "",
+                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file
+                or "",
                 SCRIPTS_DIR_ENV_VAR: container_context.scripts_dir or "",
                 STORAGE_DIR_ENV_VAR: container_context.storage_dir or "",
                 WORKFLOWS_DIR_ENV_VAR: container_context.workflows_dir or "",
@@ -210,20 +211,33 @@ class AirflowBase(DockerApp):
         try:
             if container_context.workspace_schema is not None:
                 if container_context.workspace_schema.id_workspace is not None:
-                    container_env[WORKSPACE_ID_ENV_VAR] = str(container_context.workspace_schema.id_workspace) or ""
+                    container_env[WORKSPACE_ID_ENV_VAR] = (
+                        str(container_context.workspace_schema.id_workspace) or ""
+                    )
                 if container_context.workspace_schema.ws_hash is not None:
-                    container_env[WORKSPACE_HASH_ENV_VAR] = container_context.workspace_schema.ws_hash
+                    container_env[WORKSPACE_HASH_ENV_VAR] = (
+                        container_context.workspace_schema.ws_hash
+                    )
         except Exception:
             pass
 
         if self.set_python_path:
             python_path = self.python_path
             if python_path is None:
-                python_path = f"{container_context.workspace_root}:{self.get_airflow_home()}"
-                if self.mount_resources and self.resources_dir_container_path is not None:
-                    python_path = "{}:{}".format(python_path, self.resources_dir_container_path)
+                python_path = (
+                    f"{container_context.workspace_root}:{self.get_airflow_home()}"
+                )
+                if (
+                    self.mount_resources
+                    and self.resources_dir_container_path is not None
+                ):
+                    python_path = "{}:{}".format(
+                        python_path, self.resources_dir_container_path
+                    )
                 if self.add_python_paths is not None:
-                    python_path = "{}:{}".format(python_path, ":".join(self.add_python_paths))
+                    python_path = "{}:{}".format(
+                        python_path, ":".join(self.add_python_paths)
+                    )
             if python_path is not None:
                 container_env[PYTHONPATH_ENV_VAR] = python_path
 
@@ -231,7 +245,9 @@ class AirflowBase(DockerApp):
         self.set_aws_env_vars(env_dict=container_env)
 
         # Set the AIRFLOW__CORE__DAGS_FOLDER
-        container_env[AIRFLOW_DAGS_FOLDER_ENV_VAR] = f"{container_context.workspace_root}/{self.airflow_dags_dir}"
+        container_env[AIRFLOW_DAGS_FOLDER_ENV_VAR] = (
+            f"{container_context.workspace_root}/{self.airflow_dags_dir}"
+        )
 
         # Set the AIRFLOW_ENV
         if self.airflow_env is not None:
@@ -272,7 +288,9 @@ class AirflowBase(DockerApp):
                 db_port = self.db_app.get_db_port()
             if db_driver is None:
                 db_driver = self.db_app.get_db_driver()
-        db_connection_url = f"{db_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
+        db_connection_url = (
+            f"{db_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
+        )
 
         # Set the AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
         if "None" not in db_connection_url:
@@ -289,12 +307,12 @@ class AirflowBase(DockerApp):
         if self.executor == "CeleryExecutor":
             # Airflow celery result backend
             celery_result_backend_driver = self.db_result_backend_driver or db_driver
-            celery_result_backend_url = (
-                f"{celery_result_backend_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
-            )
+            celery_result_backend_url = f"{celery_result_backend_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
             # Set the AIRFLOW__CELERY__RESULT_BACKEND
             if "None" not in celery_result_backend_url:
-                container_env["AIRFLOW__CELERY__RESULT_BACKEND"] = celery_result_backend_url
+                container_env["AIRFLOW__CELERY__RESULT_BACKEND"] = (
+                    celery_result_backend_url
+                )
 
             # Airflow celery broker url
             _redis_pass = self.get_redis_password()
@@ -304,7 +322,9 @@ class AirflowBase(DockerApp):
             redis_port = self.get_redis_port()
             redis_driver = self.get_redis_driver()
             if self.redis_app is not None and isinstance(self.redis_app, DbApp):
-                logger.debug(f"Reading redis connection details from: {self.redis_app.name}")
+                logger.debug(
+                    f"Reading redis connection details from: {self.redis_app.name}"
+                )
                 if redis_password is None:
                     redis_password = self.redis_app.get_db_password()
                 if redis_schema is None:
@@ -331,25 +351,35 @@ class AirflowBase(DockerApp):
         # Update the container env using env_file
         env_data_from_file = self.get_env_file_data()
         if env_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in env_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in env_data_from_file.items() if v is not None}
+            )
 
         # Update the container env using secrets_file
         secret_data_from_file = self.get_secret_file_data()
         if secret_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in secret_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in secret_data_from_file.items() if v is not None}
+            )
 
         # Update the container env with user provided env_vars
         # this overwrites any existing variables with the same key
         if self.env_vars is not None and isinstance(self.env_vars, dict):
-            container_env.update({k: str(v) for k, v in self.env_vars.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in self.env_vars.items() if v is not None}
+            )
 
         # logger.debug("Container Environment: {}".format(container_env))
         return container_env
 
-    def get_container_volumes(self, container_context: ContainerContext) -> Dict[str, dict]:
+    def get_container_volumes(
+        self, container_context: ContainerContext
+    ) -> Dict[str, dict]:
         from phi.utils.defaults import get_default_volume_name
 
-        container_volumes: Dict[str, dict] = super().get_container_volumes(container_context=container_context)
+        container_volumes: Dict[str, dict] = super().get_container_volumes(
+            container_context=container_context
+        )
 
         # Create Logs Volume
         if self.mount_logs:
@@ -360,7 +390,9 @@ class AirflowBase(DockerApp):
             if self.logs_volume_type == AirflowLogsVolumeType.EmptyDir:
                 logs_volume_name = self.logs_volume_name
                 if logs_volume_name is None:
-                    logs_volume_name = get_default_volume_name(f"{self.get_app_name()}-logs")
+                    logs_volume_name = get_default_volume_name(
+                        f"{self.get_app_name()}-logs"
+                    )
                 logger.debug(f"Mounting: {logs_volume_name}")
                 logger.debug(f"\tto: {logs_volume_container_path_str}")
                 container_volumes[logs_volume_name] = {

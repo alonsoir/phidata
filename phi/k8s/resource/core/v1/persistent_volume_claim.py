@@ -99,10 +99,14 @@ class PersistentVolumeClaim(K8sResource):
         pvc_list: Optional[V1PersistentVolumeClaimList] = None
         if namespace:
             logger.debug(f"Getting PVCs for ns: {namespace}")
-            pvc_list = core_v1_api.list_namespaced_persistent_volume_claim(namespace=namespace, **kwargs)
+            pvc_list = core_v1_api.list_namespaced_persistent_volume_claim(
+                namespace=namespace, **kwargs
+            )
         else:
             logger.debug("Getting PVCs for all namespaces")
-            pvc_list = core_v1_api.list_persistent_volume_claim_for_all_namespaces(**kwargs)
+            pvc_list = core_v1_api.list_persistent_volume_claim_for_all_namespaces(
+                **kwargs
+            )
 
         pvcs: Optional[List[V1PersistentVolumeClaim]] = None
         if pvc_list:
@@ -117,13 +121,17 @@ class PersistentVolumeClaim(K8sResource):
         namespace = self.get_namespace()
 
         logger.debug("Creating: {}".format(self.get_resource_name()))
-        v1_persistent_volume_claim: V1PersistentVolumeClaim = core_v1_api.create_namespaced_persistent_volume_claim(
-            namespace=namespace, body=k8s_object
+        v1_persistent_volume_claim: V1PersistentVolumeClaim = (
+            core_v1_api.create_namespaced_persistent_volume_claim(
+                namespace=namespace, body=k8s_object
+            )
         )
         # logger.debug("Created: {}".format(v1_persistent_volume_claim))
         if v1_persistent_volume_claim.metadata.creation_timestamp is not None:
             logger.debug("PVC Created")
-            self.active_resource = v1_persistent_volume_claim  # logger.debug(f"InitClaim
+            self.active_resource = (
+                v1_persistent_volume_claim  # logger.debug(f"InitClaim
+            )
             return True
         logger.error("PVC could not be created")
         return False
@@ -157,13 +165,17 @@ class PersistentVolumeClaim(K8sResource):
         namespace = self.get_namespace()
 
         logger.debug("Updating: {}".format(pvc_name))
-        v1_persistent_volume_claim: V1PersistentVolumeClaim = core_v1_api.patch_namespaced_persistent_volume_claim(
-            name=pvc_name, namespace=namespace, body=k8s_object
+        v1_persistent_volume_claim: V1PersistentVolumeClaim = (
+            core_v1_api.patch_namespaced_persistent_volume_claim(
+                name=pvc_name, namespace=namespace, body=k8s_object
+            )
         )
         # logger.debug("Updated:\n{}".format(pformat(v1_persistent_volume_claim.to_dict(), indent=2)))
         if v1_persistent_volume_claim.metadata.creation_timestamp is not None:
             logger.debug("PVC Updated")
-            self.active_resource = v1_persistent_volume_claim  # logger.debug(f"InitClaim
+            self.active_resource = (
+                v1_persistent_volume_claim  # logger.debug(f"InitClaim
+            )
             return True
         logger.error("PVC could not be updated")
         return False
@@ -176,8 +188,10 @@ class PersistentVolumeClaim(K8sResource):
         logger.debug("Deleting: {}".format(pvc_name))
         self.active_resource = None
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_status.py
-        _delete_status: V1Status = core_v1_api.delete_namespaced_persistent_volume_claim(
-            name=pvc_name, namespace=namespace
+        _delete_status: V1Status = (
+            core_v1_api.delete_namespaced_persistent_volume_claim(
+                name=pvc_name, namespace=namespace
+            )
         )
         # logger.debug("_delete_status: {}".format(pformat(_delete_status, indent=2)))
         if _delete_status.status == "Success":

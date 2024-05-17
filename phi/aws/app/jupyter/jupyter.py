@@ -37,7 +37,9 @@ class Jupyter(AwsApp):
     # Defaults to the workspace_root if mount_workspace = True else "/",
     notebook_dir: Optional[str] = None
 
-    def get_container_env(self, container_context: ContainerContext, build_context: AwsBuildContext) -> Dict[str, str]:
+    def get_container_env(
+        self, container_context: ContainerContext, build_context: AwsBuildContext
+    ) -> Dict[str, str]:
         container_env: Dict[str, str] = super().get_container_env(
             container_context=container_context, build_context=build_context
         )
@@ -61,8 +63,13 @@ class Jupyter(AwsApp):
 
         if self.notebook_dir is None:
             container_context: Optional[ContainerContext] = self.get_container_context()
-            if container_context is not None and container_context.workspace_root is not None:
-                container_cmd.append(f"--notebook-dir={str(container_context.workspace_root)}")
+            if (
+                container_context is not None
+                and container_context.workspace_root is not None
+            ):
+                container_cmd.append(
+                    f"--notebook-dir={str(container_context.workspace_root)}"
+                )
         else:
             container_cmd.append(f"--notebook-dir={str(self.notebook_dir)}")
         return container_cmd

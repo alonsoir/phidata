@@ -27,7 +27,12 @@ class S3TextReader(Reader):
             s3_object.download(temporary_file)
 
             logger.info(f"Parsing: {temporary_file}")
-            doc_name = s3_object.name.split("/")[-1].split(".")[0].replace("/", "_").replace(" ", "_")
+            doc_name = (
+                s3_object.name.split("/")[-1]
+                .split(".")[0]
+                .replace("/", "_")
+                .replace(" ", "_")
+            )
             doc_content = textract.process(temporary_file)
             documents = [
                 Document(

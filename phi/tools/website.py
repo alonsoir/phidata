@@ -12,7 +12,9 @@ class WebsiteTools(Toolkit):
         super().__init__(name="website_tools")
         self.knowledge_base: Optional[WebsiteKnowledgeBase] = knowledge_base
 
-        if self.knowledge_base is not None and isinstance(self.knowledge_base, WebsiteKnowledgeBase):
+        if self.knowledge_base is not None and isinstance(
+            self.knowledge_base, WebsiteKnowledgeBase
+        ):
             self.register(self.add_website_to_knowledge_base)
         else:
             self.register(self.read_url)

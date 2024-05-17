@@ -31,7 +31,9 @@ class CreateClusterRole(CreateK8sResource):
         )
 
         cr_rules: List[PolicyRule] = (
-            self.rules if self.rules else [PolicyRule(api_groups=["*"], resources=["*"], verbs=["*"])]
+            self.rules
+            if self.rules
+            else [PolicyRule(api_groups=["*"], resources=["*"], verbs=["*"])]
         )
 
         cr = ClusterRole(

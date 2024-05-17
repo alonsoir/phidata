@@ -92,7 +92,9 @@ class S2AssistantStorage(AssistantStorage):
     def table_exists(self) -> bool:
         logger.debug(f"Checking if table exists: {self.table.name}")
         try:
-            return inspect(self.db_engine).has_table(self.table.name, schema=self.schema)
+            return inspect(self.db_engine).has_table(
+                self.table.name, schema=self.schema
+            )
         except Exception as e:
             logger.error(e)
             return False
@@ -119,7 +121,11 @@ class S2AssistantStorage(AssistantStorage):
     def read(self, run_id: str) -> Optional[AssistantRun]:
         with self.Session.begin() as sess:
             existing_row: Optional[Row[Any]] = self._read(session=sess, run_id=run_id)
-            return AssistantRun.model_validate(existing_row) if existing_row is not None else None
+            return (
+                AssistantRun.model_validate(existing_row)
+                if existing_row is not None
+                else None
+            )
 
     def get_all_run_ids(self, user_id: Optional[str] = None) -> List[str]:
         run_ids: List[str] = []
@@ -194,11 +200,29 @@ class S2AssistantStorage(AssistantStorage):
                         "run_name": row.run_name,
                         "user_id": row.user_id,
                         "llm": json.dumps(row.llm) if row.llm is not None else None,
-                        "memory": json.dumps(row.memory) if row.memory is not None else None,
-                        "assistant_data": json.dumps(row.assistant_data) if row.assistant_data is not None else None,
-                        "run_data": json.dumps(row.run_data) if row.run_data is not None else None,
-                        "user_data": json.dumps(row.user_data) if row.user_data is not None else None,
-                        "task_data": json.dumps(row.task_data) if row.task_data is not None else None,
+                        "memory": (
+                            json.dumps(row.memory) if row.memory is not None else None
+                        ),
+                        "assistant_data": (
+                            json.dumps(row.assistant_data)
+                            if row.assistant_data is not None
+                            else None
+                        ),
+                        "run_data": (
+                            json.dumps(row.run_data)
+                            if row.run_data is not None
+                            else None
+                        ),
+                        "user_data": (
+                            json.dumps(row.user_data)
+                            if row.user_data is not None
+                            else None
+                        ),
+                        "task_data": (
+                            json.dumps(row.task_data)
+                            if row.task_data is not None
+                            else None
+                        ),
                     },
                 )
             except Exception:
@@ -212,11 +236,29 @@ class S2AssistantStorage(AssistantStorage):
                         "run_name": row.run_name,
                         "user_id": row.user_id,
                         "llm": json.dumps(row.llm) if row.llm is not None else None,
-                        "memory": json.dumps(row.memory) if row.memory is not None else None,
-                        "assistant_data": json.dumps(row.assistant_data) if row.assistant_data is not None else None,
-                        "run_data": json.dumps(row.run_data) if row.run_data is not None else None,
-                        "user_data": json.dumps(row.user_data) if row.user_data is not None else None,
-                        "task_data": json.dumps(row.task_data) if row.task_data is not None else None,
+                        "memory": (
+                            json.dumps(row.memory) if row.memory is not None else None
+                        ),
+                        "assistant_data": (
+                            json.dumps(row.assistant_data)
+                            if row.assistant_data is not None
+                            else None
+                        ),
+                        "run_data": (
+                            json.dumps(row.run_data)
+                            if row.run_data is not None
+                            else None
+                        ),
+                        "user_data": (
+                            json.dumps(row.user_data)
+                            if row.user_data is not None
+                            else None
+                        ),
+                        "task_data": (
+                            json.dumps(row.task_data)
+                            if row.task_data is not None
+                            else None
+                        ),
                     },
                 )
         return self.read(run_id=row.run_id)

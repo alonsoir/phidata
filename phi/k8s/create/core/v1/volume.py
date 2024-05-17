@@ -36,34 +36,46 @@ class CreateVolume(CreateK8sObject):
         volume = Volume(name=self.volume_name)
 
         if self.volume_type == VolumeType.EMPTY_DIR:
-            if self.empty_dir is not None and isinstance(self.empty_dir, EmptyDirVolumeSource):
+            if self.empty_dir is not None and isinstance(
+                self.empty_dir, EmptyDirVolumeSource
+            ):
                 volume.empty_dir = self.empty_dir
             else:
                 volume.empty_dir = EmptyDirVolumeSource()
         elif self.volume_type == VolumeType.AWS_EBS:
-            if self.aws_ebs is not None and isinstance(self.aws_ebs, AwsElasticBlockStoreVolumeSource):
+            if self.aws_ebs is not None and isinstance(
+                self.aws_ebs, AwsElasticBlockStoreVolumeSource
+            ):
                 volume.aws_elastic_block_store = self.aws_ebs
             else:
                 logger.error(
                     f"Volume {self.volume_type.value} selected but AwsElasticBlockStoreVolumeSource not provided."
                 )
         elif self.volume_type == VolumeType.PERSISTENT_VOLUME_CLAIM:
-            if self.pvc is not None and isinstance(self.pvc, PersistentVolumeClaimVolumeSource):
+            if self.pvc is not None and isinstance(
+                self.pvc, PersistentVolumeClaimVolumeSource
+            ):
                 volume.persistent_volume_claim = self.pvc
             else:
                 logger.error(
                     f"Volume {self.volume_type.value} selected but PersistentVolumeClaimVolumeSource not provided."
                 )
         elif self.volume_type == VolumeType.CONFIG_MAP:
-            if self.config_map is not None and isinstance(self.config_map, ConfigMapVolumeSource):
+            if self.config_map is not None and isinstance(
+                self.config_map, ConfigMapVolumeSource
+            ):
                 volume.config_map = self.config_map
             else:
-                logger.error(f"Volume {self.volume_type.value} selected but ConfigMapVolumeSource not provided.")
+                logger.error(
+                    f"Volume {self.volume_type.value} selected but ConfigMapVolumeSource not provided."
+                )
         elif self.volume_type == VolumeType.SECRET:
             if self.secret is not None and isinstance(self.secret, SecretVolumeSource):
                 volume.secret = self.secret
             else:
-                logger.error(f"Volume {self.volume_type.value} selected but SecretVolumeSource not provided.")
+                logger.error(
+                    f"Volume {self.volume_type.value} selected but SecretVolumeSource not provided."
+                )
         elif self.volume_type == VolumeType.GCE_PERSISTENT_DISK:
             if self.gce_persistent_disk is not None and isinstance(
                 self.gce_persistent_disk, GcePersistentDiskVolumeSource
@@ -74,15 +86,23 @@ class CreateVolume(CreateK8sObject):
                     f"Volume {self.volume_type.value} selected but GcePersistentDiskVolumeSource not provided."
                 )
         elif self.volume_type == VolumeType.GIT_REPO:
-            if self.git_repo is not None and isinstance(self.git_repo, GitRepoVolumeSource):
+            if self.git_repo is not None and isinstance(
+                self.git_repo, GitRepoVolumeSource
+            ):
                 volume.git_repo = self.git_repo
             else:
-                logger.error(f"Volume {self.volume_type.value} selected but GitRepoVolumeSource not provided.")
+                logger.error(
+                    f"Volume {self.volume_type.value} selected but GitRepoVolumeSource not provided."
+                )
         elif self.volume_type == VolumeType.HOST_PATH:
-            if self.host_path is not None and isinstance(self.host_path, HostPathVolumeSource):
+            if self.host_path is not None and isinstance(
+                self.host_path, HostPathVolumeSource
+            ):
                 volume.host_path = self.host_path
             else:
-                logger.error(f"Volume {self.volume_type.value} selected but HostPathVolumeSource not provided.")
+                logger.error(
+                    f"Volume {self.volume_type.value} selected but HostPathVolumeSource not provided."
+                )
 
         # logger.debug(f"Created Volume resource: {volume}")
         return volume

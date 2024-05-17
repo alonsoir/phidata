@@ -14,7 +14,12 @@ from phi.utils.log import logger
 
 
 class PromptRegistry:
-    def __init__(self, name: str, prompts: Optional[List[PromptTemplate]] = None, sync: bool = True):
+    def __init__(
+        self,
+        name: str,
+        prompts: Optional[List[PromptTemplate]] = None,
+        sync: bool = True,
+    ):
         if name is None:
             raise ValueError("PromptRegistry must have a name.")
 
@@ -26,7 +31,9 @@ class PromptRegistry:
         if prompts:
             for _prompt in prompts:
                 if _prompt.id is None:
-                    raise ValueError("PromptTemplate cannot be added to Registry without an id.")
+                    raise ValueError(
+                        "PromptTemplate cannot be added to Registry without an id."
+                    )
                 self.prompts[_prompt.id] = _prompt
 
         # All prompts in the registry, including those synced from phidata
@@ -52,7 +59,9 @@ class PromptRegistry:
     def add(self, prompt: PromptTemplate):
         prompt_id = prompt.id
         if prompt_id is None:
-            raise ValueError("PromptTemplate cannot be added to Registry without an id.")
+            raise ValueError(
+                "PromptTemplate cannot be added to Registry without an id."
+            )
 
         self.all_prompts[prompt_id] = prompt
         if self._sync:
@@ -62,7 +71,9 @@ class PromptRegistry:
     def update(self, id: str, prompt: PromptTemplate, upsert: bool = True):
         # Check if the prompt exists in the initial registry and should not be updated
         if id in self.prompts:
-            raise PromptUpdateException(f"Prompt Id: {id} cannot be updated as it is initialized with the registry.")
+            raise PromptUpdateException(
+                f"Prompt Id: {id} cannot be updated as it is initialized with the registry."
+            )
         # If upsert is False and the prompt is not found, raise an exception
         if not upsert and id not in self.all_prompts:
             raise PromptNotFoundException(f"Prompt Id: {id} not found in registry.")
@@ -79,7 +90,9 @@ class PromptRegistry:
             registry=PromptRegistrySync(registry_name=self.name),
             templates=PromptTemplatesSync(
                 templates={
-                    k: PromptTemplateSync(template_id=k, template_data=v.model_dump(exclude_none=True))
+                    k: PromptTemplateSync(
+                        template_id=k, template_data=v.model_dump(exclude_none=True)
+                    )
                     for k, v in self.prompts.items()
                 }
             ),
@@ -99,13 +112,16 @@ class PromptRegistry:
         needs_sync = (
             self._remote_templates is None
             or id not in self._remote_templates
-            or self._remote_templates[id].template_data != prompt.model_dump(exclude_none=True)
+            or self._remote_templates[id].template_data
+            != prompt.model_dump(exclude_none=True)
         )
 
         if needs_sync:
             _prompt_template: Optional[PromptTemplateSchema] = sync_prompt_template_api(
                 registry=PromptRegistrySync(registry_name=self.name),
-                prompt_template=PromptTemplateSync(template_id=id, template_data=prompt.model_dump(exclude_none=True)),
+                prompt_template=PromptTemplateSync(
+                    template_id=id, template_data=prompt.model_dump(exclude_none=True)
+                ),
             )
             if _prompt_template is not None:
                 if self._remote_templates is None:

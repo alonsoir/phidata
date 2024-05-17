@@ -47,7 +47,9 @@ class PhiCliConfig:
             clear_user_cache = (
                 self._user is not None  # previous user is not None
                 and self._user.email != "anon"  # previous user is not anon
-                and (user.email != self._user.email or user.id_user != self._user.id_user)  # new user is different
+                and (
+                    user.email != self._user.email or user.id_user != self._user.id_user
+                )  # new user is different
             )
             self._user = user
             if clear_user_cache:
@@ -113,9 +115,13 @@ class PhiCliConfig:
         ######################################################
         logger.debug(f"Updating workspace at: {ws_root_str}")
         # By this point there should be a WorkspaceConfig object for this ws_name
-        existing_ws_config: Optional[WorkspaceConfig] = self.ws_config_map.get(ws_root_str, None)
+        existing_ws_config: Optional[WorkspaceConfig] = self.ws_config_map.get(
+            ws_root_str, None
+        )
         if existing_ws_config is None:
-            logger.error(f"Could not find workspace at: {ws_root_str}, please run `phi ws setup`")
+            logger.error(
+                f"Could not find workspace at: {ws_root_str}, please run `phi ws setup`"
+            )
             return None
 
         # Update the ws_schema if it's not None and different from the existing one
@@ -158,7 +164,9 @@ class PhiCliConfig:
 
         ws_root_str = str(ws_root_path)
         print_heading(f"Deleting record for workspace at: {ws_root_str}")
-        print_info("-*- Note: this does not delete any files on disk, please delete them manually")
+        print_info(
+            "-*- Note: this does not delete any files on disk, please delete them manually"
+        )
 
         ws_config: Optional[WorkspaceConfig] = self.ws_config_map.pop(ws_root_str, None)
         if ws_config is None:
@@ -178,7 +186,8 @@ class PhiCliConfig:
             delete_workspace_for_user(
                 user=self.user,
                 workspace=WorkspaceDelete(
-                    id_workspace=ws_config.ws_schema.id_workspace, ws_name=ws_config.ws_schema.ws_name
+                    id_workspace=ws_config.ws_schema.id_workspace,
+                    ws_name=ws_config.ws_schema.ws_name,
                 ),
             )
         self.save_config()
@@ -200,7 +209,11 @@ class PhiCliConfig:
         return self.ws_config_map[ws_root_str]
 
     def get_ws_config_by_path(self, ws_root_path: Path) -> Optional[WorkspaceConfig]:
-        return self.ws_config_map[str(ws_root_path)] if str(ws_root_path) in self.ws_config_map else None
+        return (
+            self.ws_config_map[str(ws_root_path)]
+            if str(ws_root_path) in self.ws_config_map
+            else None
+        )
 
     def get_active_ws_config(self) -> Optional[WorkspaceConfig]:
         if self.active_ws_dir is not None and self.active_ws_dir in self.ws_config_map:
@@ -256,7 +269,8 @@ class PhiCliConfig:
         else:
             print_info("No active workspace found.")
             print_info(
-                "Please create a workspace using `phi ws create` " "or setup existing workspace using `phi ws setup`"
+                "Please create a workspace using `phi ws create` "
+                "or setup existing workspace using `phi ws setup`"
             )
 
         if show_all and len(self.ws_config_map) > 0:

@@ -73,12 +73,18 @@ class CreateContainer(CreateK8sObject):
             if env_from is None:
                 env_from = []
             for _cm_name_for_env in self.envs_from_configmap:
-                env_from.append(EnvFromSource(config_map_ref=ConfigMapEnvSource(name=_cm_name_for_env)))
+                env_from.append(
+                    EnvFromSource(
+                        config_map_ref=ConfigMapEnvSource(name=_cm_name_for_env)
+                    )
+                )
         if self.envs_from_secret:
             if env_from is None:
                 env_from = []
             for _secretenvs in self.envs_from_secret:
-                env_from.append(EnvFromSource(secret_ref=SecretEnvSource(name=_secretenvs)))
+                env_from.append(
+                    EnvFromSource(secret_ref=SecretEnvSource(name=_secretenvs))
+                )
 
         env: Optional[List[EnvVar]] = None
         if self.env_vars is not None and isinstance(self.env_vars, dict):
@@ -101,7 +107,11 @@ class CreateContainer(CreateK8sObject):
                         name=_cmenv_var.env_var_name,
                         value_from=EnvVarSource(
                             config_map_key_ref=ConfigMapKeySelector(
-                                key=_cmenv_var.configmap_key if _cmenv_var.configmap_key else _cmenv_var.env_var_name,
+                                key=(
+                                    _cmenv_var.configmap_key
+                                    if _cmenv_var.configmap_key
+                                    else _cmenv_var.env_var_name
+                                ),
                                 name=_cmenv_var.configmap_name,
                             )
                         ),
@@ -116,9 +126,11 @@ class CreateContainer(CreateK8sObject):
                         name=_secretenv_var.env_var_name,
                         value_from=EnvVarSource(
                             secret_key_ref=SecretKeySelector(
-                                key=_secretenv_var.secret_key
-                                if _secretenv_var.secret_key
-                                else _secretenv_var.env_var_name,
+                                key=(
+                                    _secretenv_var.secret_key
+                                    if _secretenv_var.secret_key
+                                    else _secretenv_var.env_var_name
+                                ),
                                 name=_secretenv_var.secret_name,
                             )
                         ),

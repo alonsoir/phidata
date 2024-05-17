@@ -91,7 +91,9 @@ class PgAssistantStorage(AssistantStorage):
     def table_exists(self) -> bool:
         logger.debug(f"Checking if table exists: {self.table.name}")
         try:
-            return inspect(self.db_engine).has_table(self.table.name, schema=self.schema)
+            return inspect(self.db_engine).has_table(
+                self.table.name, schema=self.schema
+            )
         except Exception as e:
             logger.error(e)
             return False
@@ -117,7 +119,11 @@ class PgAssistantStorage(AssistantStorage):
     def read(self, run_id: str) -> Optional[AssistantRun]:
         with self.Session() as sess, sess.begin():
             existing_row: Optional[Row[Any]] = self._read(session=sess, run_id=run_id)
-            return AssistantRun.model_validate(existing_row) if existing_row is not None else None
+            return (
+                AssistantRun.model_validate(existing_row)
+                if existing_row is not None
+                else None
+            )
 
     def get_all_run_ids(self, user_id: Optional[str] = None) -> List[str]:
         run_ids: List[str] = []

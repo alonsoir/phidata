@@ -25,7 +25,9 @@ class DbCluster(AwsResource):
     # Name of the cluster.
     name: str
     # The name of the database engine to be used for this DB cluster.
-    engine: Union[str, Literal["aurora", "aurora-mysql", "aurora-postgresql", "mysql", "postgres"]]
+    engine: Union[
+        str, Literal["aurora", "aurora-mysql", "aurora-postgresql", "mysql", "postgres"]
+    ]
     # The version number of the database engine to use.
     # For valid engine_version values, refer to
     # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rds.html#RDS.Client.create_db_cluster
@@ -282,7 +284,9 @@ class DbCluster(AwsResource):
     def get_db_cluster_identifier(self):
         return self.db_cluster_identifier or self.name
 
-    def get_master_username(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_master_username(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         master_username = self.master_username
         if master_username is None and self.secrets_file is not None:
             # read from secrets_file
@@ -292,25 +296,37 @@ class DbCluster(AwsResource):
         if master_username is None and self.aws_secret is not None:
             # read from aws_secret
             logger.debug(f"Reading MASTER_USERNAME from secret: {self.aws_secret.name}")
-            master_username = self.aws_secret.get_secret_value("MASTER_USERNAME", aws_client=aws_client)
+            master_username = self.aws_secret.get_secret_value(
+                "MASTER_USERNAME", aws_client=aws_client
+            )
 
         return master_username
 
-    def get_master_user_password(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_master_user_password(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         master_user_password = self.master_user_password
         if master_user_password is None and self.secrets_file is not None:
             # read from secrets_file
             secret_data = self.get_secret_file_data()
             if secret_data is not None:
-                master_user_password = secret_data.get("MASTER_USER_PASSWORD", master_user_password)
+                master_user_password = secret_data.get(
+                    "MASTER_USER_PASSWORD", master_user_password
+                )
         if master_user_password is None and self.aws_secret is not None:
             # read from aws_secret
-            logger.debug(f"Reading MASTER_USER_PASSWORD from secret: {self.aws_secret.name}")
-            master_user_password = self.aws_secret.get_secret_value("MASTER_USER_PASSWORD", aws_client=aws_client)
+            logger.debug(
+                f"Reading MASTER_USER_PASSWORD from secret: {self.aws_secret.name}"
+            )
+            master_user_password = self.aws_secret.get_secret_value(
+                "MASTER_USER_PASSWORD", aws_client=aws_client
+            )
 
         return master_user_password
 
-    def get_database_name(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_database_name(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         database_name = self.database_name
         if database_name is None and self.secrets_file is not None:
             # read from secrets_file
@@ -322,10 +338,14 @@ class DbCluster(AwsResource):
         if database_name is None and self.aws_secret is not None:
             # read from aws_secret
             logger.debug(f"Reading DATABASE_NAME from secret: {self.aws_secret.name}")
-            database_name = self.aws_secret.get_secret_value("DATABASE_NAME", aws_client=aws_client)
+            database_name = self.aws_secret.get_secret_value(
+                "DATABASE_NAME", aws_client=aws_client
+            )
             if database_name is None:
                 logger.debug(f"Reading DB_NAME from secret: {self.aws_secret.name}")
-                database_name = self.aws_secret.get_secret_value("DB_NAME", aws_client=aws_client)
+                database_name = self.aws_secret.get_secret_value(
+                    "DB_NAME", aws_client=aws_client
+                )
         return database_name
 
     def get_db_name(self) -> Optional[str]:
@@ -390,7 +410,9 @@ class DbCluster(AwsResource):
             not_null_args["CharacterSetName"] = self.character_set_name
 
         if self.db_cluster_parameter_group_name:
-            not_null_args["DBClusterParameterGroupName"] = self.db_cluster_parameter_group_name
+            not_null_args["DBClusterParameterGroupName"] = (
+                self.db_cluster_parameter_group_name
+            )
 
         if self.engine_version:
             not_null_args["EngineVersion"] = self.engine_version
@@ -402,9 +424,13 @@ class DbCluster(AwsResource):
         if self.preferred_backup_window:
             not_null_args["PreferredBackupWindow"] = self.preferred_backup_window
         if self.preferred_maintenance_window:
-            not_null_args["PreferredMaintenanceWindow"] = self.preferred_maintenance_window
+            not_null_args["PreferredMaintenanceWindow"] = (
+                self.preferred_maintenance_window
+            )
         if self.replication_source_identifier:
-            not_null_args["ReplicationSourceIdentifier"] = self.replication_source_identifier
+            not_null_args["ReplicationSourceIdentifier"] = (
+                self.replication_source_identifier
+            )
         if self.tags:
             not_null_args["Tags"] = self.tags
         if self.storage_encrypted:
@@ -412,11 +438,15 @@ class DbCluster(AwsResource):
         if self.kms_key_id:
             not_null_args["KmsKeyId"] = self.kms_key_id
         if self.enable_iam_database_authentication:
-            not_null_args["EnableIAMDbClusterAuthentication"] = self.enable_iam_database_authentication
+            not_null_args["EnableIAMDbClusterAuthentication"] = (
+                self.enable_iam_database_authentication
+            )
         if self.backtrack_window:
             not_null_args["BacktrackWindow"] = self.backtrack_window
         if self.enable_cloudwatch_logs_exports:
-            not_null_args["EnableCloudwatchLogsExports"] = self.enable_cloudwatch_logs_exports
+            not_null_args["EnableCloudwatchLogsExports"] = (
+                self.enable_cloudwatch_logs_exports
+            )
         if self.engine_mode:
             not_null_args["EngineMode"] = self.engine_mode
         if self.scaling_configuration:
@@ -434,7 +464,9 @@ class DbCluster(AwsResource):
         if self.domain_iam_role_name:
             not_null_args["DomainIAMRoleName"] = self.domain_iam_role_name
         if self.enable_global_write_forwarding:
-            not_null_args["EnableGlobalWriteForwarding"] = self.enable_global_write_forwarding
+            not_null_args["EnableGlobalWriteForwarding"] = (
+                self.enable_global_write_forwarding
+            )
         if self.db_instance_class:
             not_null_args["DBClusterInstanceClass"] = self.db_instance_class
         if self.allocated_storage:
@@ -452,13 +484,21 @@ class DbCluster(AwsResource):
         if self.monitoring_role_arn:
             not_null_args["MonitoringRoleArn"] = self.monitoring_role_arn
         if self.enable_performance_insights:
-            not_null_args["EnablePerformanceInsights"] = self.enable_performance_insights
+            not_null_args["EnablePerformanceInsights"] = (
+                self.enable_performance_insights
+            )
         if self.performance_insights_kms_key_id:
-            not_null_args["PerformanceInsightsKMSKeyId"] = self.performance_insights_kms_key_id
+            not_null_args["PerformanceInsightsKMSKeyId"] = (
+                self.performance_insights_kms_key_id
+            )
         if self.performance_insights_retention_period:
-            not_null_args["PerformanceInsightsRetentionPeriod"] = self.performance_insights_retention_period
+            not_null_args["PerformanceInsightsRetentionPeriod"] = (
+                self.performance_insights_retention_period
+            )
         if self.serverless_v2_scaling_configuration:
-            not_null_args["ServerlessV2ScalingConfiguration"] = self.serverless_v2_scaling_configuration
+            not_null_args["ServerlessV2ScalingConfiguration"] = (
+                self.serverless_v2_scaling_configuration
+            )
         if self.network_type:
             not_null_args["NetworkType"] = self.network_type
         if self.db_system_id:
@@ -466,12 +506,16 @@ class DbCluster(AwsResource):
         if self.source_region:
             not_null_args["SourceRegion"] = self.source_region
         if self.enable_local_write_forwarding:
-            not_null_args["EnableLocalWriteForwarding"] = self.enable_local_write_forwarding
+            not_null_args["EnableLocalWriteForwarding"] = (
+                self.enable_local_write_forwarding
+            )
 
         if self.manage_master_user_password:
             not_null_args["ManageMasterUserPassword"] = self.manage_master_user_password
         if self.master_user_secret_kms_key_id:
-            not_null_args["MasterUserSecretKmsKeyId"] = self.master_user_secret_kms_key_id
+            not_null_args["MasterUserSecretKmsKeyId"] = (
+                self.master_user_secret_kms_key_id
+            )
 
         # Step 3: Create DBCluster
         service_client = self.get_service_client(aws_client)
@@ -506,7 +550,9 @@ class DbCluster(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be active.")
-                waiter = self.get_service_client(aws_client).get_waiter("db_cluster_available")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "db_cluster_available"
+                )
                 waiter.wait(
                     DBClusterIdentifier=self.get_db_cluster_identifier(),
                     WaiterConfig={
@@ -537,7 +583,9 @@ class DbCluster(AwsResource):
         service_client = self.get_service_client(aws_client)
         try:
             resource_identifier = self.get_db_cluster_identifier()
-            describe_response = service_client.describe_db_clusters(DBClusterIdentifier=resource_identifier)
+            describe_response = service_client.describe_db_clusters(
+                DBClusterIdentifier=resource_identifier
+            )
             logger.debug(f"DbCluster: {describe_response}")
             resources_list = describe_response.get("DBClusters", None)
 
@@ -574,7 +622,9 @@ class DbCluster(AwsResource):
         # create a dict of args which are not null, otherwise aws type validation fails
         not_null_args: Dict[str, Any] = {}
         if self.final_db_snapshot_identifier:
-            not_null_args["FinalDBSnapshotIdentifier"] = self.final_db_snapshot_identifier
+            not_null_args["FinalDBSnapshotIdentifier"] = (
+                self.final_db_snapshot_identifier
+            )
         if self.delete_automated_backups:
             not_null_args["DeleteAutomatedBackups"] = self.delete_automated_backups
 
@@ -604,7 +654,9 @@ class DbCluster(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("db_cluster_deleted")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "db_cluster_deleted"
+                )
                 waiter.wait(
                     DBClusterIdentifier=self.get_db_cluster_identifier(),
                     WaiterConfig={
@@ -649,8 +701,13 @@ class DbCluster(AwsResource):
         existing_vpc_security_group = db_cluster.get("VpcSecurityGroups", [])
         existing_vpc_security_group_ids = []
         for existing_sg in existing_vpc_security_group:
-            existing_vpc_security_group_ids.append(existing_sg.get("VpcSecurityGroupId", None))
-        if vpc_security_group_ids is not None and vpc_security_group_ids != existing_vpc_security_group_ids:
+            existing_vpc_security_group_ids.append(
+                existing_sg.get("VpcSecurityGroupId", None)
+            )
+        if (
+            vpc_security_group_ids is not None
+            and vpc_security_group_ids != existing_vpc_security_group_ids
+        ):
             logger.info(f"Updating SecurityGroups: {vpc_security_group_ids}")
             not_null_args["VpcSecurityGroupIds"] = vpc_security_group_ids
 
@@ -663,7 +720,9 @@ class DbCluster(AwsResource):
         if self.backup_retention_period:
             not_null_args["BackupRetentionPeriod"] = self.backup_retention_period
         if self.db_cluster_parameter_group_name:
-            not_null_args["DBClusterParameterGroupName"] = self.db_cluster_parameter_group_name
+            not_null_args["DBClusterParameterGroupName"] = (
+                self.db_cluster_parameter_group_name
+            )
         if self.port:
             not_null_args["Port"] = self.port
 
@@ -672,19 +731,27 @@ class DbCluster(AwsResource):
         if self.preferred_backup_window:
             not_null_args["PreferredBackupWindow"] = self.preferred_backup_window
         if self.preferred_maintenance_window:
-            not_null_args["PreferredMaintenanceWindow"] = self.preferred_maintenance_window
+            not_null_args["PreferredMaintenanceWindow"] = (
+                self.preferred_maintenance_window
+            )
         if self.enable_iam_database_authentication:
-            not_null_args["EnableIAMDbClusterAuthentication"] = self.enable_iam_database_authentication
+            not_null_args["EnableIAMDbClusterAuthentication"] = (
+                self.enable_iam_database_authentication
+            )
         if self.backtrack_window:
             not_null_args["BacktrackWindow"] = self.backtrack_window
         if self.cloudwatch_logs_exports:
-            not_null_args["CloudwatchLogsExportConfiguration"] = self.cloudwatch_logs_exports
+            not_null_args["CloudwatchLogsExportConfiguration"] = (
+                self.cloudwatch_logs_exports
+            )
         if self.engine_version:
             not_null_args["EngineVersion"] = self.engine_version
         if self.allow_major_version_upgrade:
             not_null_args["AllowMajorVersionUpgrade"] = self.allow_major_version_upgrade
         if self.db_instance_parameter_group_name:
-            not_null_args["DBInstanceParameterGroupName"] = self.db_instance_parameter_group_name
+            not_null_args["DBInstanceParameterGroupName"] = (
+                self.db_instance_parameter_group_name
+            )
         if self.domain:
             not_null_args["Domain"] = self.domain
         if self.domain_iam_role_name:
@@ -698,7 +765,9 @@ class DbCluster(AwsResource):
         if self.copy_tags_to_snapshot:
             not_null_args["CopyTagsToSnapshot"] = self.copy_tags_to_snapshot
         if self.enable_global_write_forwarding:
-            not_null_args["EnableGlobalWriteForwarding"] = self.enable_global_write_forwarding
+            not_null_args["EnableGlobalWriteForwarding"] = (
+                self.enable_global_write_forwarding
+            )
         if self.db_instance_class:
             not_null_args["DBClusterInstanceClass"] = self.db_instance_class
         if self.allocated_storage:
@@ -714,13 +783,21 @@ class DbCluster(AwsResource):
         if self.monitoring_role_arn:
             not_null_args["MonitoringRoleArn"] = self.monitoring_role_arn
         if self.enable_performance_insights:
-            not_null_args["EnablePerformanceInsights"] = self.enable_performance_insights
+            not_null_args["EnablePerformanceInsights"] = (
+                self.enable_performance_insights
+            )
         if self.performance_insights_kms_key_id:
-            not_null_args["PerformanceInsightsKMSKeyId"] = self.performance_insights_kms_key_id
+            not_null_args["PerformanceInsightsKMSKeyId"] = (
+                self.performance_insights_kms_key_id
+            )
         if self.performance_insights_retention_period:
-            not_null_args["PerformanceInsightsRetentionPeriod"] = self.performance_insights_retention_period
+            not_null_args["PerformanceInsightsRetentionPeriod"] = (
+                self.performance_insights_retention_period
+            )
         if self.serverless_v2_scaling_configuration:
-            not_null_args["ServerlessV2ScalingConfiguration"] = self.serverless_v2_scaling_configuration
+            not_null_args["ServerlessV2ScalingConfiguration"] = (
+                self.serverless_v2_scaling_configuration
+            )
         if self.network_type:
             not_null_args["NetworkType"] = self.network_type
         if self.manage_master_user_password:
@@ -728,7 +805,9 @@ class DbCluster(AwsResource):
         if self.rotate_master_user_password:
             not_null_args["RotateMasterUserPassword"] = self.rotate_master_user_password
         if self.master_user_secret_kms_key_id:
-            not_null_args["MasterUserSecretKmsKeyId"] = self.master_user_secret_kms_key_id
+            not_null_args["MasterUserSecretKmsKeyId"] = (
+                self.master_user_secret_kms_key_id
+            )
         if self.engine_mode:
             not_null_args["EngineMode"] = self.engine_mode
         if self.allow_engine_mode_change:
@@ -754,7 +833,9 @@ class DbCluster(AwsResource):
             logger.error(e)
         return False
 
-    def get_db_endpoint(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_db_endpoint(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         """Returns the DbCluster endpoint
 
         Returns:
@@ -776,7 +857,9 @@ class DbCluster(AwsResource):
         logger.debug(f"DBCluster Endpoint: {_db_endpoint}")
         return _db_endpoint
 
-    def get_db_reader_endpoint(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_db_reader_endpoint(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         """Returns the DbCluster reader endpoint
 
         Returns:

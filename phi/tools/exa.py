@@ -8,7 +8,9 @@ from phi.utils.log import logger
 try:
     from exa_py import Exa
 except ImportError:
-    raise ImportError("`exa_py` not installed. Please install using `pip install exa_py`")
+    raise ImportError(
+        "`exa_py` not installed. Please install using `pip install exa_py`"
+    )
 
 
 class ExaTools(Toolkit):
@@ -32,7 +34,9 @@ class ExaTools(Toolkit):
 
         self.api_key = api_key or getenv("EXA_API_KEY")
         if not self.api_key:
-            logger.error("EXA_API_KEY not set. Please set the EXA_API_KEY environment variable.")
+            logger.error(
+                "EXA_API_KEY not set. Please set the EXA_API_KEY environment variable."
+            )
 
         self.show_results = show_results
 

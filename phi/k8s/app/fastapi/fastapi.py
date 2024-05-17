@@ -42,7 +42,9 @@ class FastApi(K8sApp):
     web_concurrency: Optional[int] = None
 
     def get_container_env(self, container_context: ContainerContext) -> Dict[str, str]:
-        container_env: Dict[str, str] = super().get_container_env(container_context=container_context)
+        container_env: Dict[str, str] = super().get_container_env(
+            container_context=container_context
+        )
 
         if self.uvicorn_host is not None:
             container_env["UVICORN_HOST"] = self.uvicorn_host

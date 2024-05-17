@@ -167,16 +167,22 @@ class ServiceSpec(K8sObject):
     # If specified and supported by the platform, this will restrict traffic through the cloud-provider load-balancer
     # will be restricted to the specified client IPs. This field will be ignored if the cloud-provider does not support.
     # More info: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/
-    load_balancer_source_ranges: Optional[List[str]] = Field(None, alias="loadBalancerSourceRanges")
+    load_balancer_source_ranges: Optional[List[str]] = Field(
+        None, alias="loadBalancerSourceRanges"
+    )
     # allocateLoadBalancerNodePorts defines if NodePorts will be automatically allocated for services
     # with type LoadBalancer. Default is "true". It may be set to "false" if the cluster load-balancer
     # does not rely on NodePorts.
-    allocate_load_balancer_node_ports: Optional[bool] = Field(None, alias="allocateLoadBalancerNodePorts")
+    allocate_load_balancer_node_ports: Optional[bool] = Field(
+        None, alias="allocateLoadBalancerNodePorts"
+    )
 
     # The list of ports that are exposed by this service.
     # More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
     ports: List[ServicePort]
-    publish_not_ready_addresses: Optional[bool] = Field(None, alias="publishNotReadyAddresses")
+    publish_not_ready_addresses: Optional[bool] = Field(
+        None, alias="publishNotReadyAddresses"
+    )
     # Route service traffic to pods with label keys and values matching this selector.
     # If empty or not present, the service is assumed to have an external process managing its endpoints,
     # which Kubernetes will not modify. Only applies to types ClusterIP, NodePort, and LoadBalancer.
@@ -323,13 +329,17 @@ class Service(K8sResource):
                             if svc.status.load_balancer is not None:
                                 if svc.status.load_balancer.ingress is not None:
                                     if svc.status.load_balancer.ingress[0] is not None:
-                                        lb_dns = svc.status.load_balancer.ingress[0].hostname
+                                        lb_dns = svc.status.load_balancer.ingress[
+                                            0
+                                        ].hostname
                                         break
                     sleep(1)
                 except AttributeError:
                     pass
             if lb_dns is None:
-                logger.info("LoadBalancer DNS could not be found, please check the AWS console")
+                logger.info(
+                    "LoadBalancer DNS could not be found, please check the AWS console"
+                )
                 return False
             else:
                 if self.protocol is not None:
@@ -350,7 +360,9 @@ class Service(K8sResource):
         if active_resources is None:
             return None
 
-        active_resources_dict = {_service.metadata.name: _service for _service in active_resources}
+        active_resources_dict = {
+            _service.metadata.name: _service for _service in active_resources
+        }
 
         svc_name = self.get_resource_name()
         if svc_name in active_resources_dict:

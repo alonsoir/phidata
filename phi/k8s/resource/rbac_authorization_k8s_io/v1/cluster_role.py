@@ -81,7 +81,9 @@ class ClusterRole(K8sResource):
             namespace: NOT USED.
         """
         rbac_auth_v1_api: RbacAuthorizationV1Api = k8s_client.rbac_auth_v1_api
-        cr_list: Optional[V1ClusterRoleList] = rbac_auth_v1_api.list_cluster_role(**kwargs)
+        cr_list: Optional[V1ClusterRoleList] = rbac_auth_v1_api.list_cluster_role(
+            **kwargs
+        )
         crs: Optional[List[V1ClusterRole]] = None
         if cr_list:
             crs = cr_list.items

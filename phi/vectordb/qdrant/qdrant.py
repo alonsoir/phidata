@@ -98,7 +98,9 @@ class Qdrant(VectorDb):
             logger.debug(f"Creating collection: {self.collection}")
             self.client.create_collection(
                 collection_name=self.collection,
-                vectors_config=models.VectorParams(size=self.dimensions, distance=_distance),
+                vectors_config=models.VectorParams(
+                    size=self.dimensions, distance=_distance
+                ),
             )
 
     def doc_exists(self, document: Document) -> bool:
@@ -132,7 +134,11 @@ class Qdrant(VectorDb):
             scroll_result = self.client.scroll(
                 collection_name=self.collection,
                 scroll_filter=models.Filter(
-                    must=[models.FieldCondition(key="name", match=models.MatchValue(value=name))]
+                    must=[
+                        models.FieldCondition(
+                            key="name", match=models.MatchValue(value=name)
+                        )
+                    ]
                 ),
                 limit=1,
             )
@@ -160,7 +166,9 @@ class Qdrant(VectorDb):
             )
             logger.debug(f"Inserted document: {document.name} ({document.meta_data})")
         if len(points) > 0:
-            self.client.upsert(collection_name=self.collection, wait=False, points=points)
+            self.client.upsert(
+                collection_name=self.collection, wait=False, points=points
+            )
         logger.debug(f"Upsert {len(points)} documents")
 
     def upsert(self, documents: List[Document]) -> None:
@@ -212,8 +220,12 @@ class Qdrant(VectorDb):
 
     def exists(self) -> bool:
         if self.client:
-            collections_response: models.CollectionsResponse = self.client.get_collections()
-            collections: List[models.CollectionDescription] = collections_response.collections
+            collections_response: models.CollectionsResponse = (
+                self.client.get_collections()
+            )
+            collections: List[models.CollectionDescription] = (
+                collections_response.collections
+            )
             for collection in collections:
                 if collection.name == self.collection:
                     # collection.status == models.CollectionStatus.GREEN
@@ -221,7 +233,9 @@ class Qdrant(VectorDb):
         return False
 
     def get_count(self) -> int:
-        count_result: models.CountResult = self.client.count(collection_name=self.collection, exact=True)
+        count_result: models.CountResult = self.client.count(
+            collection_name=self.collection, exact=True
+        )
         return count_result.count
 
     def optimize(self) -> None:

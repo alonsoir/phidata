@@ -196,7 +196,9 @@ class SecurityGroup(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be created.")
-                waiter = self.get_service_client(aws_client).get_waiter("security_group_exists")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "security_group_exists"
+                )
                 waiter.wait(
                     Filters=[
                         {
@@ -277,7 +279,9 @@ class SecurityGroup(AwsResource):
             if group_id is not None:
                 delete_response = service_client.delete_security_group(GroupId=group_id)
             else:
-                delete_response = service_client.delete_security_group(GroupName=self.name)
+                delete_response = service_client.delete_security_group(
+                    GroupName=self.name
+                )
             logger.debug(f"Response: {delete_response}")
 
             return True
@@ -290,8 +294,12 @@ class SecurityGroup(AwsResource):
                         f"as it is being used by another resource."
                     )
                     if ce_resp.get("Error", {}).get("Message", "") != "":
-                        logger.warning(f"Error: {ce_resp.get('Error', {}).get('Message', '')}")
-                    logger.warning("Please try again later or delete resources manually.")
+                        logger.warning(
+                            f"Error: {ce_resp.get('Error', {}).get('Message', '')}"
+                        )
+                    logger.warning(
+                        "Please try again later or delete resources manually."
+                    )
         except Exception as e:
             logger.error(f"{self.get_resource_type()} could not be deleted.")
             logger.error("Please try again or delete resources manually.")
@@ -315,7 +323,9 @@ class SecurityGroup(AwsResource):
                 return False
         return True
 
-    def get_security_group_id(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_security_group_id(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         """Returns the security group id"""
 
         if self.group_id is not None:
@@ -358,22 +368,31 @@ class SecurityGroup(AwsResource):
 
                 # Validate the response
                 if response is None or response.get("Return") is False:
-                    logger.error(f"Ingress rules could not be added to {self.get_resource_name()}")
+                    logger.error(
+                        f"Ingress rules could not be added to {self.get_resource_name()}"
+                    )
                     return False
             except ClientError as ce:
                 ce_resp = ce.response
                 if ce_resp is not None:
-                    if ce_resp.get("Error", {}).get("Code", "") == "InvalidPermission.Duplicate":
+                    if (
+                        ce_resp.get("Error", {}).get("Code", "")
+                        == "InvalidPermission.Duplicate"
+                    ):
                         pass
                 logger.debug(f"ClientError: {ce}")
             except Exception as e:
-                logger.error(f"Ingress rules could not be added to {self.get_resource_name()}: {e}")
+                logger.error(
+                    f"Ingress rules could not be added to {self.get_resource_name()}: {e}"
+                )
                 return False
 
         # Add inbound_rules
         if self.inbound_rules is not None:
             for rule in self.inbound_rules:
-                ip_permission: Dict[str, Any] = {"IpProtocol": rule.ip_protocol or "tcp"}
+                ip_permission: Dict[str, Any] = {
+                    "IpProtocol": rule.ip_protocol or "tcp"
+                }
                 if rule.from_port is not None:
                     ip_permission["FromPort"] = rule.from_port
                 if rule.to_port is not None:
@@ -390,7 +409,9 @@ class SecurityGroup(AwsResource):
                     try:
                         _cidr_ip = rule.cidr_ip_function()
                     except Exception as e:
-                        logger.warning(f"Error getting cidr_ip for {self.get_resource_name()}: {e}")
+                        logger.warning(
+                            f"Error getting cidr_ip for {self.get_resource_name()}: {e}"
+                        )
                 if _cidr_ip is not None:
                     ip_permission["IpRanges"] = [
                         {
@@ -407,7 +428,9 @@ class SecurityGroup(AwsResource):
                     try:
                         _cidr_ipv6 = rule.cidr_ipv6_function()
                     except Exception as e:
-                        logger.warning(f"Error getting cidr_ipv6 for {self.get_resource_name()}: {e}")
+                        logger.warning(
+                            f"Error getting cidr_ipv6 for {self.get_resource_name()}: {e}"
+                        )
                 if _cidr_ipv6 is not None:
                     ip_permission["Ipv6Ranges"] = [
                         {
@@ -424,7 +447,9 @@ class SecurityGroup(AwsResource):
                         if isinstance(rule.security_group_id, str):
                             source_sg_id = rule.security_group_id
                         elif isinstance(rule.security_group_id, AwsReference):
-                            source_sg_id = rule.security_group_id.get_reference(aws_client=aws_client)
+                            source_sg_id = rule.security_group_id.get_reference(
+                                aws_client=aws_client
+                            )
                     else:
                         source_sg_id = group_id
 
@@ -449,16 +474,23 @@ class SecurityGroup(AwsResource):
 
                     # Validate the response
                     if response is None or response.get("Return") is False:
-                        logger.error(f"Ingress rules could not be added to {self.get_resource_name()}")
+                        logger.error(
+                            f"Ingress rules could not be added to {self.get_resource_name()}"
+                        )
                         return False
                 except ClientError as ce:
                     ce_resp = ce.response
                     if ce_resp is not None:
-                        if ce_resp.get("Error", {}).get("Code", "") == "InvalidPermission.Duplicate":
+                        if (
+                            ce_resp.get("Error", {}).get("Code", "")
+                            == "InvalidPermission.Duplicate"
+                        ):
                             pass
                     logger.debug(f"ClientError: {ce}")
                 except Exception as e:
-                    logger.error(f"Ingress rules could not be added to {self.get_resource_name()}: {e}")
+                    logger.error(
+                        f"Ingress rules could not be added to {self.get_resource_name()}: {e}"
+                    )
                     return False
         return True
 
@@ -493,22 +525,31 @@ class SecurityGroup(AwsResource):
 
                 # Validate the response
                 if response is None or response.get("Return") is False:
-                    logger.error(f"Egress rules could not be added to {self.get_resource_name()}")
+                    logger.error(
+                        f"Egress rules could not be added to {self.get_resource_name()}"
+                    )
                     return False
             except ClientError as ce:
                 ce_resp = ce.response
                 if ce_resp is not None:
-                    if ce_resp.get("Error", {}).get("Code", "") == "InvalidPermission.Duplicate":
+                    if (
+                        ce_resp.get("Error", {}).get("Code", "")
+                        == "InvalidPermission.Duplicate"
+                    ):
                         pass
                 logger.debug(f"ClientError: {ce}")
             except Exception as e:
-                logger.error(f"Egress rules could not be added to {self.get_resource_name()}: {e}")
+                logger.error(
+                    f"Egress rules could not be added to {self.get_resource_name()}: {e}"
+                )
                 return False
 
         # Add outbound_rules
         if self.outbound_rules is not None:
             for rule in self.outbound_rules:
-                ip_permission: Dict[str, Any] = {"IpProtocol": rule.ip_protocol or "tcp"}
+                ip_permission: Dict[str, Any] = {
+                    "IpProtocol": rule.ip_protocol or "tcp"
+                }
                 if rule.from_port is not None:
                     ip_permission["FromPort"] = rule.from_port
                 if rule.to_port is not None:
@@ -525,7 +566,9 @@ class SecurityGroup(AwsResource):
                     try:
                         _cidr_ip = rule.cidr_ip_function()
                     except Exception as e:
-                        logger.warning(f"Error getting cidr_ip for {self.get_resource_name()}: {e}")
+                        logger.warning(
+                            f"Error getting cidr_ip for {self.get_resource_name()}: {e}"
+                        )
                 if _cidr_ip is not None:
                     ip_permission["IpRanges"] = [
                         {
@@ -542,7 +585,9 @@ class SecurityGroup(AwsResource):
                     try:
                         _cidr_ipv6 = rule.cidr_ipv6_function()
                     except Exception as e:
-                        logger.warning(f"Error getting cidr_ipv6 for {self.get_resource_name()}: {e}")
+                        logger.warning(
+                            f"Error getting cidr_ipv6 for {self.get_resource_name()}: {e}"
+                        )
                 if _cidr_ipv6 is not None:
                     ip_permission["Ipv6Ranges"] = [
                         {
@@ -556,7 +601,9 @@ class SecurityGroup(AwsResource):
                     if isinstance(rule.security_group_id, str):
                         destination_sg_id = rule.security_group_id
                     elif isinstance(rule.security_group_id, AwsReference):
-                        destination_sg_id = rule.security_group_id.get_reference(aws_client=aws_client)
+                        destination_sg_id = rule.security_group_id.get_reference(
+                            aws_client=aws_client
+                        )
 
                     user_id_group_pair = {}
                     if destination_sg_id is not None:
@@ -569,20 +616,29 @@ class SecurityGroup(AwsResource):
 
                 logger.debug(f"Adding Outbound Rule: {ip_permission}")
                 try:
-                    response = service_client.authorize_security_group_egress(IpPermissions=[ip_permission], **api_args)
+                    response = service_client.authorize_security_group_egress(
+                        IpPermissions=[ip_permission], **api_args
+                    )
                     logger.debug(f"Response: {response}")
 
                     # Validate the response
                     if response is None or response.get("Return") is False:
-                        logger.error(f"Egress rules could not be added to {self.get_resource_name()}")
+                        logger.error(
+                            f"Egress rules could not be added to {self.get_resource_name()}"
+                        )
                         return False
                 except ClientError as ce:
                     ce_resp = ce.response
                     if ce_resp is not None:
-                        if ce_resp.get("Error", {}).get("Code", "") == "InvalidPermission.Duplicate":
+                        if (
+                            ce_resp.get("Error", {}).get("Code", "")
+                            == "InvalidPermission.Duplicate"
+                        ):
                             pass
                     logger.debug(f"ClientError: {ce}")
                 except Exception as e:
-                    logger.error(f"Egress rules could not be added to {self.get_resource_name()}: {e}")
+                    logger.error(
+                        f"Egress rules could not be added to {self.get_resource_name()}: {e}"
+                    )
                     return False
         return True

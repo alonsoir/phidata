@@ -12,7 +12,9 @@ class WikipediaTools(Toolkit):
         super().__init__(name="wikipedia_tools")
         self.knowledge_base: Optional[WikipediaKnowledgeBase] = knowledge_base
 
-        if self.knowledge_base is not None and isinstance(self.knowledge_base, WikipediaKnowledgeBase):
+        if self.knowledge_base is not None and isinstance(
+            self.knowledge_base, WikipediaKnowledgeBase
+        ):
             self.register(self.search_wikipedia_and_update_knowledge_base)
         else:
             self.register(self.search_wikipedia)
@@ -47,8 +49,11 @@ class WikipediaTools(Toolkit):
             import wikipedia  # noqa: F401
         except ImportError:
             raise ImportError(
-                "The `wikipedia` package is not installed. " "Please install it via `pip install wikipedia`."
+                "The `wikipedia` package is not installed. "
+                "Please install it via `pip install wikipedia`."
             )
 
         logger.info(f"Searching wikipedia for: {query}")
-        return json.dumps(Document(name=query, content=wikipedia.summary(query)).to_dict())
+        return json.dumps(
+            Document(name=query, content=wikipedia.summary(query)).to_dict()
+        )

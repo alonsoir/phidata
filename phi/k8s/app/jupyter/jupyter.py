@@ -54,7 +54,9 @@ class Jupyter(K8sApp):
     schedule_pods_in_ebs_topology: bool = True
 
     def get_container_env(self, container_context: ContainerContext) -> Dict[str, str]:
-        container_env: Dict[str, str] = super().get_container_env(container_context=container_context)
+        container_env: Dict[str, str] = super().get_container_env(
+            container_context=container_context
+        )
 
         if self.jupyter_config_file is not None:
             container_env["JUPYTER_CONFIG_FILE"] = self.jupyter_config_file
@@ -75,9 +77,16 @@ class Jupyter(K8sApp):
 
         if self.notebook_dir is None:
             if self.mount_workspace:
-                container_context: Optional[ContainerContext] = self.get_container_context()
-                if container_context is not None and container_context.workspace_root is not None:
-                    container_cmd.append(f"--notebook-dir={str(container_context.workspace_root)}")
+                container_context: Optional[ContainerContext] = (
+                    self.get_container_context()
+                )
+                if (
+                    container_context is not None
+                    and container_context.workspace_root is not None
+                ):
+                    container_cmd.append(
+                        f"--notebook-dir={str(container_context.workspace_root)}"
+                    )
             else:
                 container_cmd.append("--notebook-dir=/")
         else:

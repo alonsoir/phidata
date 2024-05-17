@@ -74,9 +74,13 @@ class Listener(AwsResource):
             if target_group_arn is None:
                 logger.error("Target group ARN not available")
                 return False
-            not_null_args["DefaultActions"] = [{"Type": "forward", "TargetGroupArn": target_group_arn}]
+            not_null_args["DefaultActions"] = [
+                {"Type": "forward", "TargetGroupArn": target_group_arn}
+            ]
         else:
-            logger.warning(f"Neither target group nor default actions provided for {self.get_resource_name()}")
+            logger.warning(
+                f"Neither target group nor default actions provided for {self.get_resource_name()}"
+            )
             return True
 
         # Create Listener
@@ -115,7 +119,9 @@ class Listener(AwsResource):
                 # logger.error(f"Load balancer ARN not available")
                 return None
 
-            describe_response = service_client.describe_listeners(LoadBalancerArn=load_balancer_arn)
+            describe_response = service_client.describe_listeners(
+                LoadBalancerArn=load_balancer_arn
+            )
             logger.debug(f"Describe Response: {describe_response}")
             resource_list = describe_response.get("Listeners", None)
 
@@ -128,7 +134,9 @@ class Listener(AwsResource):
                         resource.get("Port", None) == current_listener_port
                         and resource.get("Protocol", None) == current_listener_protocol
                     ):
-                        logger.debug(f"Found {self.get_resource_type()}: {self.get_resource_name()}")
+                        logger.debug(
+                            f"Found {self.get_resource_type()}: {self.get_resource_name()}"
+                        )
                         self.active_resource = resource
                         break
         except ClientError as ce:
@@ -197,9 +205,13 @@ class Listener(AwsResource):
             if target_group_arn is None:
                 logger.error("Target group ARN not available")
                 return False
-            not_null_args["DefaultActions"] = [{"Type": "forward", "TargetGroupArn": target_group_arn}]
+            not_null_args["DefaultActions"] = [
+                {"Type": "forward", "TargetGroupArn": target_group_arn}
+            ]
         else:
-            logger.warning(f"Neither target group nor default actions provided for {self.get_resource_name()}")
+            logger.warning(
+                f"Neither target group nor default actions provided for {self.get_resource_name()}"
+            )
             return True
 
         service_client = self.get_service_client(aws_client)
@@ -257,10 +269,16 @@ class Listener(AwsResource):
             listener_protocol = self.load_balancer.protocol
 
         certificates = self.certificates
-        if certificates is None and self.acm_certificates is not None and len(self.acm_certificates) > 0:
+        if (
+            certificates is None
+            and self.acm_certificates is not None
+            and len(self.acm_certificates) > 0
+        ):
             certificates = []
             for cert in self.acm_certificates:
-                certificates.append({"CertificateArn": cert.get_certificate_arn(aws_client)})
+                certificates.append(
+                    {"CertificateArn": cert.get_certificate_arn(aws_client)}
+                )
 
         return certificates
 

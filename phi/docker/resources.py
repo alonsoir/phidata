@@ -40,7 +40,10 @@ class DockerResources(InfraResources):
         pull: Optional[bool] = None,
     ) -> Tuple[int, int]:
         from phi.cli.console import print_info, print_heading, confirm_yes_no
-        from phi.docker.resource.types import DockerContainer, DockerResourceInstallOrder
+        from phi.docker.resource.types import (
+            DockerContainer,
+            DockerResourceInstallOrder,
+        )
 
         logger.debug("-*- Creating DockerResources")
         # Build a list of DockerResources to create
@@ -50,19 +53,26 @@ class DockerResources(InfraResources):
                 if isinstance(r, ResourceGroup):
                     resources_from_resource_group = r.get_resources()
                     if len(resources_from_resource_group) > 0:
-                        for resource_from_resource_group in resources_from_resource_group:
+                        for (
+                            resource_from_resource_group
+                        ) in resources_from_resource_group:
                             if isinstance(resource_from_resource_group, DockerResource):
                                 resource_from_resource_group.set_workspace_settings(
                                     workspace_settings=self.workspace_settings
                                 )
-                                if resource_from_resource_group.group is None and self.name is not None:
+                                if (
+                                    resource_from_resource_group.group is None
+                                    and self.name is not None
+                                ):
                                     resource_from_resource_group.group = self.name
                                 if resource_from_resource_group.should_create(
                                     group_filter=group_filter,
                                     name_filter=name_filter,
                                     type_filter=type_filter,
                                 ):
-                                    resources_to_create.append(resource_from_resource_group)
+                                    resources_to_create.append(
+                                        resource_from_resource_group
+                                    )
                 elif isinstance(r, DockerResource):
                     r.set_workspace_settings(workspace_settings=self.workspace_settings)
                     if r.group is None and self.name is not None:
@@ -72,7 +82,9 @@ class DockerResources(InfraResources):
                         name_filter=name_filter,
                         type_filter=type_filter,
                     ):
-                        r.set_workspace_settings(workspace_settings=self.workspace_settings)
+                        r.set_workspace_settings(
+                            workspace_settings=self.workspace_settings
+                        )
                         resources_to_create.append(r)
 
         # Build a list of DockerApps to create
@@ -84,9 +96,14 @@ class DockerResources(InfraResources):
                     if len(apps_from_app_group) > 0:
                         for app_from_app_group in apps_from_app_group:
                             if isinstance(app_from_app_group, DockerApp):
-                                if app_from_app_group.group is None and self.name is not None:
+                                if (
+                                    app_from_app_group.group is None
+                                    and self.name is not None
+                                ):
                                     app_from_app_group.group = self.name
-                                if app_from_app_group.should_create(group_filter=group_filter):
+                                if app_from_app_group.should_create(
+                                    group_filter=group_filter
+                                ):
                                     apps_to_create.append(app_from_app_group)
                 elif isinstance(app, DockerApp):
                     if app.group is None and self.name is not None:
@@ -99,16 +116,22 @@ class DockerResources(InfraResources):
             logger.debug(f"Found {len(apps_to_create)} apps to create")
             for app in apps_to_create:
                 app.set_workspace_settings(workspace_settings=self.workspace_settings)
-                app_resources = app.get_resources(build_context=DockerBuildContext(network=self.network))
+                app_resources = app.get_resources(
+                    build_context=DockerBuildContext(network=self.network)
+                )
                 if len(app_resources) > 0:
                     # If the app has dependencies, add the resources from the
                     # dependencies first to the list of resources to create
                     if app.depends_on is not None:
                         for dep in app.depends_on:
                             if isinstance(dep, DockerApp):
-                                dep.set_workspace_settings(workspace_settings=self.workspace_settings)
+                                dep.set_workspace_settings(
+                                    workspace_settings=self.workspace_settings
+                                )
                                 dep_resources = dep.get_resources(
-                                    build_context=DockerBuildContext(network=self.network)
+                                    build_context=DockerBuildContext(
+                                        network=self.network
+                                    )
                                 )
                                 if len(dep_resources) > 0:
                                     for dep_resource in dep_resources:
@@ -116,13 +139,19 @@ class DockerResources(InfraResources):
                                             resources_to_create.append(dep_resource)
                     # Add the resources from the app to the list of resources to create
                     for app_resource in app_resources:
-                        if isinstance(app_resource, DockerResource) and app_resource.should_create(
-                            group_filter=group_filter, name_filter=name_filter, type_filter=type_filter
+                        if isinstance(
+                            app_resource, DockerResource
+                        ) and app_resource.should_create(
+                            group_filter=group_filter,
+                            name_filter=name_filter,
+                            type_filter=type_filter,
                         ):
                             resources_to_create.append(app_resource)
 
         # Sort the DockerResources in install order
-        resources_to_create.sort(key=lambda x: DockerResourceInstallOrder.get(x.__class__.__name__, 5000))
+        resources_to_create.sort(
+            key=lambda x: DockerResourceInstallOrder.get(x.__class__.__name__, 5000)
+        )
 
         # Deduplicate DockerResources
         deduped_resources_to_create: List[DockerResource] = []
@@ -140,7 +169,9 @@ class DockerResources(InfraResources):
                 for dep in docker_resource.depends_on:
                     if isinstance(dep, DockerResource):
                         if dep not in final_docker_resources:
-                            logger.debug(f"-*- Adding {dep.name}, dependency of {docker_resource.name}")
+                            logger.debug(
+                                f"-*- Adding {dep.name}, dependency of {docker_resource.name}"
+                            )
                             final_docker_resources.append(dep)
 
                 # Add the resource to be created after its dependencies
@@ -162,7 +193,9 @@ class DockerResources(InfraResources):
         if dry_run:
             print_heading("--**- Docker resources to create:")
             for resource in final_docker_resources:
-                print_info(f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}")
+                print_info(
+                    f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
             print_info(f"\nNetwork: {self.network}")
             print_info(f"Total {num_resources_to_create} resources")
             return 0, 0
@@ -171,7 +204,9 @@ class DockerResources(InfraResources):
         if not auto_confirm:
             print_heading("\n--**-- Confirm resources to create:")
             for resource in final_docker_resources:
-                print_info(f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}")
+                print_info(
+                    f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
             print_info(f"\nNetwork: {self.network}")
             print_info(f"Total {num_resources_to_create} resources")
             confirm = confirm_yes_no("\nConfirm deploy")
@@ -182,7 +217,9 @@ class DockerResources(InfraResources):
                 return 0, 0
 
         for resource in final_docker_resources:
-            print_info(f"\n-==+==- {resource.get_resource_type()}: {resource.get_resource_name()}")
+            print_info(
+                f"\n-==+==- {resource.get_resource_type()}: {resource.get_resource_name()}"
+            )
             if force is True:
                 resource.force = True
             if pull is True:
@@ -196,14 +233,21 @@ class DockerResources(InfraResources):
                 if _resource_created:
                     num_resources_created += 1
                 else:
-                    if self.workspace_settings is not None and not self.workspace_settings.continue_on_create_failure:
+                    if (
+                        self.workspace_settings is not None
+                        and not self.workspace_settings.continue_on_create_failure
+                    ):
                         return num_resources_created, num_resources_to_create
             except Exception as e:
-                logger.error(f"Failed to create {resource.get_resource_type()}: {resource.get_resource_name()}")
+                logger.error(
+                    f"Failed to create {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
                 logger.error(e)
                 logger.error("Please fix and try again...")
 
-        print_heading(f"\n--**-- Resources created: {num_resources_created}/{num_resources_to_create}")
+        print_heading(
+            f"\n--**-- Resources created: {num_resources_created}/{num_resources_to_create}"
+        )
         if num_resources_to_create != num_resources_created:
             logger.error(
                 f"Resources created: {num_resources_created} do not match resources required: {num_resources_to_create}"
@@ -220,7 +264,10 @@ class DockerResources(InfraResources):
         force: Optional[bool] = None,
     ) -> Tuple[int, int]:
         from phi.cli.console import print_info, print_heading, confirm_yes_no
-        from phi.docker.resource.types import DockerContainer, DockerResourceInstallOrder
+        from phi.docker.resource.types import (
+            DockerContainer,
+            DockerResourceInstallOrder,
+        )
 
         logger.debug("-*- Deleting DockerResources")
         # Build a list of DockerResources to delete
@@ -230,19 +277,26 @@ class DockerResources(InfraResources):
                 if isinstance(r, ResourceGroup):
                     resources_from_resource_group = r.get_resources()
                     if len(resources_from_resource_group) > 0:
-                        for resource_from_resource_group in resources_from_resource_group:
+                        for (
+                            resource_from_resource_group
+                        ) in resources_from_resource_group:
                             if isinstance(resource_from_resource_group, DockerResource):
                                 resource_from_resource_group.set_workspace_settings(
                                     workspace_settings=self.workspace_settings
                                 )
-                                if resource_from_resource_group.group is None and self.name is not None:
+                                if (
+                                    resource_from_resource_group.group is None
+                                    and self.name is not None
+                                ):
                                     resource_from_resource_group.group = self.name
                                 if resource_from_resource_group.should_delete(
                                     group_filter=group_filter,
                                     name_filter=name_filter,
                                     type_filter=type_filter,
                                 ):
-                                    resources_to_delete.append(resource_from_resource_group)
+                                    resources_to_delete.append(
+                                        resource_from_resource_group
+                                    )
                 elif isinstance(r, DockerResource):
                     r.set_workspace_settings(workspace_settings=self.workspace_settings)
                     if r.group is None and self.name is not None:
@@ -252,7 +306,9 @@ class DockerResources(InfraResources):
                         name_filter=name_filter,
                         type_filter=type_filter,
                     ):
-                        r.set_workspace_settings(workspace_settings=self.workspace_settings)
+                        r.set_workspace_settings(
+                            workspace_settings=self.workspace_settings
+                        )
                         resources_to_delete.append(r)
 
         # Build a list of DockerApps to delete
@@ -264,9 +320,14 @@ class DockerResources(InfraResources):
                     if len(apps_from_app_group) > 0:
                         for app_from_app_group in apps_from_app_group:
                             if isinstance(app_from_app_group, DockerApp):
-                                if app_from_app_group.group is None and self.name is not None:
+                                if (
+                                    app_from_app_group.group is None
+                                    and self.name is not None
+                                ):
                                     app_from_app_group.group = self.name
-                                if app_from_app_group.should_delete(group_filter=group_filter):
+                                if app_from_app_group.should_delete(
+                                    group_filter=group_filter
+                                ):
                                     apps_to_delete.append(app_from_app_group)
                 elif isinstance(app, DockerApp):
                     if app.group is None and self.name is not None:
@@ -279,12 +340,18 @@ class DockerResources(InfraResources):
             logger.debug(f"Found {len(apps_to_delete)} apps to delete")
             for app in apps_to_delete:
                 app.set_workspace_settings(workspace_settings=self.workspace_settings)
-                app_resources = app.get_resources(build_context=DockerBuildContext(network=self.network))
+                app_resources = app.get_resources(
+                    build_context=DockerBuildContext(network=self.network)
+                )
                 if len(app_resources) > 0:
                     # Add the resources from the app to the list of resources to delete
                     for app_resource in app_resources:
-                        if isinstance(app_resource, DockerResource) and app_resource.should_delete(
-                            group_filter=group_filter, name_filter=name_filter, type_filter=type_filter
+                        if isinstance(
+                            app_resource, DockerResource
+                        ) and app_resource.should_delete(
+                            group_filter=group_filter,
+                            name_filter=name_filter,
+                            type_filter=type_filter,
                         ):
                             resources_to_delete.append(app_resource)
                     # # If the app has dependencies, add the resources from the
@@ -302,7 +369,10 @@ class DockerResources(InfraResources):
                     #                         resources_to_delete.append(dep_resource)
 
         # Sort the DockerResources in install order
-        resources_to_delete.sort(key=lambda x: DockerResourceInstallOrder.get(x.__class__.__name__, 5000), reverse=True)
+        resources_to_delete.sort(
+            key=lambda x: DockerResourceInstallOrder.get(x.__class__.__name__, 5000),
+            reverse=True,
+        )
 
         # Deduplicate DockerResources
         deduped_resources_to_delete: List[DockerResource] = []
@@ -322,7 +392,9 @@ class DockerResources(InfraResources):
                 # 2. Remove the dependencies if they are already added to the final_docker_resources
                 for dep in docker_resource.depends_on:
                     if dep in final_docker_resources:
-                        logger.debug(f"-*- Removing {dep.name}, dependency of {docker_resource.name}")
+                        logger.debug(
+                            f"-*- Removing {dep.name}, dependency of {docker_resource.name}"
+                        )
                         final_docker_resources.remove(dep)
 
                 # 3. Add the resource to be deleted before its dependencies
@@ -334,7 +406,9 @@ class DockerResources(InfraResources):
                 for dep in docker_resource.depends_on:
                     if isinstance(dep, DockerResource):
                         if dep not in final_docker_resources:
-                            logger.debug(f"-*- Adding {dep.name}, dependency of {docker_resource.name}")
+                            logger.debug(
+                                f"-*- Adding {dep.name}, dependency of {docker_resource.name}"
+                            )
                             final_docker_resources.append(dep)
             else:
                 # Add the resource to be deleted if it has no dependencies
@@ -351,7 +425,9 @@ class DockerResources(InfraResources):
         if dry_run:
             print_heading("--**- Docker resources to delete:")
             for resource in final_docker_resources:
-                print_info(f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}")
+                print_info(
+                    f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
             print_info("")
             print_info(f"\nNetwork: {self.network}")
             print_info(f"Total {num_resources_to_delete} resources")
@@ -361,7 +437,9 @@ class DockerResources(InfraResources):
         if not auto_confirm:
             print_heading("\n--**-- Confirm resources to delete:")
             for resource in final_docker_resources:
-                print_info(f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}")
+                print_info(
+                    f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
             print_info("")
             print_info(f"\nNetwork: {self.network}")
             print_info(f"Total {num_resources_to_delete} resources")
@@ -373,7 +451,9 @@ class DockerResources(InfraResources):
                 return 0, 0
 
         for resource in final_docker_resources:
-            print_info(f"\n-==+==- {resource.get_resource_type()}: {resource.get_resource_name()}")
+            print_info(
+                f"\n-==+==- {resource.get_resource_type()}: {resource.get_resource_name()}"
+            )
             if force is True:
                 resource.force = True
             if isinstance(resource, DockerContainer):
@@ -385,14 +465,21 @@ class DockerResources(InfraResources):
                 if _resource_deleted:
                     num_resources_deleted += 1
                 else:
-                    if self.workspace_settings is not None and not self.workspace_settings.continue_on_delete_failure:
+                    if (
+                        self.workspace_settings is not None
+                        and not self.workspace_settings.continue_on_delete_failure
+                    ):
                         return num_resources_deleted, num_resources_to_delete
             except Exception as e:
-                logger.error(f"Failed to delete {resource.get_resource_type()}: {resource.get_resource_name()}")
+                logger.error(
+                    f"Failed to delete {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
                 logger.error(e)
                 logger.error("Please fix and try again...")
 
-        print_heading(f"\n--**-- Resources deleted: {num_resources_deleted}/{num_resources_to_delete}")
+        print_heading(
+            f"\n--**-- Resources deleted: {num_resources_deleted}/{num_resources_to_delete}"
+        )
         if num_resources_to_delete != num_resources_deleted:
             logger.error(
                 f"Resources deleted: {num_resources_deleted} do not match resources required: {num_resources_to_delete}"
@@ -410,7 +497,10 @@ class DockerResources(InfraResources):
         pull: Optional[bool] = None,
     ) -> Tuple[int, int]:
         from phi.cli.console import print_info, print_heading, confirm_yes_no
-        from phi.docker.resource.types import DockerContainer, DockerResourceInstallOrder
+        from phi.docker.resource.types import (
+            DockerContainer,
+            DockerResourceInstallOrder,
+        )
 
         logger.debug("-*- Updating DockerResources")
 
@@ -421,19 +511,26 @@ class DockerResources(InfraResources):
                 if isinstance(r, ResourceGroup):
                     resources_from_resource_group = r.get_resources()
                     if len(resources_from_resource_group) > 0:
-                        for resource_from_resource_group in resources_from_resource_group:
+                        for (
+                            resource_from_resource_group
+                        ) in resources_from_resource_group:
                             if isinstance(resource_from_resource_group, DockerResource):
                                 resource_from_resource_group.set_workspace_settings(
                                     workspace_settings=self.workspace_settings
                                 )
-                                if resource_from_resource_group.group is None and self.name is not None:
+                                if (
+                                    resource_from_resource_group.group is None
+                                    and self.name is not None
+                                ):
                                     resource_from_resource_group.group = self.name
                                 if resource_from_resource_group.should_update(
                                     group_filter=group_filter,
                                     name_filter=name_filter,
                                     type_filter=type_filter,
                                 ):
-                                    resources_to_update.append(resource_from_resource_group)
+                                    resources_to_update.append(
+                                        resource_from_resource_group
+                                    )
                 elif isinstance(r, DockerResource):
                     r.set_workspace_settings(workspace_settings=self.workspace_settings)
                     if r.group is None and self.name is not None:
@@ -443,7 +540,9 @@ class DockerResources(InfraResources):
                         name_filter=name_filter,
                         type_filter=type_filter,
                     ):
-                        r.set_workspace_settings(workspace_settings=self.workspace_settings)
+                        r.set_workspace_settings(
+                            workspace_settings=self.workspace_settings
+                        )
                         resources_to_update.append(r)
 
         # Build a list of DockerApps to update
@@ -455,9 +554,14 @@ class DockerResources(InfraResources):
                     if len(apps_from_app_group) > 0:
                         for app_from_app_group in apps_from_app_group:
                             if isinstance(app_from_app_group, DockerApp):
-                                if app_from_app_group.group is None and self.name is not None:
+                                if (
+                                    app_from_app_group.group is None
+                                    and self.name is not None
+                                ):
                                     app_from_app_group.group = self.name
-                                if app_from_app_group.should_update(group_filter=group_filter):
+                                if app_from_app_group.should_update(
+                                    group_filter=group_filter
+                                ):
                                     apps_to_update.append(app_from_app_group)
                 elif isinstance(app, DockerApp):
                     if app.group is None and self.name is not None:
@@ -470,7 +574,9 @@ class DockerResources(InfraResources):
             logger.debug(f"Found {len(apps_to_update)} apps to update")
             for app in apps_to_update:
                 app.set_workspace_settings(workspace_settings=self.workspace_settings)
-                app_resources = app.get_resources(build_context=DockerBuildContext(network=self.network))
+                app_resources = app.get_resources(
+                    build_context=DockerBuildContext(network=self.network)
+                )
                 if len(app_resources) > 0:
                     # # If the app has dependencies, add the resources from the
                     # # dependencies first to the list of resources to update
@@ -487,13 +593,20 @@ class DockerResources(InfraResources):
                     #                         resources_to_update.append(dep_resource)
                     # Add the resources from the app to the list of resources to update
                     for app_resource in app_resources:
-                        if isinstance(app_resource, DockerResource) and app_resource.should_update(
-                            group_filter=group_filter, name_filter=name_filter, type_filter=type_filter
+                        if isinstance(
+                            app_resource, DockerResource
+                        ) and app_resource.should_update(
+                            group_filter=group_filter,
+                            name_filter=name_filter,
+                            type_filter=type_filter,
                         ):
                             resources_to_update.append(app_resource)
 
         # Sort the DockerResources in install order
-        resources_to_update.sort(key=lambda x: DockerResourceInstallOrder.get(x.__class__.__name__, 5000), reverse=True)
+        resources_to_update.sort(
+            key=lambda x: DockerResourceInstallOrder.get(x.__class__.__name__, 5000),
+            reverse=True,
+        )
 
         # Deduplicate DockerResources
         deduped_resources_to_update: List[DockerResource] = []
@@ -511,7 +624,9 @@ class DockerResources(InfraResources):
                 for dep in docker_resource.depends_on:
                     if isinstance(dep, DockerResource):
                         if dep not in final_docker_resources:
-                            logger.debug(f"-*- Adding {dep.name}, dependency of {docker_resource.name}")
+                            logger.debug(
+                                f"-*- Adding {dep.name}, dependency of {docker_resource.name}"
+                            )
                             final_docker_resources.append(dep)
 
                 # Add the resource to be created after its dependencies
@@ -533,7 +648,9 @@ class DockerResources(InfraResources):
         if dry_run:
             print_heading("--**- Docker resources to update:")
             for resource in final_docker_resources:
-                print_info(f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}")
+                print_info(
+                    f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
             print_info("")
             print_info(f"\nNetwork: {self.network}")
             print_info(f"Total {num_resources_to_update} resources")
@@ -543,7 +660,9 @@ class DockerResources(InfraResources):
         if not auto_confirm:
             print_heading("\n--**-- Confirm resources to update:")
             for resource in final_docker_resources:
-                print_info(f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}")
+                print_info(
+                    f"  -+-> {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
             print_info("")
             print_info(f"\nNetwork: {self.network}")
             print_info(f"Total {num_resources_to_update} resources")
@@ -555,7 +674,9 @@ class DockerResources(InfraResources):
                 return 0, 0
 
         for resource in final_docker_resources:
-            print_info(f"\n-==+==- {resource.get_resource_type()}: {resource.get_resource_name()}")
+            print_info(
+                f"\n-==+==- {resource.get_resource_type()}: {resource.get_resource_name()}"
+            )
             if force is True:
                 resource.force = True
             if pull is True:
@@ -569,14 +690,21 @@ class DockerResources(InfraResources):
                 if _resource_updated:
                     num_resources_updated += 1
                 else:
-                    if self.workspace_settings is not None and not self.workspace_settings.continue_on_patch_failure:
+                    if (
+                        self.workspace_settings is not None
+                        and not self.workspace_settings.continue_on_patch_failure
+                    ):
                         return num_resources_updated, num_resources_to_update
             except Exception as e:
-                logger.error(f"Failed to update {resource.get_resource_type()}: {resource.get_resource_name()}")
+                logger.error(
+                    f"Failed to update {resource.get_resource_type()}: {resource.get_resource_name()}"
+                )
                 logger.error(e)
                 logger.error("Please fix and try again...")
 
-        print_heading(f"\n--**-- Resources updated: {num_resources_updated}/{num_resources_to_update}")
+        print_heading(
+            f"\n--**-- Resources updated: {num_resources_updated}/{num_resources_to_update}"
+        )
         if num_resources_to_update != num_resources_updated:
             logger.error(
                 f"Resources updated: {num_resources_updated} do not match resources required: {num_resources_to_update}"

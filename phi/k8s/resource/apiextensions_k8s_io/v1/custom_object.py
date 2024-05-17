@@ -122,12 +122,14 @@ class CustomObject(K8sResource):
         print_info("Sleeping for 5 seconds so that CRDs can be registered")
         sleep(5)
         logger.debug("Creating: {}".format(self.get_resource_name()))
-        custom_object: Dict[str, Any] = custom_objects_api.create_namespaced_custom_object(
-            group=self.group,
-            version=self.version,
-            namespace=namespace,
-            plural=self.plural,
-            body=k8s_object,
+        custom_object: Dict[str, Any] = (
+            custom_objects_api.create_namespaced_custom_object(
+                group=self.group,
+                version=self.version,
+                namespace=namespace,
+                plural=self.plural,
+                body=k8s_object,
+            )
         )
         # logger.debug("Created:\n{}".format(pformat(custom_object, indent=2)))
         if custom_object.get("metadata", {}).get("creationTimestamp", None) is not None:
@@ -154,7 +156,8 @@ class CustomObject(K8sResource):
             return None
 
         active_resources_dict = {
-            _custom_object.get("metadata", {}).get("name", None): _custom_object for _custom_object in active_resources
+            _custom_object.get("metadata", {}).get("name", None): _custom_object
+            for _custom_object in active_resources
         }
 
         custom_object_name = self.get_resource_name()
@@ -171,13 +174,15 @@ class CustomObject(K8sResource):
         namespace = self.get_namespace()
 
         logger.debug("Updating: {}".format(custom_object_name))
-        custom_object: Dict[str, Any] = custom_objects_api.patch_namespaced_custom_object(
-            group=self.group,
-            version=self.version,
-            namespace=namespace,
-            plural=self.plural,
-            name=custom_object_name,
-            body=k8s_object,
+        custom_object: Dict[str, Any] = (
+            custom_objects_api.patch_namespaced_custom_object(
+                group=self.group,
+                version=self.version,
+                namespace=namespace,
+                plural=self.plural,
+                name=custom_object_name,
+                body=k8s_object,
+            )
         )
         # logger.debug("Updated: {}".format(custom_object))
         if custom_object.get("metadata", {}).get("creationTimestamp", None) is not None:
@@ -196,13 +201,15 @@ class CustomObject(K8sResource):
         self.active_resource = None
         delete_options = V1DeleteOptions()
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_status.py
-        delete_status: Dict[str, Any] = custom_objects_api.delete_namespaced_custom_object(
-            group=self.group,
-            version=self.version,
-            namespace=namespace,
-            plural=self.plural,
-            name=custom_object_name,
-            body=delete_options,
+        delete_status: Dict[str, Any] = (
+            custom_objects_api.delete_namespaced_custom_object(
+                group=self.group,
+                version=self.version,
+                namespace=namespace,
+                plural=self.plural,
+                name=custom_object_name,
+                body=delete_options,
+            )
         )
         logger.debug("delete_status: {}".format(delete_status))
         if delete_status.get("status", None) == "Success":

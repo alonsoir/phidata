@@ -38,9 +38,14 @@ def get_workspace_dir_path(ws_root_path: Path) -> Path:
         phidata_conf = read_pyproject_phidata(ws_pyproject_toml)
         if phidata_conf is not None:
             phidata_conf_workspace_dir_str = phidata_conf.get("workspace", None)
-            phidata_conf_workspace_dir_path = ws_root_path.joinpath(phidata_conf_workspace_dir_str)
+            phidata_conf_workspace_dir_path = ws_root_path.joinpath(
+                phidata_conf_workspace_dir_str
+            )
             logger.debug(f"Searching {phidata_conf_workspace_dir_path}")
-            if phidata_conf_workspace_dir_path.exists() and phidata_conf_workspace_dir_path.is_dir():
+            if (
+                phidata_conf_workspace_dir_path.exists()
+                and phidata_conf_workspace_dir_path.is_dir()
+            ):
                 return phidata_conf_workspace_dir_path
 
     logger.error(f"Could not find a workspace dir at {ws_root_path}")

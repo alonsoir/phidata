@@ -95,7 +95,11 @@ class SupersetBase(DockerApp):
     redis_driver: str = "redis"
 
     def get_db_user(self) -> Optional[str]:
-        return self.db_user or self.get_secret_from_file("DATABASE_USER") or self.get_secret_from_file("DB_USER")
+        return (
+            self.db_user
+            or self.get_secret_from_file("DATABASE_USER")
+            or self.get_secret_from_file("DB_USER")
+        )
 
     def get_db_password(self) -> Optional[str]:
         return (
@@ -105,13 +109,25 @@ class SupersetBase(DockerApp):
         )
 
     def get_db_database(self) -> Optional[str]:
-        return self.db_database or self.get_secret_from_file("DATABASE_DB") or self.get_secret_from_file("DB_DATABASE")
+        return (
+            self.db_database
+            or self.get_secret_from_file("DATABASE_DB")
+            or self.get_secret_from_file("DB_DATABASE")
+        )
 
     def get_db_driver(self) -> Optional[str]:
-        return self.db_driver or self.get_secret_from_file("DATABASE_DIALECT") or self.get_secret_from_file("DB_DRIVER")
+        return (
+            self.db_driver
+            or self.get_secret_from_file("DATABASE_DIALECT")
+            or self.get_secret_from_file("DB_DRIVER")
+        )
 
     def get_db_host(self) -> Optional[str]:
-        return self.db_host or self.get_secret_from_file("DATABASE_HOST") or self.get_secret_from_file("DB_HOST")
+        return (
+            self.db_host
+            or self.get_secret_from_file("DATABASE_HOST")
+            or self.get_secret_from_file("DB_HOST")
+        )
 
     def get_db_port(self) -> Optional[int]:
         return (
@@ -159,7 +175,8 @@ class SupersetBase(DockerApp):
                 "PRINT_ENV_ON_LOAD": str(self.print_env_on_load),
                 "RESOURCES_DIR_CONTAINER_PATH": str(self.resources_dir_container_path),
                 PHI_RUNTIME_ENV_VAR: "docker",
-                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file or "",
+                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file
+                or "",
                 SCRIPTS_DIR_ENV_VAR: container_context.scripts_dir or "",
                 STORAGE_DIR_ENV_VAR: container_context.storage_dir or "",
                 WORKFLOWS_DIR_ENV_VAR: container_context.workflows_dir or "",
@@ -173,9 +190,13 @@ class SupersetBase(DockerApp):
         try:
             if container_context.workspace_schema is not None:
                 if container_context.workspace_schema.id_workspace is not None:
-                    container_env[WORKSPACE_ID_ENV_VAR] = str(container_context.workspace_schema.id_workspace) or ""
+                    container_env[WORKSPACE_ID_ENV_VAR] = (
+                        str(container_context.workspace_schema.id_workspace) or ""
+                    )
                 if container_context.workspace_schema.ws_hash is not None:
-                    container_env[WORKSPACE_HASH_ENV_VAR] = container_context.workspace_schema.ws_hash
+                    container_env[WORKSPACE_HASH_ENV_VAR] = (
+                        container_context.workspace_schema.ws_hash
+                    )
         except Exception:
             pass
 
@@ -183,10 +204,17 @@ class SupersetBase(DockerApp):
             python_path = self.python_path
             if python_path is None:
                 python_path = f"/app/pythonpath:{container_context.workspace_root}"
-                if self.mount_resources and self.resources_dir_container_path is not None:
-                    python_path = "{}:{}/pythonpath_dev".format(python_path, self.resources_dir_container_path)
+                if (
+                    self.mount_resources
+                    and self.resources_dir_container_path is not None
+                ):
+                    python_path = "{}:{}/pythonpath_dev".format(
+                        python_path, self.resources_dir_container_path
+                    )
                 if self.add_python_paths is not None:
-                    python_path = "{}:{}".format(python_path, ":".join(self.add_python_paths))
+                    python_path = "{}:{}".format(
+                        python_path, ":".join(self.add_python_paths)
+                    )
             if python_path is not None:
                 container_env[PYTHONPATH_ENV_VAR] = python_path
 
@@ -244,7 +272,9 @@ class SupersetBase(DockerApp):
         redis_port = self.get_redis_port()
         redis_driver = self.get_redis_driver()
         if self.redis_app is not None and isinstance(self.redis_app, DbApp):
-            logger.debug(f"Reading redis connection details from: {self.redis_app.name}")
+            logger.debug(
+                f"Reading redis connection details from: {self.redis_app.name}"
+            )
             if redis_host is None:
                 redis_host = self.redis_app.get_db_host()
             if redis_port is None:
@@ -262,17 +292,23 @@ class SupersetBase(DockerApp):
         # Update the container env using env_file
         env_data_from_file = self.get_env_file_data()
         if env_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in env_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in env_data_from_file.items() if v is not None}
+            )
 
         # Update the container env using secrets_file
         secret_data_from_file = self.get_secret_file_data()
         if secret_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in secret_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in secret_data_from_file.items() if v is not None}
+            )
 
         # Update the container env with user provided env_vars
         # this overwrites any existing variables with the same key
         if self.env_vars is not None and isinstance(self.env_vars, dict):
-            container_env.update({k: str(v) for k, v in self.env_vars.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in self.env_vars.items() if v is not None}
+            )
 
         # logger.debug("Container Environment: {}".format(container_env))
         return container_env

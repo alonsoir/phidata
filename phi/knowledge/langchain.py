@@ -28,14 +28,18 @@ class LangChainKnowledgeBase(AssistantKnowledge):
             logger.debug("Creating retriever")
             if self.search_kwargs is None:
                 self.search_kwargs = {"k": self.num_documents}
-            self.retriever = self.vectorstore.as_retriever(search_kwargs=self.search_kwargs)
+            self.retriever = self.vectorstore.as_retriever(
+                search_kwargs=self.search_kwargs
+            )
 
         if self.retriever is None:
             logger.error("No retriever provided")
             return []
 
         if not isinstance(self.retriever, VectorStoreRetriever):
-            raise ValueError(f"Retriever is not of type VectorStoreRetriever: {self.retriever}")
+            raise ValueError(
+                f"Retriever is not of type VectorStoreRetriever: {self.retriever}"
+            )
 
         _num_documents = num_documents or self.num_documents
         logger.debug(f"Getting {_num_documents} relevant documents for query: {query}")
@@ -50,12 +54,16 @@ class LangChainKnowledgeBase(AssistantKnowledge):
             )
         return documents
 
-    def load(self, recreate: bool = False, upsert: bool = True, skip_existing: bool = True) -> None:
+    def load(
+        self, recreate: bool = False, upsert: bool = True, skip_existing: bool = True
+    ) -> None:
         if self.loader is None:
             logger.error("No loader provided for LangChainKnowledgeBase")
             return
         self.loader()
 
     def exists(self) -> bool:
-        logger.warning("LangChainKnowledgeBase.exists() not supported - please check the vectorstore manually.")
+        logger.warning(
+            "LangChainKnowledgeBase.exists() not supported - please check the vectorstore manually."
+        )
         return True

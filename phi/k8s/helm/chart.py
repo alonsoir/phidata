@@ -45,7 +45,9 @@ class HelmChart(ResourceBase):
             get_args = ["helm", "get", "manifest", self.name]
             if self.namespace is not None:
                 get_args.append(f"--namespace={self.namespace}")
-            get_result = run_shell_command(get_args, display_result=False, display_error=False)
+            get_result = run_shell_command(
+                get_args, display_result=False, display_error=False
+            )
             if get_result.stdout:
                 import yaml
 
@@ -122,22 +124,30 @@ class HelmChart(ResourceBase):
         client: K8sApiClient = k8s_client or self.get_k8s_client()
         if self.use_cache and self.is_active(client):
             self.resource_created = True
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} already exists")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} already exists"
+            )
             return True
 
         # Step 3: Create the resource
         else:
             self.resource_created = self._create(client)
             if self.resource_created:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} created")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} created"
+                )
 
         # Step 4: Run post create steps
         if self.resource_created:
             if self.save_output:
                 self.save_output_file()
-            logger.debug(f"Running post-create for {self.get_resource_type()}: {self.get_resource_name()}")
+            logger.debug(
+                f"Running post-create for {self.get_resource_type()}: {self.get_resource_name()}"
+            )
             return self.post_create(client)
-        logger.error(f"Failed to create {self.get_resource_type()}: {self.get_resource_name()}")
+        logger.error(
+            f"Failed to create {self.get_resource_type()}: {self.get_resource_name()}"
+        )
         return self.resource_created
 
     def post_create(self, k8s_client: K8sApiClient) -> bool:
@@ -174,17 +184,25 @@ class HelmChart(ResourceBase):
         if self.is_active(client):
             self.resource_updated = self._update(client)
         else:
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} does not exist")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} does not exist"
+            )
             return True
 
         # Step 3: Run post update steps
         if self.resource_updated:
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} updated")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} updated"
+            )
             if self.save_output:
                 self.save_output_file()
-            logger.debug(f"Running post-update for {self.get_resource_type()}: {self.get_resource_name()}")
+            logger.debug(
+                f"Running post-update for {self.get_resource_type()}: {self.get_resource_name()}"
+            )
             return self.post_update(client)
-        logger.error(f"Failed to update {self.get_resource_type()}: {self.get_resource_name()}")
+        logger.error(
+            f"Failed to update {self.get_resource_type()}: {self.get_resource_name()}"
+        )
         return self.resource_updated
 
     def post_update(self, k8s_client: K8sApiClient) -> bool:
@@ -213,17 +231,25 @@ class HelmChart(ResourceBase):
         if self.is_active(client):
             self.resource_deleted = self._delete(client)
         else:
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} does not exist")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} does not exist"
+            )
             return True
 
         # Step 3: Run post delete steps
         if self.resource_deleted:
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} deleted")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} deleted"
+            )
             if self.save_output:
                 self.delete_output_file()
-            logger.debug(f"Running post-delete for {self.get_resource_type()}: {self.get_resource_name()}.")
+            logger.debug(
+                f"Running post-delete for {self.get_resource_type()}: {self.get_resource_name()}."
+            )
             return self.post_delete(client)
-        logger.error(f"Failed to delete {self.get_resource_type()}: {self.get_resource_name()}")
+        logger.error(
+            f"Failed to delete {self.get_resource_type()}: {self.get_resource_name()}"
+        )
         return self.resource_deleted
 
     def post_delete(self, k8s_client: K8sApiClient) -> bool:

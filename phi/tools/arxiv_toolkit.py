@@ -17,18 +17,27 @@ except ImportError:
 
 
 class ArxivToolkit(Toolkit):
-    def __init__(self, search_arxiv: bool = True, read_arxiv_papers: bool = True, download_dir: Optional[Path] = None):
+    def __init__(
+        self,
+        search_arxiv: bool = True,
+        read_arxiv_papers: bool = True,
+        download_dir: Optional[Path] = None,
+    ):
         super().__init__(name="arxiv_tools")
 
         self.client: arxiv.Client = arxiv.Client()
-        self.download_dir: Path = download_dir or Path(__file__).parent.joinpath("arxiv_pdfs")
+        self.download_dir: Path = download_dir or Path(__file__).parent.joinpath(
+            "arxiv_pdfs"
+        )
 
         if search_arxiv:
             self.register(self.search_arxiv_and_return_articles)
         if read_arxiv_papers:
             self.register(self.read_arxiv_papers)
 
-    def search_arxiv_and_return_articles(self, query: str, num_articles: int = 10) -> str:
+    def search_arxiv_and_return_articles(
+        self, query: str, num_articles: int = 10
+    ) -> str:
         """Use this function to search arXiv for a query and return the top articles.
 
         Args:
@@ -56,7 +65,9 @@ class ArxivToolkit(Toolkit):
                     "authors": [author.name for author in result.authors],
                     "primary_category": result.primary_category,
                     "categories": result.categories,
-                    "published": result.published.isoformat() if result.published else None,
+                    "published": (
+                        result.published.isoformat() if result.published else None
+                    ),
                     "pdf_url": result.pdf_url,
                     "links": [link.href for link in result.links],
                     "summary": result.summary,
@@ -67,7 +78,9 @@ class ArxivToolkit(Toolkit):
                 logger.error(f"Error processing article: {e}")
         return json.dumps(articles, indent=4)
 
-    def read_arxiv_papers(self, id_list: List[str], pages_to_read: Optional[int] = None) -> str:
+    def read_arxiv_papers(
+        self, id_list: List[str], pages_to_read: Optional[int] = None
+    ) -> str:
         """Use this function to read a list of arxiv papers and return the content.
 
         Args:
@@ -93,7 +106,9 @@ class ArxivToolkit(Toolkit):
                     "authors": [author.name for author in result.authors],
                     "primary_category": result.primary_category,
                     "categories": result.categories,
-                    "published": result.published.isoformat() if result.published else None,
+                    "published": (
+                        result.published.isoformat() if result.published else None
+                    ),
                     "pdf_url": result.pdf_url,
                     "links": [link.href for link in result.links],
                     "summary": result.summary,

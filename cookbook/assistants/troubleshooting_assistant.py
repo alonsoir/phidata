@@ -9,7 +9,11 @@ error_message = ""
 troubleshooting_assistant = Assistant(
     llm=OpenAIChat(model="gpt-4o"),
     description="You help people with their refactor needs of code goals.",
-    instructions=["I’m encountering an error message {error_message} in my code. Can you help me troubleshoot and find a solution?"],
+    instructions=[
+        "I’m encountering an error message {error_message} in my code. Can you help me troubleshoot and find a solution?"
+    ],
 )
 # -*- Print a response to the cli
-troubleshooting_assistant.print_response(f"help me with my code, this is the error i found:\n{error_message}", markdown=True)
+troubleshooting_assistant.print_response(
+    f"help me with my code, this is the error i found:\n{error_message}", markdown=True
+)

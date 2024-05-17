@@ -169,9 +169,13 @@ class EksNodeGroup(AwsResource):
             try:
                 nodegroup_iam_role.create(aws_client)
                 nodegroup_iam_role_arn = nodegroup_iam_role.read(aws_client).arn
-                print_info(f"ARN for {nodegroup_iam_role.name}: {nodegroup_iam_role_arn}")
+                print_info(
+                    f"ARN for {nodegroup_iam_role.name}: {nodegroup_iam_role_arn}"
+                )
             except Exception as e:
-                logger.error("NodeGroup IamRole creation failed, please fix and try again")
+                logger.error(
+                    "NodeGroup IamRole creation failed, please fix and try again"
+                )
                 logger.error(e)
                 return False
         if nodegroup_iam_role_arn is None:
@@ -194,7 +198,10 @@ class EksNodeGroup(AwsResource):
                 subnets = [
                     subnet_id
                     for subnet_id in subnets
-                    if Subnet(name=subnet_id).get_availability_zone(aws_client=aws_client) in azs_filter
+                    if Subnet(name=subnet_id).get_availability_zone(
+                        aws_client=aws_client
+                    )
+                    in azs_filter
                 ]
             logger.debug(f"Using subnets from EKSCluster: {subnets}")
         # cast for type checker
@@ -286,7 +293,9 @@ class EksNodeGroup(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be created.")
-                waiter = self.get_service_client(aws_client).get_waiter("nodegroup_active")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "nodegroup_active"
+                )
                 waiter.wait(
                     clusterName=self.eks_cluster.name,
                     nodegroupName=self.name,
@@ -347,7 +356,9 @@ class EksNodeGroup(AwsResource):
             try:
                 nodegroup_iam_role.delete(aws_client)
             except Exception as e:
-                logger.error("IamRole deletion failed, please try again or delete manually")
+                logger.error(
+                    "IamRole deletion failed, please try again or delete manually"
+                )
                 logger.error(e)
 
         # Step 2: Delete the NodeGroup
@@ -371,7 +382,9 @@ class EksNodeGroup(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("nodegroup_deleted")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "nodegroup_deleted"
+                )
                 waiter.wait(
                     clusterName=self.eks_cluster.name,
                     nodegroupName=self.name,

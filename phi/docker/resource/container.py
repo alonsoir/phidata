@@ -123,16 +123,22 @@ class DockerContainer(DockerResource):
         try:
             _api_client: DockerClient = docker_client.api_client
             with Progress(
-                SpinnerColumn(spinner_name="dots"), TextColumn("{task.description}"), transient=True
+                SpinnerColumn(spinner_name="dots"),
+                TextColumn("{task.description}"),
+                transient=True,
             ) as progress:
                 if self.pull:
                     try:
-                        pull_image_task = progress.add_task("Downloading Image...")  # noqa: F841
+                        pull_image_task = progress.add_task(
+                            "Downloading Image..."
+                        )  # noqa: F841
                         _api_client.images.pull(self.image, platform=self.platform)
                         progress.update(pull_image_task, completed=True)
                     except Exception as pull_exc:
                         logger.debug(f"Could not pull image: {self.image}: {pull_exc}")
-                run_container_task = progress.add_task("Running Container...")  # noqa: F841
+                run_container_task = progress.add_task(
+                    "Running Container..."
+                )  # noqa: F841
                 container_object = _api_client.containers.run(
                     name=self.name,
                     image=self.image,
@@ -164,7 +170,9 @@ class DockerContainer(DockerResource):
                 )
                 return container_object
         except ImageNotFound as img_error:
-            logger.error(f"Image {self.image} not found. Explanation: {img_error.explanation}")
+            logger.error(
+                f"Image {self.image} not found. Explanation: {img_error.explanation}"
+            )
             raise
         except APIError as api_err:
             logger.error(f"APIError: {api_err.explanation}")
@@ -212,11 +220,17 @@ class DockerContainer(DockerResource):
                 from rich.progress import Progress, SpinnerColumn, TextColumn
 
                 with Progress(
-                    SpinnerColumn(spinner_name="dots"), TextColumn("{task.description}"), transient=True
+                    SpinnerColumn(spinner_name="dots"),
+                    TextColumn("{task.description}"),
+                    transient=True,
                 ) as progress:
-                    task = progress.add_task("Waiting for container to start", total=None)  # noqa: F841
+                    task = progress.add_task(
+                        "Waiting for container to start", total=None
+                    )  # noqa: F841
                     while self.container_status != "created":
-                        logger.debug(f"Container Status: {self.container_status}, trying again in 1 seconds")
+                        logger.debug(
+                            f"Container Status: {self.container_status}, trying again in 1 seconds"
+                        )
                         sleep(1)
                         container_object.reload()
                         self.container_status = container_object.status
@@ -331,12 +345,18 @@ class DockerContainer(DockerResource):
         if not self.force:
             # If use_cache is True and container is active then return True
             if self.use_cache and self.is_active(docker_client=docker_client):
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} already exists")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} already exists"
+                )
                 return True
 
         resource_created = self._create(docker_client=docker_client)
         if resource_created:
-            print_info(f"{self.get_resource_type()}: {self.get_resource_name()} created")
+            print_info(
+                f"{self.get_resource_type()}: {self.get_resource_name()} created"
+            )
             return True
-        logger.error(f"Failed to create {self.get_resource_type()}: {self.get_resource_name()}")
+        logger.error(
+            f"Failed to create {self.get_resource_type()}: {self.get_resource_name()}"
+        )
         return False

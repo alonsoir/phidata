@@ -20,5 +20,7 @@ class VolumeNodeAffinity(K8sObject):
     ) -> V1VolumeNodeAffinity:
         # Return a V1VolumeNodeAffinity object
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_volume_node_affinity.py
-        _v1_volume_node_affinity = V1VolumeNodeAffinity(required=self.required.get_k8s_object())
+        _v1_volume_node_affinity = V1VolumeNodeAffinity(
+            required=self.required.get_k8s_object()
+        )
         return _v1_volume_node_affinity

@@ -35,7 +35,9 @@ class DeploymentSpec(K8sObject):
     # ProgressDeadlineExceeded reason will be surfaced in the deployment status.
     # Note that progress will not be estimated during the time a deployment is paused.
     # Defaults to 600s.
-    progress_deadline_seconds: Optional[int] = Field(None, alias="progressDeadlineSeconds")
+    progress_deadline_seconds: Optional[int] = Field(
+        None, alias="progressDeadlineSeconds"
+    )
     replicas: Optional[int] = None
     # The number of old ReplicaSets to retain to allow rollback.
     # This is a pointer to distinguish between explicit zero and not specified.
@@ -113,7 +115,9 @@ class Deployment(K8sResource):
         deploy_list: Optional[V1DeploymentList] = None
         if namespace:
             # logger.debug(f"Getting deploys for ns: {namespace}")
-            deploy_list = apps_v1_api.list_namespaced_deployment(namespace=namespace, **kwargs)
+            deploy_list = apps_v1_api.list_namespaced_deployment(
+                namespace=namespace, **kwargs
+            )
         else:
             # logger.debug("Getting deploys for all namespaces")
             deploy_list = apps_v1_api.list_deployment_for_all_namespaces(**kwargs)
@@ -158,7 +162,9 @@ class Deployment(K8sResource):
         if active_resources is None:
             return None
 
-        active_resources_dict = {_deploy.metadata.name: _deploy for _deploy in active_resources}
+        active_resources_dict = {
+            _deploy.metadata.name: _deploy for _deploy in active_resources
+        }
 
         deploy_name = self.get_resource_name()
         if deploy_name in active_resources_dict:
@@ -182,7 +188,9 @@ class Deployment(K8sResource):
         if self.restart_on_update:
             if self.spec.template.metadata.annotations is None:
                 self.spec.template.metadata.annotations = {}
-            self.spec.template.metadata.annotations["kubectl.kubernetes.io/restartedAt"] = current_datetime_utc_str()
+            self.spec.template.metadata.annotations[
+                "kubectl.kubernetes.io/restartedAt"
+            ] = current_datetime_utc_str()
             logger.debug(f"annotations: {self.spec.template.metadata.annotations}")
 
         apps_v1_api: AppsV1Api = k8s_client.apps_v1_api

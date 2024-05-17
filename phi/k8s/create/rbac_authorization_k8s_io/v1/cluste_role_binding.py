@@ -28,7 +28,9 @@ class CreateClusterRoleBinding(CreateK8sResource):
         # logger.debug(f"Init ClusterRoleBinding resource: {crb_name}")
 
         sa_name = self.service_account_name
-        subjects: List[Subject] = [Subject(kind=Kind.SERVICEACCOUNT, name=sa_name, namespace=self.namespace)]
+        subjects: List[Subject] = [
+            Subject(kind=Kind.SERVICEACCOUNT, name=sa_name, namespace=self.namespace)
+        ]
         cr_name = self.cr_name
 
         crb_labels = create_component_labels_dict(

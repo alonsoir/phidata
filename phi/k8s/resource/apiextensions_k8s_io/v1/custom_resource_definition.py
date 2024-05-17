@@ -93,7 +93,9 @@ class CustomResourceDefinitionVersion(K8sObject):
     storage: bool = True
     # schema describes the schema used for validation, pruning, and defaulting of this version of the custom resource.
     # openAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
-    open_apiv3_schema: Optional[V1JSONSchemaProps] = Field(None, alias="openAPIV3Schema")
+    open_apiv3_schema: Optional[V1JSONSchemaProps] = Field(
+        None, alias="openAPIV3Schema"
+    )
     # deprecated indicates this version of the custom resource API is deprecated. When set to true,
     # API requests to this version receive a warning header in the server response. Defaults to false.
     deprecated: Optional[bool] = None
@@ -200,7 +202,9 @@ class CustomResourceDefinition(K8sResource):
         """
         logger.debug("Getting CRDs from cluster")
         apiextensions_v1_api: ApiextensionsV1Api = k8s_client.apiextensions_v1_api
-        crd_list: Optional[V1CustomResourceDefinitionList] = apiextensions_v1_api.list_custom_resource_definition()
+        crd_list: Optional[V1CustomResourceDefinitionList] = (
+            apiextensions_v1_api.list_custom_resource_definition()
+        )
         crds: Optional[List[V1CustomResourceDefinition]] = None
         if crd_list:
             crds = crd_list.items
@@ -237,9 +241,11 @@ class CustomResourceDefinition(K8sResource):
 
         namespace = self.get_namespace()
         active_resource: Optional[V1CustomResourceDefinition] = None
-        active_resources: Optional[List[V1CustomResourceDefinition]] = self.get_from_cluster(
-            k8s_client=k8s_client,
-            namespace=namespace,
+        active_resources: Optional[List[V1CustomResourceDefinition]] = (
+            self.get_from_cluster(
+                k8s_client=k8s_client,
+                namespace=namespace,
+            )
         )
         # logger.debug(f"Active Resources: {active_resources}")
         if active_resources is None:
@@ -283,10 +289,12 @@ class CustomResourceDefinition(K8sResource):
         logger.debug("Deleting: {}".format(crd_name))
         self.active_resource = None
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_status.py
-        delete_status: V1Status = apiextensions_v1_api.delete_custom_resource_definition(
-            name=crd_name,
-            async_req=self.async_req,
-            pretty=self.pretty,
+        delete_status: V1Status = (
+            apiextensions_v1_api.delete_custom_resource_definition(
+                name=crd_name,
+                async_req=self.async_req,
+                pretty=self.pretty,
+            )
         )
         # logger.debug("CRD delete_status type: {}".format(type(delete_status.status)))
         # logger.debug("CRD delete_status: {}".format(delete_status.status))

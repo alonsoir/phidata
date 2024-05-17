@@ -82,7 +82,9 @@ class EksFargateProfile(AwsResource):
             # Get private subnets
             # Only private subnets are supported for pods that are running on Fargate.
             eks_vpc_stack: CloudFormationStack = self.eks_cluster.get_vpc_stack()
-            private_subnets: Optional[List[str]] = eks_vpc_stack.get_private_subnets(aws_client)
+            private_subnets: Optional[List[str]] = eks_vpc_stack.get_private_subnets(
+                aws_client
+            )
 
             # create a dict of args which are not null, otherwise aws type validation fails
             not_null_args: Dict[str, Any] = {}
@@ -118,8 +120,12 @@ class EksFargateProfile(AwsResource):
                 #     f"create_profile_response type: {type(create_profile_response)}"
                 # )
                 ## Validate Fargate role creation
-                fargate_profile_creation_time = create_profile_response.get("fargateProfile", {}).get("createdAt", None)
-                fargate_profile_status = create_profile_response.get("fargateProfile", {}).get("status", None)
+                fargate_profile_creation_time = create_profile_response.get(
+                    "fargateProfile", {}
+                ).get("createdAt", None)
+                fargate_profile_status = create_profile_response.get(
+                    "fargateProfile", {}
+                ).get("status", None)
                 logger.debug(f"creation_time: {fargate_profile_creation_time}")
                 logger.debug(f"cluster_status: {fargate_profile_status}")
                 if fargate_profile_creation_time is not None:
@@ -127,7 +133,9 @@ class EksFargateProfile(AwsResource):
                     self.active_resource = create_profile_response
                     return True
             except Exception as e:
-                logger.error("EksFargateProfile could not be created, this operation is known to be buggy.")
+                logger.error(
+                    "EksFargateProfile could not be created, this operation is known to be buggy."
+                )
                 logger.error("Please deploy the workspace again.")
                 logger.error(e)
                 return False
@@ -139,8 +147,12 @@ class EksFargateProfile(AwsResource):
         ## Wait for EksFargateProfile to be created
         if self.wait_for_create:
             try:
-                print_info("Waiting for EksFargateProfile to be created, this can take upto 5 minutes")
-                waiter = self.get_service_client(aws_client).get_waiter("fargate_profile_active")
+                print_info(
+                    "Waiting for EksFargateProfile to be created, this can take upto 5 minutes"
+                )
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "fargate_profile_active"
+                )
                 waiter.wait(
                     clusterName=self.eks_cluster.name,
                     fargateProfileName=self.name,
@@ -175,9 +187,15 @@ class EksFargateProfile(AwsResource):
             # logger.debug(f"describe_profile_response: {describe_profile_response}")
             # logger.debug(f"describe_profile_response type: {type(describe_profile_response)}")
 
-            fargate_profile_creation_time = describe_profile_response.get("fargateProfile", {}).get("createdAt", None)
-            fargate_profile_status = describe_profile_response.get("fargateProfile", {}).get("status", None)
-            logger.debug(f"FargateProfile creation_time: {fargate_profile_creation_time}")
+            fargate_profile_creation_time = describe_profile_response.get(
+                "fargateProfile", {}
+            ).get("createdAt", None)
+            fargate_profile_status = describe_profile_response.get(
+                "fargateProfile", {}
+            ).get("status", None)
+            logger.debug(
+                f"FargateProfile creation_time: {fargate_profile_creation_time}"
+            )
             logger.debug(f"FargateProfile status: {fargate_profile_status}")
             if fargate_profile_creation_time is not None:
                 logger.debug(f"EksFargateProfile found: {self.name}")
@@ -203,7 +221,9 @@ class EksFargateProfile(AwsResource):
                 print_info(f"Deleting IamRole: {fargate_iam_role.name}")
                 fargate_iam_role.delete(aws_client)
             except Exception as e:
-                logger.error("IamRole deletion failed, please try again or delete manually")
+                logger.error(
+                    "IamRole deletion failed, please try again or delete manually"
+                )
                 logger.error(e)
 
             # Delete the Fargate profile
@@ -228,8 +248,12 @@ class EksFargateProfile(AwsResource):
         ## Wait for EksFargateProfile to be deleted
         if self.wait_for_delete:
             try:
-                print_info("Waiting for EksFargateProfile to be deleted, this can take upto 5 minutes")
-                waiter = self.get_service_client(aws_client).get_waiter("fargate_profile_deleted")
+                print_info(
+                    "Waiting for EksFargateProfile to be deleted, this can take upto 5 minutes"
+                )
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "fargate_profile_deleted"
+                )
                 waiter.wait(
                     clusterName=self.eks_cluster.name,
                     fargateProfileName=self.name,
@@ -277,5 +301,7 @@ class EksFargateProfile(AwsResource):
             }
             """
             ),
-            policy_arns=["arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"],
+            policy_arns=[
+                "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
+            ],
         )

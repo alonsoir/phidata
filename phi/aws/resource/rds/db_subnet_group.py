@@ -53,12 +53,16 @@ class DbSubnetGroup(AwsResource):
                 subnet_ids = self.subnet_ids.get_reference(aws_client=aws_client)
         if len(subnet_ids) == 0 and self.vpc_stack is not None:
             logger.debug("Getting private subnet_ids from vpc stack")
-            private_subnet_ids = self.vpc_stack.get_private_subnets(aws_client=aws_client)
+            private_subnet_ids = self.vpc_stack.get_private_subnets(
+                aws_client=aws_client
+            )
             if private_subnet_ids is not None:
                 subnet_ids.extend(private_subnet_ids)
             if len(subnet_ids) == 0:
                 logger.debug("Getting public subnet_ids from vpc stack")
-                public_subnet_ids = self.vpc_stack.get_public_subnets(aws_client=aws_client)
+                public_subnet_ids = self.vpc_stack.get_public_subnets(
+                    aws_client=aws_client
+                )
                 if public_subnet_ids is not None:
                     subnet_ids.extend(public_subnet_ids)
         return subnet_ids
@@ -93,7 +97,9 @@ class DbSubnetGroup(AwsResource):
 
             self.active_resource = create_response.get("DBSubnetGroup", None)
             if self.active_resource is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} created")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} created"
+                )
                 logger.debug(f"DbSubnetGroup: {self.active_resource}")
                 return True
         except Exception as e:
@@ -112,12 +118,16 @@ class DbSubnetGroup(AwsResource):
         logger.debug(f"Reading {self.get_resource_type()}: {self.get_resource_name()}")
         try:
             service_client = self.get_service_client(aws_client)
-            describe_response = service_client.describe_db_subnet_groups(DBSubnetGroupName=self.name)
+            describe_response = service_client.describe_db_subnet_groups(
+                DBSubnetGroupName=self.name
+            )
             logger.debug(f"describe_response type: {type(describe_response)}")
             logger.debug(f"describe_response: {describe_response}")
 
             db_subnet_group_list = describe_response.get("DBSubnetGroups", None)
-            if db_subnet_group_list is not None and isinstance(db_subnet_group_list, list):
+            if db_subnet_group_list is not None and isinstance(
+                db_subnet_group_list, list
+            ):
                 for _db_subnet_group in db_subnet_group_list:
                     _db_sg_name = _db_subnet_group.get("DBSubnetGroupName", None)
                     if _db_sg_name == self.name:
@@ -148,7 +158,9 @@ class DbSubnetGroup(AwsResource):
             service_client = self.get_service_client(aws_client)
             self.active_resource = None
 
-            delete_response = service_client.delete_db_subnet_group(DBSubnetGroupName=self.name)
+            delete_response = service_client.delete_db_subnet_group(
+                DBSubnetGroupName=self.name
+            )
             logger.debug(f"delete_response: {delete_response}")
             return True
         except Exception as e:
@@ -180,7 +192,9 @@ class DbSubnetGroup(AwsResource):
 
             self.active_resource = update_response.get("DBSubnetGroup", None)
             if self.active_resource is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} updated")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} updated"
+                )
                 return True
         except Exception as e:
             logger.error(f"{self.get_resource_type()} could not be updated.")

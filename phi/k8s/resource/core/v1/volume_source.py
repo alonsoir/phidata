@@ -315,7 +315,9 @@ class NFSVolumeSource(K8sObject):
     ) -> V1NFSVolumeSource:
         # Return a V1NFSVolumeSource object
         # https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_nfs_volume_source.py
-        _v1_nfs_volume_source = V1NFSVolumeSource(path=self.path, read_only=self.read_only, server=self.server)
+        _v1_nfs_volume_source = V1NFSVolumeSource(
+            path=self.path, read_only=self.read_only, server=self.server
+        )
         return _v1_nfs_volume_source
 
 

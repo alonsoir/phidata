@@ -20,7 +20,9 @@ class YamlResource(K8sResource):
     url: Optional[str] = None
 
     @staticmethod
-    def get_from_cluster(k8s_client: K8sApiClient, namespace: Optional[str] = None, **kwargs) -> None:
+    def get_from_cluster(
+        k8s_client: K8sApiClient, namespace: Optional[str] = None, **kwargs
+    ) -> None:
         # Not implemented for YamlResources
         return None
 

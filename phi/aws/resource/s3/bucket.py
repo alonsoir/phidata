@@ -20,14 +20,18 @@ class S3Bucket(AwsResource):
     # Name of the bucket
     name: str
     # The canned ACL to apply to the bucket.
-    acl: Optional[Literal["private", "public-read", "public-read-write", "authenticated-read"]] = None
+    acl: Optional[
+        Literal["private", "public-read", "public-read-write", "authenticated-read"]
+    ] = None
     grant_full_control: Optional[str] = None
     grant_read: Optional[str] = None
     grant_read_ACP: Optional[str] = None
     grant_write: Optional[str] = None
     grant_write_ACP: Optional[str] = None
     object_lock_enabled_for_bucket: Optional[bool] = None
-    object_ownership: Optional[Literal["BucketOwnerPreferred", "ObjectWriter", "BucketOwnerEnforced"]] = None
+    object_ownership: Optional[
+        Literal["BucketOwnerPreferred", "ObjectWriter", "BucketOwnerEnforced"]
+    ] = None
 
     @property
     def uri(self) -> str:
@@ -83,7 +87,9 @@ class S3Bucket(AwsResource):
         if self.grant_write_ACP:
             not_null_args["GrantWriteACP"] = self.grant_write_ACP
         if self.object_lock_enabled_for_bucket:
-            not_null_args["ObjectLockEnabledForBucket"] = self.object_lock_enabled_for_bucket
+            not_null_args["ObjectLockEnabledForBucket"] = (
+                self.object_lock_enabled_for_bucket
+            )
         if self.object_ownership:
             not_null_args["ObjectOwnership"] = self.object_ownership
 
@@ -172,7 +178,9 @@ class S3Bucket(AwsResource):
             logger.error(e)
         return False
 
-    def get_objects(self, aws_client: Optional[AwsApiClient] = None, prefix: Optional[str] = None) -> List[Any]:
+    def get_objects(
+        self, aws_client: Optional[AwsApiClient] = None, prefix: Optional[str] = None
+    ) -> List[Any]:
         """Returns a list of s3.Object objects for the s3.Bucket
 
         Args:

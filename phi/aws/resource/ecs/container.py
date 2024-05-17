@@ -90,11 +90,15 @@ class EcsContainer(AwsResource):
     resource_requirements: Optional[List[Dict[str, Any]]] = None
     firelens_configuration: Optional[Dict[str, Any]] = None
 
-    def get_container_definition(self, aws_client: Optional[AwsApiClient] = None) -> Dict[str, Any]:
+    def get_container_definition(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Dict[str, Any]:
         container_definition: Dict[str, Any] = {}
 
         # Build container environment
-        container_environment: List[Dict[str, Any]] = self.build_container_environment(aws_client=aws_client)
+        container_environment: List[Dict[str, Any]] = self.build_container_environment(
+            aws_client=aws_client
+        )
         if container_environment is not None:
             container_definition["environment"] = container_environment
 
@@ -147,7 +151,9 @@ class EcsContainer(AwsResource):
         if self.privileged is not None:
             container_definition["privileged"] = self.privileged
         if self.readonly_root_filesystem is not None:
-            container_definition["readonlyRootFilesystem"] = self.readonly_root_filesystem
+            container_definition["readonlyRootFilesystem"] = (
+                self.readonly_root_filesystem
+            )
         if self.dns_servers is not None:
             container_definition["dnsServers"] = self.dns_servers
         if self.dns_search_domains is not None:
@@ -177,7 +183,9 @@ class EcsContainer(AwsResource):
 
         return container_definition
 
-    def build_container_environment(self, aws_client: Optional[AwsApiClient] = None) -> List[Dict[str, Any]]:
+    def build_container_environment(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> List[Dict[str, Any]]:
         logger.debug("Building container environment")
         container_environment: List[Dict[str, Any]] = []
         if self.environment is not None:
@@ -190,7 +198,9 @@ class EcsContainer(AwsResource):
                 if isinstance(env_value, AwsReference):
                     logger.debug(f"{env_name} is an AwsReference")
                     try:
-                        env_value_parsed = env_value.get_reference(aws_client=aws_client)
+                        env_value_parsed = env_value.get_reference(
+                            aws_client=aws_client
+                        )
                     except Exception as e:
                         logger.error(f"Error while parsing {env_name}: {e}")
                 else:
@@ -199,16 +209,22 @@ class EcsContainer(AwsResource):
                 if env_value_parsed is not None:
                     try:
                         env_val_str = str(env_value_parsed)
-                        container_environment.append({"name": env_name, "value": env_val_str})
+                        container_environment.append(
+                            {"name": env_name, "value": env_val_str}
+                        )
                     except Exception as e:
                         logger.error(f"Error while converting {env_value} to str: {e}")
 
         if self.env_from_secrets is not None:
-            secrets: Dict[str, Any] = read_secrets(self.env_from_secrets, aws_client=aws_client)
+            secrets: Dict[str, Any] = read_secrets(
+                self.env_from_secrets, aws_client=aws_client
+            )
             for secret_name, secret_value in secrets.items():
                 try:
                     secret_value = str(secret_value)
-                    container_environment.append({"name": secret_name, "value": secret_value})
+                    container_environment.append(
+                        {"name": secret_name, "value": secret_value}
+                    )
                 except Exception as e:
                     logger.error(f"Error while converting {secret_value} to str: {e}")
         return container_environment

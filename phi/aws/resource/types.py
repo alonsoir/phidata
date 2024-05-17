@@ -100,10 +100,15 @@ _aws_resource_type_aliases: Dict[str, Type[AwsResource]] = {
     "volume": EbsVolume,
 }
 
-AwsResourceAliasToTypeMap: Dict[str, Type[AwsResource]] = dict(**_aws_resource_type_names, **_aws_resource_type_aliases)
+AwsResourceAliasToTypeMap: Dict[str, Type[AwsResource]] = dict(
+    **_aws_resource_type_names, **_aws_resource_type_aliases
+)
 
 # Maps each AwsResource to an install weight
 # lower weight AwsResource(s) get installed first
 AwsResourceInstallOrder: Dict[str, int] = OrderedDict(
-    {resource_type.__name__: idx for idx, resource_type in enumerate(AwsResourceTypeList, start=1)}
+    {
+        resource_type.__name__: idx
+        for idx, resource_type in enumerate(AwsResourceTypeList, start=1)
+    }
 )

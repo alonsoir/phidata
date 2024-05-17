@@ -119,12 +119,18 @@ def up(
         None,
         help="Resource filter. Format - ENV:INFRA:GROUP:NAME:TYPE",
     ),
-    env_filter: Optional[str] = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to deploy."),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to deploy."),
+    env_filter: Optional[str] = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to deploy."
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to deploy."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter resource using name."),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter resource using name."
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -214,7 +220,8 @@ def up(
                 + f"is not the Active Workspace ({active_ws_dir_name})"
             )
             update_active_workspace = typer.confirm(
-                f"Update active workspace to {ws_at_current_path_dir_name}", default=True
+                f"Update active workspace to {ws_at_current_path_dir_name}",
+                default=True,
             )
             if update_active_workspace:
                 phi_config.set_active_ws_dir(ws_at_current_path.ws_root_path)
@@ -230,7 +237,9 @@ def up(
     # derive env:infra:name:type:group from ws_filter
     if resource_filter is not None:
         if not isinstance(resource_filter, str):
-            raise TypeError(f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}")
+            raise TypeError(
+                f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}"
+            )
         (
             target_env,
             target_infra_str,
@@ -242,9 +251,17 @@ def up(
     # derive env:infra:name:type:group from command options
     if target_env is None and env_filter is not None and isinstance(env_filter, str):
         target_env = env_filter
-    if target_infra_str is None and infra_filter is not None and isinstance(infra_filter, str):
+    if (
+        target_infra_str is None
+        and infra_filter is not None
+        and isinstance(infra_filter, str)
+    ):
         target_infra_str = infra_filter
-    if target_group is None and group_filter is not None and isinstance(group_filter, str):
+    if (
+        target_group is None
+        and group_filter is not None
+        and isinstance(group_filter, str)
+    ):
         target_group = group_filter
     if target_name is None and name_filter is not None and isinstance(name_filter, str):
         target_name = name_filter
@@ -253,10 +270,16 @@ def up(
 
     # derive env:infra:name:type:group from defaults
     if target_env is None:
-        target_env = active_ws_config.workspace_settings.default_env if active_ws_config.workspace_settings else None
+        target_env = (
+            active_ws_config.workspace_settings.default_env
+            if active_ws_config.workspace_settings
+            else None
+        )
     if target_infra_str is None:
         target_infra_str = (
-            active_ws_config.workspace_settings.default_infra if active_ws_config.workspace_settings else None
+            active_ws_config.workspace_settings.default_infra
+            if active_ws_config.workspace_settings
+            else None
         )
     if target_infra_str is not None:
         try:
@@ -275,7 +298,9 @@ def up(
     logger.debug(f"\tauto_confirm : {auto_confirm}")
     logger.debug(f"\tforce        : {force}")
     logger.debug(f"\tpull         : {pull}")
-    print_heading("Starting workspace: {}".format(str(active_ws_config.ws_root_path.stem)))
+    print_heading(
+        "Starting workspace: {}".format(str(active_ws_config.ws_root_path.stem))
+    )
     start_workspace(
         phi_config=phi_config,
         ws_config=active_ws_config,
@@ -297,14 +322,18 @@ def down(
         None,
         help="Resource filter. Format - ENV:INFRA:GROUP:NAME:TYPE",
     ),
-    env_filter: str = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to shut down."),
+    env_filter: str = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to shut down."
+    ),
     infra_filter: Optional[str] = typer.Option(
         None, "-i", "--infra", metavar="", help="Filter the infra to shut down."
     ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter resource using name."),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter resource using name."
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -384,7 +413,8 @@ def down(
                 + f"is not the Active Workspace ({active_ws_dir_name})"
             )
             update_active_workspace = typer.confirm(
-                f"Update active workspace to {ws_at_current_path_dir_name}", default=True
+                f"Update active workspace to {ws_at_current_path_dir_name}",
+                default=True,
             )
             if update_active_workspace:
                 phi_config.set_active_ws_dir(ws_at_current_path.ws_root_path)
@@ -400,7 +430,9 @@ def down(
     # derive env:infra:name:type:group from ws_filter
     if resource_filter is not None:
         if not isinstance(resource_filter, str):
-            raise TypeError(f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}")
+            raise TypeError(
+                f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}"
+            )
         (
             target_env,
             target_infra_str,
@@ -412,9 +444,17 @@ def down(
     # derive env:infra:name:type:group from command options
     if target_env is None and env_filter is not None and isinstance(env_filter, str):
         target_env = env_filter
-    if target_infra_str is None and infra_filter is not None and isinstance(infra_filter, str):
+    if (
+        target_infra_str is None
+        and infra_filter is not None
+        and isinstance(infra_filter, str)
+    ):
         target_infra_str = infra_filter
-    if target_group is None and group_filter is not None and isinstance(group_filter, str):
+    if (
+        target_group is None
+        and group_filter is not None
+        and isinstance(group_filter, str)
+    ):
         target_group = group_filter
     if target_name is None and name_filter is not None and isinstance(name_filter, str):
         target_name = name_filter
@@ -423,10 +463,16 @@ def down(
 
     # derive env:infra:name:type:group from defaults
     if target_env is None:
-        target_env = active_ws_config.workspace_settings.default_env if active_ws_config.workspace_settings else None
+        target_env = (
+            active_ws_config.workspace_settings.default_env
+            if active_ws_config.workspace_settings
+            else None
+        )
     if target_infra_str is None:
         target_infra_str = (
-            active_ws_config.workspace_settings.default_infra if active_ws_config.workspace_settings else None
+            active_ws_config.workspace_settings.default_infra
+            if active_ws_config.workspace_settings
+            else None
         )
     if target_infra_str is not None:
         try:
@@ -444,7 +490,9 @@ def down(
     logger.debug(f"\tdry_run      : {dry_run}")
     logger.debug(f"\tauto_confirm : {auto_confirm}")
     logger.debug(f"\tforce        : {force}")
-    print_heading("Stopping workspace: {}".format(str(active_ws_config.ws_root_path.stem)))
+    print_heading(
+        "Stopping workspace: {}".format(str(active_ws_config.ws_root_path.stem))
+    )
     stop_workspace(
         phi_config=phi_config,
         ws_config=active_ws_config,
@@ -465,12 +513,18 @@ def patch(
         None,
         help="Resource filter. Format - ENV:INFRA:GROUP:NAME:TYPE",
     ),
-    env_filter: str = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to patch."),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to patch."),
+    env_filter: str = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to patch."
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to patch."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter resource using name."),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter resource using name."
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -556,7 +610,8 @@ def patch(
                 + f"is not the Active Workspace ({active_ws_dir_name})"
             )
             update_active_workspace = typer.confirm(
-                f"Update active workspace to {ws_at_current_path_dir_name}", default=True
+                f"Update active workspace to {ws_at_current_path_dir_name}",
+                default=True,
             )
             if update_active_workspace:
                 phi_config.set_active_ws_dir(ws_at_current_path.ws_root_path)
@@ -572,7 +627,9 @@ def patch(
     # derive env:infra:name:type:group from ws_filter
     if resource_filter is not None:
         if not isinstance(resource_filter, str):
-            raise TypeError(f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}")
+            raise TypeError(
+                f"Invalid resource_filter. Expected: str, Received: {type(resource_filter)}"
+            )
         (
             target_env,
             target_infra_str,
@@ -584,9 +641,17 @@ def patch(
     # derive env:infra:name:type:group from command options
     if target_env is None and env_filter is not None and isinstance(env_filter, str):
         target_env = env_filter
-    if target_infra_str is None and infra_filter is not None and isinstance(infra_filter, str):
+    if (
+        target_infra_str is None
+        and infra_filter is not None
+        and isinstance(infra_filter, str)
+    ):
         target_infra_str = infra_filter
-    if target_group is None and group_filter is not None and isinstance(group_filter, str):
+    if (
+        target_group is None
+        and group_filter is not None
+        and isinstance(group_filter, str)
+    ):
         target_group = group_filter
     if target_name is None and name_filter is not None and isinstance(name_filter, str):
         target_name = name_filter
@@ -595,10 +660,16 @@ def patch(
 
     # derive env:infra:name:type:group from defaults
     if target_env is None:
-        target_env = active_ws_config.workspace_settings.default_env if active_ws_config.workspace_settings else None
+        target_env = (
+            active_ws_config.workspace_settings.default_env
+            if active_ws_config.workspace_settings
+            else None
+        )
     if target_infra_str is None:
         target_infra_str = (
-            active_ws_config.workspace_settings.default_infra if active_ws_config.workspace_settings else None
+            active_ws_config.workspace_settings.default_infra
+            if active_ws_config.workspace_settings
+            else None
         )
     if target_infra_str is not None:
         try:
@@ -617,7 +688,9 @@ def patch(
     logger.debug(f"\tauto_confirm : {auto_confirm}")
     logger.debug(f"\tforce        : {force}")
     logger.debug(f"\tpull         : {pull}")
-    print_heading("Updating workspace: {}".format(str(active_ws_config.ws_root_path.stem)))
+    print_heading(
+        "Updating workspace: {}".format(str(active_ws_config.ws_root_path.stem))
+    )
     update_workspace(
         phi_config=phi_config,
         ws_config=active_ws_config,
@@ -639,12 +712,18 @@ def restart(
         None,
         help="Resource filter. Format - ENV:INFRA:GROUP:NAME:TYPE",
     ),
-    env_filter: str = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to restart."),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to restart."),
+    env_filter: str = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to restart."
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to restart."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter resource using name."),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter resource using name."
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -764,12 +843,16 @@ def config(
     load_env(
         dotenv_dir=active_ws_config.ws_root_path,
     )
-    print_info(active_ws_config.model_dump_json(include={"ws_name", "ws_root_path"}, indent=2))
+    print_info(
+        active_ws_config.model_dump_json(include={"ws_name", "ws_root_path"}, indent=2)
+    )
 
 
 @ws_cli.command(short_help="Delete workspace record")
 def delete(
-    ws_name: Optional[str] = typer.Option(None, "-ws", help="Name of the workspace to delete"),
+    ws_name: Optional[str] = typer.Option(
+        None, "-ws", help="Name of the workspace to delete"
+    ),
     all_workspaces: bool = typer.Option(
         False,
         "-a",
@@ -814,7 +897,11 @@ def delete(
     else:
         # Delete all workspaces if flag is set
         if all_workspaces:
-            ws_to_delete = [ws.ws_root_path for ws in phi_config.available_ws if ws.ws_root_path is not None]
+            ws_to_delete = [
+                ws.ws_root_path
+                for ws in phi_config.available_ws
+                if ws.ws_root_path is not None
+            ]
         else:
             # By default, we assume this command is run for the active workspace
             if phi_config.active_ws_dir is not None:

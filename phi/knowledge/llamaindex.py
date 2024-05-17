@@ -8,7 +8,9 @@ try:
     from llama_index.core.schema import NodeWithScore
     from llama_index.core.retrievers import BaseRetriever
 except ImportError:
-    raise ImportError("The `llama-index-core` package is not installed. Please install it via `pip install langchain`.")
+    raise ImportError(
+        "The `llama-index-core` package is not installed. Please install it via `pip install langchain`."
+    )
 
 
 class LlamaIndexKnowledgeBase(AssistantKnowledge):
@@ -29,7 +31,9 @@ class LlamaIndexKnowledgeBase(AssistantKnowledge):
             ValueError: If the retriever is not of type BaseRetriever.
         """
         if not isinstance(self.retriever, BaseRetriever):
-            raise ValueError(f"Retriever is not of type BaseRetriever: {self.retriever}")
+            raise ValueError(
+                f"Retriever is not of type BaseRetriever: {self.retriever}"
+            )
 
         lc_documents: List[NodeWithScore] = self.retriever.retrieve(query)
         if num_documents is not None:
@@ -44,12 +48,16 @@ class LlamaIndexKnowledgeBase(AssistantKnowledge):
             )
         return documents
 
-    def load(self, recreate: bool = False, upsert: bool = True, skip_existing: bool = True) -> None:
+    def load(
+        self, recreate: bool = False, upsert: bool = True, skip_existing: bool = True
+    ) -> None:
         if self.loader is None:
             logger.error("No loader provided for LlamaIndexKnowledgeBase")
             return
         self.loader()
 
     def exists(self) -> bool:
-        logger.warning("LlamaIndexKnowledgeBase.exists() not supported - please check the vectorstore manually.")
+        logger.warning(
+            "LlamaIndexKnowledgeBase.exists() not supported - please check the vectorstore manually."
+        )
         return True

@@ -14,7 +14,9 @@ class AirflowWorker(AirflowBase):
     queue_name: str = "default"
 
     def get_container_env(self, container_context: ContainerContext) -> Dict[str, str]:
-        container_env: Dict[str, str] = super().get_container_env(container_context=container_context)
+        container_env: Dict[str, str] = super().get_container_env(
+            container_context=container_context
+        )
 
         # Set the queue name
         container_env["QUEUE_NAME"] = self.queue_name

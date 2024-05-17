@@ -37,7 +37,9 @@ class CreatePersistentVolume(CreateK8sResource):
     node_affinity: Optional[VolumeNodeAffinity] = None
     # What happens to a persistent volume when released from its claim.
     #   The default policy is Retain.
-    persistent_volume_reclaim_policy: Optional[Literal["Delete", "Recycle", "Retain"]] = None
+    persistent_volume_reclaim_policy: Optional[
+        Literal["Delete", "Recycle", "Retain"]
+    ] = None
     # Name of StorageClass to which this persistent volume belongs.
     # Empty value means that this volume does not belong to any StorageClass.
     storage_class_name: Optional[str] = None
@@ -99,9 +101,13 @@ class CreatePersistentVolume(CreateK8sResource):
             if self.local is not None and isinstance(self.local, LocalVolumeSource):
                 persistent_volume.spec.local = self.local
             else:
-                logger.error(f"PersistentVolume {self.volume_type.value} selected but LocalVolumeSource not provided.")
+                logger.error(
+                    f"PersistentVolume {self.volume_type.value} selected but LocalVolumeSource not provided."
+                )
         elif self.volume_type == VolumeType.HOST_PATH:
-            if self.host_path is not None and isinstance(self.host_path, HostPathVolumeSource):
+            if self.host_path is not None and isinstance(
+                self.host_path, HostPathVolumeSource
+            ):
                 persistent_volume.spec.host_path = self.host_path
             else:
                 logger.error(
@@ -121,11 +127,15 @@ class CreatePersistentVolume(CreateK8sResource):
             if self.nfs is not None and isinstance(self.nfs, NFSVolumeSource):
                 persistent_volume.spec.nfs = self.nfs
             else:
-                logger.error(f"PersistentVolume {self.volume_type.value} selected but NFSVolumeSource not provided.")
+                logger.error(
+                    f"PersistentVolume {self.volume_type.value} selected but NFSVolumeSource not provided."
+                )
         elif self.volume_type == VolumeType.PERSISTENT_VOLUME_CLAIM:
             if self.claim_ref is not None and isinstance(self.claim_ref, ClaimRef):
                 persistent_volume.spec.claim_ref = self.claim_ref
             else:
-                logger.error(f"PersistentVolume {self.volume_type.value} selected but ClaimRef not provided.")
+                logger.error(
+                    f"PersistentVolume {self.volume_type.value} selected but ClaimRef not provided."
+                )
 
         return persistent_volume

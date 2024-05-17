@@ -21,7 +21,9 @@ try:
         StreamedChatResponse_ToolCallsGeneration,
     )
     from cohere.types.chat_request_tool_results_item import ChatRequestToolResultsItem
-    from cohere.types.tool_parameter_definitions_value import ToolParameterDefinitionsValue
+    from cohere.types.tool_parameter_definitions_value import (
+        ToolParameterDefinitionsValue,
+    )
 except ImportError:
     logger.error("`cohere` not installed")
     raise
@@ -88,17 +90,25 @@ class CohereChat(LLM):
                 description=function.description or "",
                 parameter_definitions={
                     param_name: ToolParameterDefinitionsValue(
-                        type=param_info["type"] if isinstance(param_info["type"], str) else param_info["type"][0],
+                        type=(
+                            param_info["type"]
+                            if isinstance(param_info["type"], str)
+                            else param_info["type"][0]
+                        ),
                         required="null" not in param_info["type"],
                     )
-                    for param_name, param_info in function.parameters.get("properties", {}).items()
+                    for param_name, param_info in function.parameters.get(
+                        "properties", {}
+                    ).items()
                 },
             )
             for f_name, function in self.functions.items()
         ]
 
     def invoke(
-        self, messages: List[Message], tool_results: Optional[List[ChatRequestToolResultsItem]] = None
+        self,
+        messages: List[Message],
+        tool_results: Optional[List[ChatRequestToolResultsItem]] = None,
     ) -> NonStreamedChatResponse:
         api_kwargs: Dict[str, Any] = self.api_kwargs
         chat_message: Optional[str] = None
@@ -116,7 +126,9 @@ class CohereChat(LLM):
                     # Update the chat_message to the new user message
                     chat_message = m.get_content_string()
                 else:
-                    chat_history.append({"role": "CHATBOT", "message": m.get_content_string() or ""})
+                    chat_history.append(
+                        {"role": "CHATBOT", "message": m.get_content_string() or ""}
+                    )
             api_kwargs["chat_history"] = chat_history
         else:
             # Set first system message as preamble
@@ -136,10 +148,14 @@ class CohereChat(LLM):
         if tool_results:
             api_kwargs["tool_results"] = tool_results
 
-        return self.client.chat(message=chat_message or "", model=self.model, **api_kwargs)
+        return self.client.chat(
+            message=chat_message or "", model=self.model, **api_kwargs
+        )
 
     def invoke_stream(
-        self, messages: List[Message], tool_results: Optional[List[ChatRequestToolResultsItem]] = None
+        self,
+        messages: List[Message],
+        tool_results: Optional[List[ChatRequestToolResultsItem]] = None,
     ) -> Iterator[StreamedChatResponse]:
         api_kwargs: Dict[str, Any] = self.api_kwargs
         chat_message: Optional[str] = None
@@ -157,7 +173,9 @@ class CohereChat(LLM):
                     # Update the chat_message to the new user message
                     chat_message = m.get_content_string()
                 else:
-                    chat_history.append({"role": "CHATBOT", "message": m.get_content_string() or ""})
+                    chat_history.append(
+                        {"role": "CHATBOT", "message": m.get_content_string() or ""}
+                    )
             api_kwargs["chat_history"] = chat_history
         else:
             # Set first system message as preamble
@@ -178,9 +196,15 @@ class CohereChat(LLM):
             api_kwargs["tool_results"] = tool_results
 
         logger.debug(f"Chat message: {chat_message}")
-        return self.client.chat_stream(message=chat_message or "", model=self.model, **api_kwargs)
+        return self.client.chat_stream(
+            message=chat_message or "", model=self.model, **api_kwargs
+        )
 
-    def response(self, messages: List[Message], tool_results: Optional[List[ChatRequestToolResultsItem]] = None) -> str:
+    def response(
+        self,
+        messages: List[Message],
+        tool_results: Optional[List[ChatRequestToolResultsItem]] = None,
+    ) -> str:
         logger.debug("---------- Cohere Response Start ----------")
         # -*- Log messages for debugging
         for m in messages:
@@ -188,7 +212,9 @@ class CohereChat(LLM):
 
         response_timer = Timer()
         response_timer.start()
-        response: NonStreamedChatResponse = self.invoke(messages=messages, tool_results=tool_results)
+        response: NonStreamedChatResponse = self.invoke(
+            messages=messages, tool_results=tool_results
+        )
         response_timer.stop()
         logger.debug(f"Time to generate response: {response_timer.elapsed:.4f}s")
 
@@ -231,9 +257,13 @@ class CohereChat(LLM):
             final_response = ""
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
-                    messages.append(Message(role="user", content="Could not find function to call."))
+                    messages.append(
+                        Message(role="user", content="Could not find function to call.")
+                    )
                     continue
                 if _function_call.error is not None:
                     messages.append(Message(role="user", content=_function_call.error))
@@ -242,30 +272,41 @@ class CohereChat(LLM):
 
             if self.show_tool_calls:
                 if len(function_calls_to_run) == 1:
-                    final_response += f" - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    final_response += (
+                        f" - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    )
                 elif len(function_calls_to_run) > 1:
                     final_response += "Running:"
                     for _f in function_calls_to_run:
                         final_response += f"\n - {_f.get_call_str()}"
                     final_response += "\n\n"
 
-            function_call_results = self.run_function_calls(function_calls_to_run, role="user")
+            function_call_results = self.run_function_calls(
+                function_calls_to_run, role="user"
+            )
 
             # Making sure the length of tool calls and function call results are the same to avoid unexpected behavior
-            if response_tool_calls is not None and 0 < len(function_call_results) == len(response_tool_calls):
+            if response_tool_calls is not None and 0 < len(
+                function_call_results
+            ) == len(response_tool_calls):
                 # Constructs a list named tool_results, where each element is a dictionary that contains details of tool calls and their outputs.
                 # It pairs each tool call in response_tool_calls with its corresponding result in function_call_results.
                 tool_results = [
                     ChatRequestToolResultsItem(
-                        call=tool_call, outputs=[tool_call.parameters, {"result": fn_result.content}]
+                        call=tool_call,
+                        outputs=[tool_call.parameters, {"result": fn_result.content}],
                     )
-                    for tool_call, fn_result in zip(response_tool_calls, function_call_results)
+                    for tool_call, fn_result in zip(
+                        response_tool_calls, function_call_results
+                    )
                 ]
                 messages.append(Message(role="user", content="Tool result"))
                 # logger.debug(f"Tool results: {tool_results}")
 
             # -*- Yield new response using results of tool calls
-            final_response += self.response(messages=messages, tool_results=tool_results)
+            final_response += self.response(
+                messages=messages, tool_results=tool_results
+            )
             return final_response
         logger.debug("---------- Cohere Response End ----------")
         # -*- Return content if no function calls are present
@@ -274,7 +315,9 @@ class CohereChat(LLM):
         return "Something went wrong, please try again."
 
     def response_stream(
-        self, messages: List[Message], tool_results: Optional[List[ChatRequestToolResultsItem]] = None
+        self,
+        messages: List[Message],
+        tool_results: Optional[List[ChatRequestToolResultsItem]] = None,
     ) -> Any:
         logger.debug("---------- Cohere Response Start ----------")
         # -*- Log messages for debugging
@@ -286,7 +329,9 @@ class CohereChat(LLM):
         response_tool_calls: List[CohereToolCall] = []
         response_timer = Timer()
         response_timer.start()
-        for response in self.invoke_stream(messages=messages, tool_results=tool_results):
+        for response in self.invoke_stream(
+            messages=messages, tool_results=tool_results
+        ):
             # logger.debug(f"Cohere response type: {type(response)}")
             # logger.debug(f"Cohere response: {response}")
 
@@ -337,9 +382,13 @@ class CohereChat(LLM):
         if assistant_message.tool_calls is not None and self.run_tools:
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
-                    messages.append(Message(role="user", content="Could not find function to call."))
+                    messages.append(
+                        Message(role="user", content="Could not find function to call.")
+                    )
                     continue
                 if _function_call.error is not None:
                     messages.append(Message(role="user", content=_function_call.error))
@@ -355,23 +404,32 @@ class CohereChat(LLM):
                         yield f"\n - {_f.get_call_str()}"
                     yield "\n\n"
 
-            function_call_results = self.run_function_calls(function_calls_to_run, role="user")
+            function_call_results = self.run_function_calls(
+                function_calls_to_run, role="user"
+            )
 
             # Making sure the length of tool calls and function call results are the same to avoid unexpected behavior
-            if response_tool_calls is not None and 0 < len(function_call_results) == len(tool_calls):
+            if response_tool_calls is not None and 0 < len(
+                function_call_results
+            ) == len(tool_calls):
                 # Constructs a list named tool_results, where each element is a dictionary that contains details of tool calls and their outputs.
                 # It pairs each tool call in response_tool_calls with its corresponding result in function_call_results.
                 tool_results = [
                     ChatRequestToolResultsItem(
-                        call=tool_call, outputs=[tool_call.parameters, {"result": fn_result.content}]
+                        call=tool_call,
+                        outputs=[tool_call.parameters, {"result": fn_result.content}],
                     )
-                    for tool_call, fn_result in zip(response_tool_calls, function_call_results)
+                    for tool_call, fn_result in zip(
+                        response_tool_calls, function_call_results
+                    )
                 ]
                 messages.append(Message(role="user", content="Tool result"))
                 # logger.debug(f"Tool results: {tool_results}")
 
             # -*- Yield new response using results of tool calls
-            yield from self.response_stream(messages=messages, tool_results=tool_results)
+            yield from self.response_stream(
+                messages=messages, tool_results=tool_results
+            )
         logger.debug("---------- Cohere Response End ----------")
 
     def get_tool_call_prompt(self) -> Optional[str]:

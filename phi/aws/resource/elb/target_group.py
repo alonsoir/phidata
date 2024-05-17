@@ -77,9 +77,13 @@ class TargetGroup(AwsResource):
         if self.health_check_path is not None:
             not_null_args["HealthCheckPath"] = self.health_check_path
         if self.health_check_interval_seconds is not None:
-            not_null_args["HealthCheckIntervalSeconds"] = self.health_check_interval_seconds
+            not_null_args["HealthCheckIntervalSeconds"] = (
+                self.health_check_interval_seconds
+            )
         if self.health_check_timeout_seconds is not None:
-            not_null_args["HealthCheckTimeoutSeconds"] = self.health_check_timeout_seconds
+            not_null_args["HealthCheckTimeoutSeconds"] = (
+                self.health_check_timeout_seconds
+            )
         if self.healthy_threshold_count is not None:
             not_null_args["HealthyThresholdCount"] = self.healthy_threshold_count
         if self.unhealthy_threshold_count is not None:
@@ -183,9 +187,13 @@ class TargetGroup(AwsResource):
         if self.health_check_path is not None:
             not_null_args["HealthCheckPath"] = self.health_check_path
         if self.health_check_interval_seconds is not None:
-            not_null_args["HealthCheckIntervalSeconds"] = self.health_check_interval_seconds
+            not_null_args["HealthCheckIntervalSeconds"] = (
+                self.health_check_interval_seconds
+            )
         if self.health_check_timeout_seconds is not None:
-            not_null_args["HealthCheckTimeoutSeconds"] = self.health_check_timeout_seconds
+            not_null_args["HealthCheckTimeoutSeconds"] = (
+                self.health_check_timeout_seconds
+            )
         if self.healthy_threshold_count is not None:
             not_null_args["HealthyThresholdCount"] = self.healthy_threshold_count
         if self.unhealthy_threshold_count is not None:

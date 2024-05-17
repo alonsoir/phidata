@@ -71,7 +71,10 @@ class YouTubeTools(Toolkit):
             return "Error getting video ID from URL, please provide a valid YouTube url"
 
         try:
-            params = {"format": "json", "url": f"https://www.youtube.com/watch?v={video_id}"}
+            params = {
+                "format": "json",
+                "url": f"https://www.youtube.com/watch?v={video_id}",
+            }
             url = "https://www.youtube.com/oembed"
             query_string = urlencode(params)
             url = url + "?" + query_string
@@ -115,7 +118,9 @@ class YouTubeTools(Toolkit):
         try:
             captions = None
             if self.languages:
-                captions = YouTubeTranscriptApi.get_transcript(video_id, languages=self.languages)
+                captions = YouTubeTranscriptApi.get_transcript(
+                    video_id, languages=self.languages
+                )
             else:
                 captions = YouTubeTranscriptApi.get_transcript(video_id)
             # logger.debug(f"Captions for video {video_id}: {captions}")

@@ -92,7 +92,9 @@ class PgVector2(VectorDb):
     def table_exists(self) -> bool:
         logger.debug(f"Checking if table exists: {self.table.name}")
         try:
-            return inspect(self.db_engine).has_table(self.table.name, schema=self.schema)
+            return inspect(self.db_engine).has_table(
+                self.table.name, schema=self.schema
+            )
         except Exception as e:
             logger.error(e)
             return False
@@ -105,7 +107,9 @@ class PgVector2(VectorDb):
                     sess.execute(text("create extension if not exists vector;"))
                     if self.schema is not None:
                         logger.debug(f"Creating schema: {self.schema}")
-                        sess.execute(text(f"create schema if not exists {self.schema};"))
+                        sess.execute(
+                            text(f"create schema if not exists {self.schema};")
+                        )
             logger.debug(f"Creating table: {self.collection}")
             self.table.create(self.db_engine)
 
@@ -120,7 +124,10 @@ class PgVector2(VectorDb):
         with self.Session() as sess:
             with sess.begin():
                 cleaned_content = document.content.replace("\x00", "\ufffd")
-                stmt = select(*columns).where(self.table.c.content_hash == md5(cleaned_content.encode()).hexdigest())
+                stmt = select(*columns).where(
+                    self.table.c.content_hash
+                    == md5(cleaned_content.encode()).hexdigest()
+                )
                 result = sess.execute(stmt).first()
                 return result is not None
 
@@ -169,7 +176,9 @@ class PgVector2(VectorDb):
                 )
                 sess.execute(stmt)
                 counter += 1
-                logger.debug(f"Inserted document: {document.name} ({document.meta_data})")
+                logger.debug(
+                    f"Inserted document: {document.name} ({document.meta_data})"
+                )
 
                 # Commit every `batch_size` documents
                 if counter >= batch_size:
@@ -223,7 +232,9 @@ class PgVector2(VectorDb):
                 )
                 sess.execute(stmt)
                 counter += 1
-                logger.debug(f"Upserted document: {document.id} | {document.name} | {document.meta_data}")
+                logger.debug(
+                    f"Upserted document: {document.id} | {document.name} | {document.meta_data}"
+                )
 
                 # Commit every `batch_size` documents
                 if counter >= batch_size:
@@ -236,7 +247,9 @@ class PgVector2(VectorDb):
                 sess.commit()
                 logger.info(f"Committed {counter} documents")
 
-    def search(self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None) -> List[Document]:
+    def search(
+        self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None
+    ) -> List[Document]:
         query_embedding = self.embedder.get_embedding(query)
         if query_embedding is None:
             logger.error(f"Error getting embedding for Query: {query}")
@@ -258,11 +271,17 @@ class PgVector2(VectorDb):
                     stmt = stmt.where(getattr(self.table.c, key) == value)
 
         if self.distance == Distance.l2:
-            stmt = stmt.order_by(self.table.c.embedding.max_inner_product(query_embedding))
+            stmt = stmt.order_by(
+                self.table.c.embedding.max_inner_product(query_embedding)
+            )
         if self.distance == Distance.cosine:
-            stmt = stmt.order_by(self.table.c.embedding.cosine_distance(query_embedding))
+            stmt = stmt.order_by(
+                self.table.c.embedding.cosine_distance(query_embedding)
+            )
         if self.distance == Distance.max_inner_product:
-            stmt = stmt.order_by(self.table.c.embedding.max_inner_product(query_embedding))
+            stmt = stmt.order_by(
+                self.table.c.embedding.max_inner_product(query_embedding)
+            )
 
         stmt = stmt.limit(limit=limit)
         logger.debug(f"Query: {stmt}")
@@ -273,9 +292,15 @@ class PgVector2(VectorDb):
                 with sess.begin():
                     if self.index is not None:
                         if isinstance(self.index, Ivfflat):
-                            sess.execute(text(f"SET LOCAL ivfflat.probes = {self.index.probes}"))
+                            sess.execute(
+                                text(f"SET LOCAL ivfflat.probes = {self.index.probes}")
+                            )
                         elif isinstance(self.index, HNSW):
-                            sess.execute(text(f"SET LOCAL hnsw.ef_search  = {self.index.ef_search}"))
+                            sess.execute(
+                                text(
+                                    f"SET LOCAL hnsw.ef_search  = {self.index.ef_search}"
+                                )
+                            )
                     neighbors = sess.execute(stmt).fetchall() or []
         except Exception as e:
             logger.error(f"Error searching for documents: {e}")

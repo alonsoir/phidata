@@ -53,7 +53,9 @@ def save_resources(
             num_rgs_saved += 1
         num_resources_saved += _num_resources_saved
         num_resources_to_save += _num_resources_to_save
-        logger.debug(f"Saved {num_resources_saved} resources in {num_rgs_saved} resource groups")
+        logger.debug(
+            f"Saved {num_resources_saved} resources in {num_rgs_saved} resource groups"
+        )
 
     if num_resources_saved == 0:
         return

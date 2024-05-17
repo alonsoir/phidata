@@ -57,7 +57,9 @@ class Gemini(LLM):
 
         # If the tool is a Tool or Dict, add it directly to the LLM
         if isinstance(tool, Tool) or isinstance(tool, Dict):
-            logger.warning(f"Tool of type: {type(tool)} is not yet supported by Gemini.")
+            logger.warning(
+                f"Tool of type: {type(tool)} is not yet supported by Gemini."
+            )
         # If the tool is a Callable or Toolkit, add its functions to the LLM
         elif callable(tool) or isinstance(tool, Toolkit) or isinstance(tool, Function):
             if self.functions is None:
@@ -103,13 +105,17 @@ class Gemini(LLM):
         if self.generative_model_kwargs:
             kwargs.update(self.generative_model_kwargs)
         if self.function_declarations:
-            kwargs["tools"] = [GeminiTool(function_declarations=self.function_declarations)]
+            kwargs["tools"] = [
+                GeminiTool(function_declarations=self.function_declarations)
+            ]
         return kwargs
 
     @property
     def client(self) -> GenerativeModel:
         if self.generative_model is None:
-            self.generative_model = GenerativeModel(model_name=self.model, **self.api_kwargs)
+            self.generative_model = GenerativeModel(
+                model_name=self.model, **self.api_kwargs
+            )
         return self.generative_model
 
     def to_dict(self) -> Dict[str, Any]:
@@ -130,7 +136,9 @@ class Gemini(LLM):
         return _contents
 
     def invoke(self, messages: List[Message]) -> GenerationResponse:
-        return self.client.generate_content(contents=self.convert_messages_to_contents(messages))
+        return self.client.generate_content(
+            contents=self.convert_messages_to_contents(messages)
+        )
 
     def invoke_stream(self, messages: List[Message]) -> Iterator[GenerationResponse]:
         yield from self.client.generate_content(
@@ -175,7 +183,9 @@ class Gemini(LLM):
                     "type": "function",
                     "function": {
                         "name": _part_dict.get("function_call").get("name"),
-                        "arguments": json.dumps(_part_dict.get("function_call").get("args")),
+                        "arguments": json.dumps(
+                            _part_dict.get("function_call").get("args")
+                        ),
                     },
                 }
             )
@@ -207,20 +217,34 @@ class Gemini(LLM):
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
                 _tool_call_id = tool_call.get("id")
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
                     messages.append(
-                        Message(role="tool", tool_call_id=_tool_call_id, content="Could not find function to call.")
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content="Could not find function to call.",
+                        )
                     )
                     continue
                 if _function_call.error is not None:
-                    messages.append(Message(role="tool", tool_call_id=_tool_call_id, content=_function_call.error))
+                    messages.append(
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content=_function_call.error,
+                        )
+                    )
                     continue
                 function_calls_to_run.append(_function_call)
 
             if self.show_tool_calls:
                 if len(function_calls_to_run) == 1:
-                    final_response += f"\n - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    final_response += (
+                        f"\n - Running: {function_calls_to_run[0].get_call_str()}\n\n"
+                    )
                 elif len(function_calls_to_run) > 1:
                     final_response += "\nRunning:"
                     for _f in function_calls_to_run:
@@ -274,7 +298,9 @@ class Gemini(LLM):
                         "type": "function",
                         "function": {
                             "name": _part_dict.get("function_call").get("name"),
-                            "arguments": json.dumps(_part_dict.get("function_call").get("args")),
+                            "arguments": json.dumps(
+                                _part_dict.get("function_call").get("args")
+                            ),
                         },
                     }
                 )
@@ -300,14 +326,26 @@ class Gemini(LLM):
             function_calls_to_run: List[FunctionCall] = []
             for tool_call in assistant_message.tool_calls:
                 _tool_call_id = tool_call.get("id")
-                _function_call = get_function_call_for_tool_call(tool_call, self.functions)
+                _function_call = get_function_call_for_tool_call(
+                    tool_call, self.functions
+                )
                 if _function_call is None:
                     messages.append(
-                        Message(role="tool", tool_call_id=_tool_call_id, content="Could not find function to call.")
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content="Could not find function to call.",
+                        )
                     )
                     continue
                 if _function_call.error is not None:
-                    messages.append(Message(role="tool", tool_call_id=_tool_call_id, content=_function_call.error))
+                    messages.append(
+                        Message(
+                            role="tool",
+                            tool_call_id=_tool_call_id,
+                            content=_function_call.error,
+                        )
+                    )
                     continue
                 function_calls_to_run.append(_function_call)
 

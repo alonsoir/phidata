@@ -124,7 +124,11 @@ class SqlAssistantStorage(AssistantStorage):
     def read(self, run_id: str) -> Optional[AssistantRun]:
         with self.Session() as sess:
             existing_row: Optional[Row[Any]] = self._read(session=sess, run_id=run_id)
-            return AssistantRun.model_validate(existing_row) if existing_row is not None else None
+            return (
+                AssistantRun.model_validate(existing_row)
+                if existing_row is not None
+                else None
+            )
 
     def get_all_run_ids(self, user_id: Optional[str] = None) -> List[str]:
         run_ids: List[str] = []

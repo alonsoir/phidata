@@ -69,7 +69,9 @@ class S2VectorDb(VectorDb):
     def table_exists(self) -> bool:
         logger.debug(f"Checking if table exists: {self.table.name}")
         try:
-            return inspect(self.db_engine).has_table(self.table.name, schema=self.schema)
+            return inspect(self.db_engine).has_table(
+                self.table.name, schema=self.schema
+            )
         except Exception as e:
             logger.error(e)
             return False
@@ -94,7 +96,9 @@ class S2VectorDb(VectorDb):
         columns = [self.table.c.name, self.table.c.content_hash]
         with self.Session.begin() as sess:
             cleaned_content = document.content.replace("\x00", "\ufffd")
-            stmt = select(*columns).where(self.table.c.content_hash == md5(cleaned_content.encode()).hexdigest())
+            stmt = select(*columns).where(
+                self.table.c.content_hash == md5(cleaned_content.encode()).hexdigest()
+            )
             result = sess.execute(stmt).first()
             return result is not None
 
@@ -134,7 +138,9 @@ class S2VectorDb(VectorDb):
                 meta_data_json = json.dumps(document.meta_data)
                 usage_json = json.dumps(document.usage)
                 embedding_json = json.dumps(document.embedding)
-                json_array_pack = text("JSON_ARRAY_PACK(:embedding)").bindparams(embedding=embedding_json)
+                json_array_pack = text("JSON_ARRAY_PACK(:embedding)").bindparams(
+                    embedding=embedding_json
+                )
 
                 stmt = mysql.insert(self.table).values(
                     id=_id,
@@ -147,7 +153,9 @@ class S2VectorDb(VectorDb):
                 )
                 sess.execute(stmt)
                 counter += 1
-                logger.debug(f"Inserted document: {document.name} ({document.meta_data})")
+                logger.debug(
+                    f"Inserted document: {document.name} ({document.meta_data})"
+                )
 
             # Commit all documents
             sess.commit()
@@ -175,7 +183,9 @@ class S2VectorDb(VectorDb):
                 meta_data_json = json.dumps(document.meta_data)
                 usage_json = json.dumps(document.usage)
                 embedding_json = json.dumps(document.embedding)
-                json_array_pack = text("JSON_ARRAY_PACK(:embedding)").bindparams(embedding=embedding_json)
+                json_array_pack = text("JSON_ARRAY_PACK(:embedding)").bindparams(
+                    embedding=embedding_json
+                )
 
                 stmt = mysql.insert(self.table).values(
                     id=_id,
@@ -188,13 +198,17 @@ class S2VectorDb(VectorDb):
                 )
                 sess.execute(stmt)
                 counter += 1
-                logger.debug(f"Inserted document: {document.id} | {document.name} | {document.meta_data}")
+                logger.debug(
+                    f"Inserted document: {document.id} | {document.name} | {document.meta_data}"
+                )
 
             # Commit all remaining documents
             sess.commit()
             logger.debug(f"Committed {counter} documents")
 
-    def search(self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None) -> List[Document]:
+    def search(
+        self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None
+    ) -> List[Document]:
         query_embedding = self.embedder.get_embedding(query)
         if query_embedding is None:
             logger.error(f"Error getting embedding for Query: {query}")
@@ -218,15 +232,21 @@ class S2VectorDb(VectorDb):
                     stmt = stmt.where(getattr(self.table.c, key) == value)
 
         if self.distance == Distance.l2:
-            stmt = stmt.order_by(self.table.c.embedding.max_inner_product(query_embedding))
+            stmt = stmt.order_by(
+                self.table.c.embedding.max_inner_product(query_embedding)
+            )
         if self.distance == Distance.cosine:
             embedding_json = json.dumps(query_embedding)
-            dot_product_expr = func.dot_product(self.table.c.embedding, text("JSON_ARRAY_PACK(:embedding)"))
+            dot_product_expr = func.dot_product(
+                self.table.c.embedding, text("JSON_ARRAY_PACK(:embedding)")
+            )
             stmt = stmt.order_by(dot_product_expr.desc())
             stmt = stmt.params(embedding=embedding_json)
             # stmt = stmt.order_by(self.table.c.embedding.cosine_distance(query_embedding))
         if self.distance == Distance.max_inner_product:
-            stmt = stmt.order_by(self.table.c.embedding.max_inner_product(query_embedding))
+            stmt = stmt.order_by(
+                self.table.c.embedding.max_inner_product(query_embedding)
+            )
 
         stmt = stmt.limit(limit=limit)
         logger.debug(f"Query: {stmt}")
@@ -248,10 +268,14 @@ class S2VectorDb(VectorDb):
         # Build search results
         search_results: List[Document] = []
         for neighbor in neighbors:
-            meta_data_dict = json.loads(neighbor.meta_data) if neighbor.meta_data else {}
+            meta_data_dict = (
+                json.loads(neighbor.meta_data) if neighbor.meta_data else {}
+            )
             usage_dict = json.loads(neighbor.usage) if neighbor.usage else {}
             # Convert the embedding mysql.TEXT back into a list
-            embedding_list = json.loads(neighbor.embedding) if neighbor.embedding else []
+            embedding_list = (
+                json.loads(neighbor.embedding) if neighbor.embedding else []
+            )
 
             search_results.append(
                 Document(

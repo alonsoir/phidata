@@ -204,7 +204,9 @@ class DbInstance(AwsResource):
     def get_db_instance_identifier(self):
         return self.db_instance_identifier or self.name
 
-    def get_master_username(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_master_username(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         master_username = self.master_username
         if master_username is None and self.secrets_file is not None:
             # read from secrets_file
@@ -214,21 +216,31 @@ class DbInstance(AwsResource):
         if master_username is None and self.aws_secret is not None:
             # read from aws_secret
             logger.debug(f"Reading MASTER_USERNAME from secret: {self.aws_secret.name}")
-            master_username = self.aws_secret.get_secret_value("MASTER_USERNAME", aws_client=aws_client)
+            master_username = self.aws_secret.get_secret_value(
+                "MASTER_USERNAME", aws_client=aws_client
+            )
 
         return master_username
 
-    def get_master_user_password(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_master_user_password(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         master_user_password = self.master_user_password
         if master_user_password is None and self.secrets_file is not None:
             # read from secrets_file
             secret_data = self.get_secret_file_data()
             if secret_data is not None:
-                master_user_password = secret_data.get("MASTER_USER_PASSWORD", master_user_password)
+                master_user_password = secret_data.get(
+                    "MASTER_USER_PASSWORD", master_user_password
+                )
         if master_user_password is None and self.aws_secret is not None:
             # read from aws_secret
-            logger.debug(f"Reading MASTER_USER_PASSWORD from secret: {self.aws_secret.name}")
-            master_user_password = self.aws_secret.get_secret_value("MASTER_USER_PASSWORD", aws_client=aws_client)
+            logger.debug(
+                f"Reading MASTER_USER_PASSWORD from secret: {self.aws_secret.name}"
+            )
+            master_user_password = self.aws_secret.get_secret_value(
+                "MASTER_USER_PASSWORD", aws_client=aws_client
+            )
 
         return master_user_password
 
@@ -246,8 +258,12 @@ class DbInstance(AwsResource):
             logger.debug(f"Reading DB_NAME from secret: {self.aws_secret.name}")
             db_name = self.aws_secret.get_secret_value("DB_NAME", aws_client=aws_client)
             if db_name is None:
-                logger.debug(f"Reading DATABASE_NAME from secret: {self.aws_secret.name}")
-                db_name = self.aws_secret.get_secret_value("DATABASE_NAME", aws_client=aws_client)
+                logger.debug(
+                    f"Reading DATABASE_NAME from secret: {self.aws_secret.name}"
+                )
+                db_name = self.aws_secret.get_secret_value(
+                    "DATABASE_NAME", aws_client=aws_client
+                )
         return db_name
 
     def get_database_name(self) -> Optional[str]:
@@ -313,7 +329,9 @@ class DbInstance(AwsResource):
             not_null_args["AvailabilityZone"] = self.availability_zone
 
         if self.preferred_maintenance_window:
-            not_null_args["PreferredMaintenanceWindow"] = self.preferred_maintenance_window
+            not_null_args["PreferredMaintenanceWindow"] = (
+                self.preferred_maintenance_window
+            )
         if self.db_parameter_group_name:
             not_null_args["DBParameterGroupName"] = self.db_parameter_group_name
         if self.backup_retention_period:
@@ -369,15 +387,25 @@ class DbInstance(AwsResource):
         if self.timezone:
             not_null_args["Timezone"] = self.timezone
         if self.enable_iam_database_authentication:
-            not_null_args["EnableIAMDatabaseAuthentication"] = self.enable_iam_database_authentication
+            not_null_args["EnableIAMDatabaseAuthentication"] = (
+                self.enable_iam_database_authentication
+            )
         if self.enable_performance_insights:
-            not_null_args["EnablePerformanceInsights"] = self.enable_performance_insights
+            not_null_args["EnablePerformanceInsights"] = (
+                self.enable_performance_insights
+            )
         if self.performance_insights_kms_key_id:
-            not_null_args["PerformanceInsightsKMSKeyId"] = self.performance_insights_kms_key_id
+            not_null_args["PerformanceInsightsKMSKeyId"] = (
+                self.performance_insights_kms_key_id
+            )
         if self.performance_insights_retention_period:
-            not_null_args["PerformanceInsightsRetentionPeriod"] = self.performance_insights_retention_period
+            not_null_args["PerformanceInsightsRetentionPeriod"] = (
+                self.performance_insights_retention_period
+            )
         if self.enable_cloudwatch_logs_exports:
-            not_null_args["EnableCloudwatchLogsExports"] = self.enable_cloudwatch_logs_exports
+            not_null_args["EnableCloudwatchLogsExports"] = (
+                self.enable_cloudwatch_logs_exports
+            )
         if self.processor_features:
             not_null_args["ProcessorFeatures"] = self.processor_features
         if self.deletion_protection:
@@ -404,7 +432,9 @@ class DbInstance(AwsResource):
         if self.manage_master_user_password:
             not_null_args["ManageMasterUserPassword"] = self.manage_master_user_password
         if self.master_user_secret_kms_key_id:
-            not_null_args["MasterUserSecretKmsKeyId"] = self.master_user_secret_kms_key_id
+            not_null_args["MasterUserSecretKmsKeyId"] = (
+                self.master_user_secret_kms_key_id
+            )
 
         # Step 3: Create DBInstance
         service_client = self.get_service_client(aws_client)
@@ -432,7 +462,9 @@ class DbInstance(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be active.")
-                waiter = self.get_service_client(aws_client).get_waiter("db_instance_available")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "db_instance_available"
+                )
                 waiter.wait(
                     DBInstanceIdentifier=self.get_db_instance_identifier(),
                     WaiterConfig={
@@ -458,7 +490,9 @@ class DbInstance(AwsResource):
         service_client = self.get_service_client(aws_client)
         try:
             resource_identifier = self.get_db_instance_identifier()
-            describe_response = service_client.describe_db_instances(DBInstanceIdentifier=resource_identifier)
+            describe_response = service_client.describe_db_instances(
+                DBInstanceIdentifier=resource_identifier
+            )
             # logger.debug(f"DbInstance: {describe_response}")
             resources_list = describe_response.get("DBInstances", None)
 
@@ -489,7 +523,9 @@ class DbInstance(AwsResource):
         # create a dict of args which are not null, otherwise aws type validation fails
         not_null_args: Dict[str, Any] = {}
         if self.final_db_snapshot_identifier:
-            not_null_args["FinalDBSnapshotIdentifier"] = self.final_db_snapshot_identifier
+            not_null_args["FinalDBSnapshotIdentifier"] = (
+                self.final_db_snapshot_identifier
+            )
         if self.delete_automated_backups:
             not_null_args["DeleteAutomatedBackups"] = self.delete_automated_backups
 
@@ -519,7 +555,9 @@ class DbInstance(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("db_instance_deleted")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "db_instance_deleted"
+                )
                 waiter.wait(
                     DBInstanceIdentifier=self.get_db_instance_identifier(),
                     WaiterConfig={
@@ -564,8 +602,13 @@ class DbInstance(AwsResource):
         existing_vpc_security_group = db_instance.get("VpcSecurityGroups", [])
         existing_vpc_security_group_ids = []
         for existing_sg in existing_vpc_security_group:
-            existing_vpc_security_group_ids.append(existing_sg.get("VpcSecurityGroupId", None))
-        if vpc_security_group_ids is not None and vpc_security_group_ids != existing_vpc_security_group_ids:
+            existing_vpc_security_group_ids.append(
+                existing_sg.get("VpcSecurityGroupId", None)
+            )
+        if (
+            vpc_security_group_ids is not None
+            and vpc_security_group_ids != existing_vpc_security_group_ids
+        ):
             logger.info(f"Updating SecurityGroups: {vpc_security_group_ids}")
             not_null_args["VpcSecurityGroupIds"] = vpc_security_group_ids
 
@@ -573,8 +616,13 @@ class DbInstance(AwsResource):
         if db_subnet_group_name is None and self.db_subnet_group is not None:
             db_subnet_group_name = self.db_subnet_group.name
         # Check if db_subnet_group_name has changed
-        existing_db_subnet_group_name = db_instance.get("DBSubnetGroup", {}).get("DBSubnetGroupName", None)
-        if db_subnet_group_name is not None and db_subnet_group_name != existing_db_subnet_group_name:
+        existing_db_subnet_group_name = db_instance.get("DBSubnetGroup", {}).get(
+            "DBSubnetGroupName", None
+        )
+        if (
+            db_subnet_group_name is not None
+            and db_subnet_group_name != existing_db_subnet_group_name
+        ):
             logger.info(f"Updating DbSubnetGroup: {db_subnet_group_name}")
             not_null_args["DBSubnetGroupName"] = db_subnet_group_name
 
@@ -594,7 +642,9 @@ class DbInstance(AwsResource):
         if self.preferred_backup_window:
             not_null_args["PreferredBackupWindow"] = self.preferred_backup_window
         if self.preferred_maintenance_window:
-            not_null_args["PreferredMaintenanceWindow"] = self.preferred_maintenance_window
+            not_null_args["PreferredMaintenanceWindow"] = (
+                self.preferred_maintenance_window
+            )
         if self.multi_az:
             not_null_args["MultiAZ"] = self.multi_az
         if self.engine_version:
@@ -636,35 +686,53 @@ class DbInstance(AwsResource):
         if self.promotion_tier:
             not_null_args["PromotionTier"] = self.promotion_tier
         if self.enable_iam_database_authentication:
-            not_null_args["EnableIAMDatabaseAuthentication"] = self.enable_iam_database_authentication
+            not_null_args["EnableIAMDatabaseAuthentication"] = (
+                self.enable_iam_database_authentication
+            )
         if self.enable_performance_insights:
-            not_null_args["EnablePerformanceInsights"] = self.enable_performance_insights
+            not_null_args["EnablePerformanceInsights"] = (
+                self.enable_performance_insights
+            )
         if self.performance_insights_kms_key_id:
-            not_null_args["PerformanceInsightsKMSKeyId"] = self.performance_insights_kms_key_id
+            not_null_args["PerformanceInsightsKMSKeyId"] = (
+                self.performance_insights_kms_key_id
+            )
         if self.performance_insights_retention_period:
-            not_null_args["PerformanceInsightsRetentionPeriod"] = self.performance_insights_retention_period
+            not_null_args["PerformanceInsightsRetentionPeriod"] = (
+                self.performance_insights_retention_period
+            )
         if self.cloudwatch_logs_export_configuration:
-            not_null_args["CloudwatchLogsExportConfiguration"] = self.cloudwatch_logs_export_configuration
+            not_null_args["CloudwatchLogsExportConfiguration"] = (
+                self.cloudwatch_logs_export_configuration
+            )
         if self.processor_features:
             not_null_args["ProcessorFeatures"] = self.processor_features
         if self.use_default_processor_features:
-            not_null_args["UseDefaultProcessorFeatures"] = self.use_default_processor_features
+            not_null_args["UseDefaultProcessorFeatures"] = (
+                self.use_default_processor_features
+            )
         if self.deletion_protection:
             not_null_args["DeletionProtection"] = self.deletion_protection
         if self.max_allocated_storage:
             not_null_args["MaxAllocatedStorage"] = self.max_allocated_storage
         if self.certificate_rotation_restart:
-            not_null_args["CertificateRotationRestart"] = self.certificate_rotation_restart
+            not_null_args["CertificateRotationRestart"] = (
+                self.certificate_rotation_restart
+            )
         if self.replica_mode:
             not_null_args["ReplicaMode"] = self.replica_mode
         if self.enable_customer_owned_ip:
             not_null_args["EnableCustomerOwnedIp"] = self.enable_customer_owned_ip
         if self.aws_backup_recovery_point_arn:
-            not_null_args["AwsBackupRecoveryPointArn"] = self.aws_backup_recovery_point_arn
+            not_null_args["AwsBackupRecoveryPointArn"] = (
+                self.aws_backup_recovery_point_arn
+            )
         if self.automation_mode:
             not_null_args["AutomationMode"] = self.automation_mode
         if self.resume_full_automation_mode_minutes:
-            not_null_args["ResumeFullAutomationModeMinutes"] = self.resume_full_automation_mode_minutes
+            not_null_args["ResumeFullAutomationModeMinutes"] = (
+                self.resume_full_automation_mode_minutes
+            )
         if self.network_type:
             not_null_args["NetworkType"] = self.network_type
         if self.storage_throughput:
@@ -674,7 +742,9 @@ class DbInstance(AwsResource):
         if self.rotate_master_user_password:
             not_null_args["RotateMasterUserPassword"] = self.rotate_master_user_password
         if self.master_user_secret_kms_key_id:
-            not_null_args["MasterUserSecretKmsKeyId"] = self.master_user_secret_kms_key_id
+            not_null_args["MasterUserSecretKmsKeyId"] = (
+                self.master_user_secret_kms_key_id
+            )
 
         # Step 2: Update DBInstance
         service_client = self.get_service_client(aws_client)
@@ -696,7 +766,9 @@ class DbInstance(AwsResource):
             logger.error(e)
         return False
 
-    def get_db_endpoint(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_db_endpoint(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         """Returns the DbInstance endpoint
 
         Returns:

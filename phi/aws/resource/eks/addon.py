@@ -118,7 +118,9 @@ class EksAddon(AwsResource):
 
         service_client = self.get_service_client(aws_client)
         try:
-            describe_response = service_client.describe_addon(clusterName=self.cluster_name, addonName=self.name)
+            describe_response = service_client.describe_addon(
+                clusterName=self.cluster_name, addonName=self.name
+            )
             # logger.debug(f"EksAddon: {describe_response}")
             # logger.debug(f"EksAddon type: {type(describe_response)}")
             addon_dict = describe_response.get("addon", {})

@@ -149,31 +149,54 @@ class AwsApp(AppBase):
             workspace_parent=workspace_parent_in_container,
         )
 
-        if self.workspace_settings is not None and self.workspace_settings.scripts_dir is not None:
-            self.container_context.scripts_dir = f"{workspace_root_in_container}/{self.workspace_settings.scripts_dir}"
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.scripts_dir is not None
+        ):
+            self.container_context.scripts_dir = (
+                f"{workspace_root_in_container}/{self.workspace_settings.scripts_dir}"
+            )
 
-        if self.workspace_settings is not None and self.workspace_settings.storage_dir is not None:
-            self.container_context.storage_dir = f"{workspace_root_in_container}/{self.workspace_settings.storage_dir}"
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.storage_dir is not None
+        ):
+            self.container_context.storage_dir = (
+                f"{workspace_root_in_container}/{self.workspace_settings.storage_dir}"
+            )
 
-        if self.workspace_settings is not None and self.workspace_settings.workflows_dir is not None:
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.workflows_dir is not None
+        ):
             self.container_context.workflows_dir = (
                 f"{workspace_root_in_container}/{self.workspace_settings.workflows_dir}"
             )
 
-        if self.workspace_settings is not None and self.workspace_settings.workspace_dir is not None:
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.workspace_dir is not None
+        ):
             self.container_context.workspace_dir = (
                 f"{workspace_root_in_container}/{self.workspace_settings.workspace_dir}"
             )
 
-        if self.workspace_settings is not None and self.workspace_settings.ws_schema is not None:
+        if (
+            self.workspace_settings is not None
+            and self.workspace_settings.ws_schema is not None
+        ):
             self.container_context.workspace_schema = self.workspace_settings.ws_schema
 
         if self.requirements_file is not None:
-            self.container_context.requirements_file = f"{workspace_root_in_container}/{self.requirements_file}"
+            self.container_context.requirements_file = (
+                f"{workspace_root_in_container}/{self.requirements_file}"
+            )
 
         return self.container_context
 
-    def get_container_env(self, container_context: ContainerContext, build_context: AwsBuildContext) -> Dict[str, str]:
+    def get_container_env(
+        self, container_context: ContainerContext, build_context: AwsBuildContext
+    ) -> Dict[str, str]:
         from phi.constants import (
             PHI_RUNTIME_ENV_VAR,
             PYTHONPATH_ENV_VAR,
@@ -194,7 +217,8 @@ class AwsApp(AppBase):
                 "INSTALL_REQUIREMENTS": str(self.install_requirements),
                 "PRINT_ENV_ON_LOAD": str(self.print_env_on_load),
                 PHI_RUNTIME_ENV_VAR: "ecs",
-                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file or "",
+                REQUIREMENTS_FILE_PATH_ENV_VAR: container_context.requirements_file
+                or "",
                 SCRIPTS_DIR_ENV_VAR: container_context.scripts_dir or "",
                 STORAGE_DIR_ENV_VAR: container_context.storage_dir or "",
                 WORKFLOWS_DIR_ENV_VAR: container_context.workflows_dir or "",
@@ -206,9 +230,13 @@ class AwsApp(AppBase):
         try:
             if container_context.workspace_schema is not None:
                 if container_context.workspace_schema.id_workspace is not None:
-                    container_env[WORKSPACE_ID_ENV_VAR] = str(container_context.workspace_schema.id_workspace) or ""
+                    container_env[WORKSPACE_ID_ENV_VAR] = (
+                        str(container_context.workspace_schema.id_workspace) or ""
+                    )
                 if container_context.workspace_schema.ws_hash is not None:
-                    container_env[WORKSPACE_HASH_ENV_VAR] = container_context.workspace_schema.ws_hash
+                    container_env[WORKSPACE_HASH_ENV_VAR] = (
+                        container_context.workspace_schema.ws_hash
+                    )
         except Exception:
             pass
 
@@ -217,27 +245,37 @@ class AwsApp(AppBase):
             if python_path is None:
                 python_path = container_context.workspace_root
                 if self.add_python_paths is not None:
-                    python_path = "{}:{}".format(python_path, ":".join(self.add_python_paths))
+                    python_path = "{}:{}".format(
+                        python_path, ":".join(self.add_python_paths)
+                    )
             if python_path is not None:
                 container_env[PYTHONPATH_ENV_VAR] = python_path
 
         # Set aws region and profile
-        self.set_aws_env_vars(env_dict=container_env, aws_region=build_context.aws_region)
+        self.set_aws_env_vars(
+            env_dict=container_env, aws_region=build_context.aws_region
+        )
 
         # Update the container env using env_file
         env_data_from_file = self.get_env_file_data()
         if env_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in env_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in env_data_from_file.items() if v is not None}
+            )
 
         # Update the container env using secrets_file
         secret_data_from_file = self.get_secret_file_data()
         if secret_data_from_file is not None:
-            container_env.update({k: str(v) for k, v in secret_data_from_file.items() if v is not None})
+            container_env.update(
+                {k: str(v) for k, v in secret_data_from_file.items() if v is not None}
+            )
 
         # Update the container env with user provided env_vars
         # this overwrites any existing variables with the same key
         if self.env_vars is not None and isinstance(self.env_vars, dict):
-            container_env.update({k: v for k, v in self.env_vars.items() if v is not None})
+            container_env.update(
+                {k: v for k, v in self.env_vars.items() if v is not None}
+            )
 
         # logger.debug("Container Environment: {}".format(container_env))
         return container_env
@@ -245,7 +283,9 @@ class AwsApp(AppBase):
     def get_load_balancer_security_groups(self) -> Optional[List["SecurityGroup"]]:
         from phi.aws.resource.ec2.security_group import SecurityGroup, InboundRule
 
-        load_balancer_security_groups: Optional[List[SecurityGroup]] = self.load_balancer_security_groups
+        load_balancer_security_groups: Optional[List[SecurityGroup]] = (
+            self.load_balancer_security_groups
+        )
         if load_balancer_security_groups is None:
             # Create security group for the load balancer
             if self.create_load_balancer and self.create_security_groups:
@@ -298,7 +338,9 @@ class AwsApp(AppBase):
                     InboundRule(
                         description=f"Allow traffic from {lb_sg.name} to the {self.get_app_name()}",
                         port=self.container_port,
-                        source_security_group_id=AwsReference(lb_sg.get_security_group_id),
+                        source_security_group_id=AwsReference(
+                            lb_sg.get_security_group_id
+                        ),
                     )
                 )
                 app_sg.depends_on.append(lb_sg)
@@ -315,7 +357,9 @@ class AwsApp(AppBase):
                     InboundRule(
                         description=f"Allow traffic from {inbound_sg.name} to the {self.get_app_name()}",
                         port=self.container_port,
-                        source_security_group_id=AwsReference(inbound_sg.get_security_group_id),
+                        source_security_group_id=AwsReference(
+                            inbound_sg.get_security_group_id
+                        ),
                     )
                 )
 
@@ -387,11 +431,15 @@ class AwsApp(AppBase):
         if self.ecs_cluster is None:
             if self.create_ecs_cluster:
                 return self.ecs_cluster_definition()
-            raise Exception("Please provide ECSCluster or set create_ecs_cluster to True")
+            raise Exception(
+                "Please provide ECSCluster or set create_ecs_cluster to True"
+            )
         elif isinstance(self.ecs_cluster, EcsCluster):
             return self.ecs_cluster
         else:
-            raise Exception(f"Invalid ECSCluster: {self.ecs_cluster} - Must be of type EcsCluster")
+            raise Exception(
+                f"Invalid ECSCluster: {self.ecs_cluster} - Must be of type EcsCluster"
+            )
 
     def load_balancer_definition(self) -> "LoadBalancer":
         from phi.aws.resource.elb.load_balancer import LoadBalancer
@@ -413,7 +461,9 @@ class AwsApp(AppBase):
         elif isinstance(self.load_balancer, LoadBalancer):
             return self.load_balancer
         else:
-            raise Exception(f"Invalid LoadBalancer: {self.load_balancer} - Must be of type LoadBalancer")
+            raise Exception(
+                f"Invalid LoadBalancer: {self.load_balancer} - Must be of type LoadBalancer"
+            )
 
     def target_group_definition(self) -> "TargetGroup":
         from phi.aws.resource.elb.target_group import TargetGroup
@@ -444,10 +494,14 @@ class AwsApp(AppBase):
         elif isinstance(self.target_group, TargetGroup):
             return self.target_group
         else:
-            raise Exception(f"Invalid TargetGroup: {self.target_group} - Must be of type TargetGroup")
+            raise Exception(
+                f"Invalid TargetGroup: {self.target_group} - Must be of type TargetGroup"
+            )
 
     def listeners_definition(
-        self, load_balancer: Optional["LoadBalancer"], target_group: Optional["TargetGroup"]
+        self,
+        load_balancer: Optional["LoadBalancer"],
+        target_group: Optional["TargetGroup"],
     ) -> List["Listener"]:
         from phi.aws.resource.elb.listener import Listener
 
@@ -457,7 +511,9 @@ class AwsApp(AppBase):
             target_group=target_group,
         )
         if self.load_balancer_certificate_arn is not None:
-            listener.certificates = [{"CertificateArn": self.load_balancer_certificate_arn}]
+            listener.certificates = [
+                {"CertificateArn": self.load_balancer_certificate_arn}
+            ]
         if self.load_balancer_certificate is not None:
             listener.acm_certificates = [self.load_balancer_certificate]
 
@@ -488,7 +544,9 @@ class AwsApp(AppBase):
         return listeners
 
     def get_listeners(
-        self, load_balancer: Optional["LoadBalancer"], target_group: Optional["TargetGroup"]
+        self,
+        load_balancer: Optional["LoadBalancer"],
+        target_group: Optional["TargetGroup"],
     ) -> Optional[List["Listener"]]:
         from phi.aws.resource.elb.listener import Listener
 
@@ -499,10 +557,14 @@ class AwsApp(AppBase):
         elif isinstance(self.listeners, list):
             for listener in self.listeners:
                 if not isinstance(listener, Listener):
-                    raise Exception(f"Invalid Listener: {listener} - Must be of type Listener")
+                    raise Exception(
+                        f"Invalid Listener: {listener} - Must be of type Listener"
+                    )
             return self.listeners
         else:
-            raise Exception(f"Invalid Listener: {self.listeners} - Must be of type List[Listener]")
+            raise Exception(
+                f"Invalid Listener: {self.listeners} - Must be of type List[Listener]"
+            )
 
     def get_container_command(self) -> Optional[List[str]]:
         if isinstance(self.command, str):
@@ -518,7 +580,9 @@ class AwsApp(AppBase):
                 port_mapping["appProtocol"] = self.ecs_service_connect_protocol
         return [port_mapping]
 
-    def get_ecs_container(self, container_context: ContainerContext, build_context: AwsBuildContext) -> "EcsContainer":
+    def get_ecs_container(
+        self, container_context: ContainerContext, build_context: AwsBuildContext
+    ) -> "EcsContainer":
         from phi.aws.resource.ecs.container import EcsContainer
 
         # -*- Get Container Environment
@@ -554,7 +618,9 @@ class AwsApp(AppBase):
             env_from_secrets=self.aws_secrets,
         )
 
-    def get_ecs_task_definition(self, ecs_container: "EcsContainer") -> "EcsTaskDefinition":
+    def get_ecs_task_definition(
+        self, ecs_container: "EcsContainer"
+    ) -> "EcsTaskDefinition":
         from phi.aws.resource.ecs.task_definition import EcsTaskDefinition
 
         return EcsTaskDefinition(
@@ -654,12 +720,18 @@ class AwsApp(AppBase):
         # - nginx is enabled
         # - user provided target_group is None
         # - user provided target_group_port is None
-        if self.enable_nginx and self.target_group is None and self.target_group_port is None:
+        if (
+            self.enable_nginx
+            and self.target_group is None
+            and self.target_group_port is None
+        ):
             if target_group is not None:
                 target_group.port = self.nginx_container_port
 
         # -*- Get Listener
-        listeners: Optional[List[Listener]] = self.get_listeners(load_balancer=load_balancer, target_group=target_group)
+        listeners: Optional[List[Listener]] = self.get_listeners(
+            load_balancer=load_balancer, target_group=target_group
+        )
 
         # -*- Get ECSContainer
         ecs_container: EcsContainer = self.get_ecs_container(
@@ -670,7 +742,9 @@ class AwsApp(AppBase):
         nginx_shared_volume: Optional[EcsVolume] = None
         if self.enable_nginx and ecs_container is not None:
             nginx_container_name = f"{self.get_app_name()}-nginx"
-            nginx_shared_volume = EcsVolume(name=get_default_volume_name(self.get_app_name()))
+            nginx_shared_volume = EcsVolume(
+                name=get_default_volume_name(self.get_app_name())
+            )
             nginx_image_str = f"{self.nginx_image_name}:{self.nginx_image_tag}"
             if self.nginx_image and isinstance(self.nginx_image, DockerImage):
                 nginx_image_str = self.nginx_image.get_image_str()
@@ -686,7 +760,11 @@ class AwsApp(AppBase):
                     "options": {
                         "awslogs-group": self.get_app_name(),
                         "awslogs-region": build_context.aws_region
-                        or (self.workspace_settings.aws_region if self.workspace_settings else None),
+                        or (
+                            self.workspace_settings.aws_region
+                            if self.workspace_settings
+                            else None
+                        ),
                         "awslogs-create-group": "true",
                         "awslogs-stream-prefix": nginx_container_name,
                     },
@@ -711,7 +789,9 @@ class AwsApp(AppBase):
             ecs_container.mount_points = nginx_container.mount_points
 
         # -*- Get ECS Task Definition
-        ecs_task_definition: EcsTaskDefinition = self.get_ecs_task_definition(ecs_container=ecs_container)
+        ecs_task_definition: EcsTaskDefinition = self.get_ecs_task_definition(
+            ecs_container=ecs_container
+        )
         # -*- Add nginx container to ecs_task_definition if nginx is enabled
         if self.enable_nginx:
             if ecs_task_definition is not None:
@@ -719,9 +799,13 @@ class AwsApp(AppBase):
                     if ecs_task_definition.containers:
                         ecs_task_definition.containers.append(nginx_container)
                     else:
-                        logger.error("While adding Nginx container, found TaskDefinition.containers to be None")
+                        logger.error(
+                            "While adding Nginx container, found TaskDefinition.containers to be None"
+                        )
                 else:
-                    logger.error("While adding Nginx container, found nginx_container to be None")
+                    logger.error(
+                        "While adding Nginx container, found nginx_container to be None"
+                    )
                 if nginx_shared_volume:
                     ecs_task_definition.volumes = [nginx_shared_volume]
 
@@ -739,7 +823,9 @@ class AwsApp(AppBase):
                     ecs_service.target_container_name = nginx_container.name
                     ecs_service.target_container_port = self.nginx_container_port
                 else:
-                    logger.error("While adding Nginx container as target_container, found nginx_container to be None")
+                    logger.error(
+                        "While adding Nginx container as target_container, found nginx_container to be None"
+                    )
 
         # -*- List of AwsResources created by this App
         app_resources: List[AwsResource] = []

@@ -16,7 +16,9 @@ class Subnet(AwsResource):
     resource_type: Optional[str] = "Subnet"
     service_name: str = "ec2"
 
-    def get_availability_zone(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_availability_zone(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         # logger.debug(f"Reading {self.get_resource_type()}: {self.get_resource_name()}")
 
         from botocore.exceptions import ClientError

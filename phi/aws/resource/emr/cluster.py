@@ -59,7 +59,9 @@ class EmrCluster(AwsResource):
     # The IAM role provides permissions that the automatic scaling feature requires to launch and terminate EC2
     # instances in an instance group.
     auto_scaling_role: Optional[str] = None
-    scale_down_behavior: Optional[Literal["TERMINATE_AT_INSTANCE_HOUR", "TERMINATE_AT_TASK_COMPLETION"]] = None
+    scale_down_behavior: Optional[
+        Literal["TERMINATE_AT_INSTANCE_HOUR", "TERMINATE_AT_TASK_COMPLETION"]
+    ] = None
     custom_ami_id: Optional[str] = None
     # The size, in GiB, of the Amazon EBS root device volume of the Linux AMI that is used for each EC2 instance.
     ebs_root_volume_size: Optional[int] = None
@@ -161,7 +163,9 @@ class EmrCluster(AwsResource):
             self.cluster_arn = create_response.get("ClusterArn", None)
             self.active_resource = create_response
             if self.active_resource is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} created")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} created"
+                )
                 logger.debug(f"JobFlowId: {self.job_flow_id}")
                 logger.debug(f"ClusterArn: {self.cluster_arn}")
                 return True
@@ -176,7 +180,9 @@ class EmrCluster(AwsResource):
             try:
                 print_info("Waiting for EmrCluster to be active.")
                 if self.job_flow_id is not None:
-                    waiter = self.get_service_client(aws_client).get_waiter("cluster_running")
+                    waiter = self.get_service_client(aws_client).get_waiter(
+                        "cluster_running"
+                    )
                     waiter.wait(
                         ClusterId=self.job_flow_id,
                         WaiterConfig={
@@ -207,7 +213,9 @@ class EmrCluster(AwsResource):
             # logger.debug(f"list_response: {list_response}")
 
             cluster_summary_list = list_response.get("Clusters", None)
-            if cluster_summary_list is not None and isinstance(cluster_summary_list, list):
+            if cluster_summary_list is not None and isinstance(
+                cluster_summary_list, list
+            ):
                 for _cluster_summary in cluster_summary_list:
                     cluster_name = _cluster_summary.get("Name", None)
                     if cluster_name == self.name:
@@ -245,7 +253,9 @@ class EmrCluster(AwsResource):
 
             if self.job_flow_id:
                 service_client.terminate_job_flows(JobFlowIds=[self.job_flow_id])
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} deleted")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} deleted"
+                )
             else:
                 logger.error("Could not find cluster id")
             return True

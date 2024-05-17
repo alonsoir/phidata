@@ -110,13 +110,21 @@ class EksKubeconfig(AwsResource):
         return self.kubeconfig_path or self.eks_cluster.kubeconfig_path
 
     def get_kubeconfig_cluster_name(self) -> str:
-        return self.kubeconfig_cluster_name or self.eks_cluster.get_kubeconfig_cluster_name()
+        return (
+            self.kubeconfig_cluster_name
+            or self.eks_cluster.get_kubeconfig_cluster_name()
+        )
 
     def get_kubeconfig_user_name(self) -> str:
-        return self.kubeconfig_cluster_user or self.eks_cluster.get_kubeconfig_user_name()
+        return (
+            self.kubeconfig_cluster_user or self.eks_cluster.get_kubeconfig_user_name()
+        )
 
     def get_kubeconfig_context_name(self) -> str:
-        return self.kubeconfig_cluster_context or self.eks_cluster.get_kubeconfig_context_name()
+        return (
+            self.kubeconfig_cluster_context
+            or self.eks_cluster.get_kubeconfig_context_name()
+        )
 
     def get_kubeconfig_role(self) -> Optional[IamRole]:
         return self.kubeconfig_role or self.eks_cluster.kubeconfig_role
@@ -133,7 +141,11 @@ class EksKubeconfig(AwsResource):
 
         # Step 2: Get EksCluster cert, endpoint & arn
         try:
-            cluster_cert = eks_cluster.get("cluster", {}).get("certificateAuthority", {}).get("data", None)
+            cluster_cert = (
+                eks_cluster.get("cluster", {})
+                .get("certificateAuthority", {})
+                .get("data", None)
+            )
             logger.debug(f"cluster_cert: {cluster_cert}")
 
             cluster_endpoint = eks_cluster.get("cluster", {}).get("endpoint", None)
@@ -178,7 +190,9 @@ class EksKubeconfig(AwsResource):
             "args": new_user_exec_args,
         }
         if aws_client.aws_profile is not None:
-            new_user_exec["env"] = [{"name": "AWS_PROFILE", "value": aws_client.aws_profile}]
+            new_user_exec["env"] = [
+                {"name": "AWS_PROFILE", "value": aws_client.aws_profile}
+            ]
 
         new_user = KubeconfigUser(
             name=self.get_kubeconfig_user_name(),
@@ -223,9 +237,12 @@ class EksKubeconfig(AwsResource):
                     cluster_config_exists = True
                     if (
                         _cluster.cluster.server != new_cluster.cluster.server
-                        or _cluster.cluster.certificate_authority_data != new_cluster.cluster.certificate_authority_data
+                        or _cluster.cluster.certificate_authority_data
+                        != new_cluster.cluster.certificate_authority_data
                     ):
-                        logger.debug("Kubeconfig.cluster mismatch, updating cluster config")
+                        logger.debug(
+                            "Kubeconfig.cluster mismatch, updating cluster config"
+                        )
                         kubeconfig.clusters.pop(idx)
                         # logger.debug(
                         #     f"removed_cluster_config: {removed_cluster_config}"
@@ -269,7 +286,9 @@ class EksKubeconfig(AwsResource):
                 if _context.name == new_context.name:
                     context_config_exists = True
                     if _context.context != new_context.context:
-                        logger.debug("Kubeconfig.context mismatch, updating context config")
+                        logger.debug(
+                            "Kubeconfig.context mismatch, updating context config"
+                        )
                         kubeconfig.contexts.pop(idx)
                         # logger.debug(
                         #     f"removed_context_config: {removed_context_config}"
@@ -281,7 +300,10 @@ class EksKubeconfig(AwsResource):
                 kubeconfig.contexts.append(new_context)
                 write_kubeconfig = True
 
-            if kubeconfig.current_context is None or kubeconfig.current_context != current_context:
+            if (
+                kubeconfig.current_context is None
+                or kubeconfig.current_context != current_context
+            ):
                 logger.debug("Updating Kubeconfig.current_context")
                 kubeconfig.current_context = current_context
                 write_kubeconfig = True

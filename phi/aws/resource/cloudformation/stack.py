@@ -58,7 +58,9 @@ class CloudFormationStack(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be created.")
-                waiter = self.get_service_client(aws_client).get_waiter("stack_create_complete")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "stack_create_complete"
+                )
                 waiter.wait(
                     StackName=self.name,
                     WaiterConfig={
@@ -129,7 +131,9 @@ class CloudFormationStack(AwsResource):
         if self.wait_for_delete:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be deleted.")
-                waiter = self.get_service_client(aws_client).get_waiter("stack_delete_complete")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "stack_delete_complete"
+                )
                 waiter.wait(
                     StackName=self.name,
                     WaiterConfig={
@@ -143,7 +147,9 @@ class CloudFormationStack(AwsResource):
                 logger.error(e)
         return True
 
-    def get_stack_resource(self, aws_client: AwsApiClient, logical_id: str) -> Optional[Any]:
+    def get_stack_resource(
+        self, aws_client: AwsApiClient, logical_id: str
+    ) -> Optional[Any]:
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudformation.html#CloudFormation.StackResource
         # logger.debug(f"Getting StackResource {logical_id} for {self.name}")
         try:
@@ -157,34 +163,54 @@ class CloudFormationStack(AwsResource):
     def get_stack_resource_physical_id(self, stack_resource: Any) -> Optional[str]:
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudformation.html#CloudFormation.StackResource
         try:
-            physical_resource_id = stack_resource.physical_resource_id if stack_resource is not None else None
+            physical_resource_id = (
+                stack_resource.physical_resource_id
+                if stack_resource is not None
+                else None
+            )
             logger.debug(f"{stack_resource.logical_id}: {physical_resource_id}")
             return physical_resource_id
         except Exception:
             return None
 
-    def get_private_subnets(self, aws_client: Optional[AwsApiClient] = None) -> Optional[List[str]]:
+    def get_private_subnets(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[List[str]]:
         try:
             client: AwsApiClient = (
                 aws_client
                 if aws_client is not None
-                else AwsApiClient(aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile())
+                else AwsApiClient(
+                    aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile()
+                )
             )
 
             private_subnets = []
 
-            private_subnet_1_stack_resource = self.get_stack_resource(client, "PrivateSubnet01")
-            private_subnet_1_physical_resource_id = self.get_stack_resource_physical_id(private_subnet_1_stack_resource)
+            private_subnet_1_stack_resource = self.get_stack_resource(
+                client, "PrivateSubnet01"
+            )
+            private_subnet_1_physical_resource_id = self.get_stack_resource_physical_id(
+                private_subnet_1_stack_resource
+            )
             if private_subnet_1_physical_resource_id is not None:
                 private_subnets.append(private_subnet_1_physical_resource_id)
 
-            private_subnet_2_stack_resource = self.get_stack_resource(client, "PrivateSubnet02")
-            private_subnet_2_physical_resource_id = self.get_stack_resource_physical_id(private_subnet_2_stack_resource)
+            private_subnet_2_stack_resource = self.get_stack_resource(
+                client, "PrivateSubnet02"
+            )
+            private_subnet_2_physical_resource_id = self.get_stack_resource_physical_id(
+                private_subnet_2_stack_resource
+            )
             if private_subnet_2_physical_resource_id is not None:
                 private_subnets.append(private_subnet_2_physical_resource_id)
 
-            private_subnet_3_stack_resource = self.get_stack_resource(client, "PrivateSubnet03")
-            private_subnet_3_physical_resource_id = self.get_stack_resource_physical_id(private_subnet_3_stack_resource)
+            private_subnet_3_stack_resource = self.get_stack_resource(
+                client, "PrivateSubnet03"
+            )
+            private_subnet_3_physical_resource_id = self.get_stack_resource_physical_id(
+                private_subnet_3_stack_resource
+            )
             if private_subnet_3_physical_resource_id is not None:
                 private_subnets.append(private_subnet_3_physical_resource_id)
 
@@ -193,23 +219,35 @@ class CloudFormationStack(AwsResource):
             logger.error(e)
         return None
 
-    def get_public_subnets(self, aws_client: Optional[AwsApiClient] = None) -> Optional[List[str]]:
+    def get_public_subnets(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[List[str]]:
         try:
             client: AwsApiClient = (
                 aws_client
                 if aws_client is not None
-                else AwsApiClient(aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile())
+                else AwsApiClient(
+                    aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile()
+                )
             )
 
             public_subnets = []
 
-            public_subnet_1_stack_resource = self.get_stack_resource(client, "PublicSubnet01")
-            public_subnet_1_physical_resource_id = self.get_stack_resource_physical_id(public_subnet_1_stack_resource)
+            public_subnet_1_stack_resource = self.get_stack_resource(
+                client, "PublicSubnet01"
+            )
+            public_subnet_1_physical_resource_id = self.get_stack_resource_physical_id(
+                public_subnet_1_stack_resource
+            )
             if public_subnet_1_physical_resource_id is not None:
                 public_subnets.append(public_subnet_1_physical_resource_id)
 
-            public_subnet_2_stack_resource = self.get_stack_resource(client, "PublicSubnet02")
-            public_subnet_2_physical_resource_id = self.get_stack_resource_physical_id(public_subnet_2_stack_resource)
+            public_subnet_2_stack_resource = self.get_stack_resource(
+                client, "PublicSubnet02"
+            )
+            public_subnet_2_physical_resource_id = self.get_stack_resource_physical_id(
+                public_subnet_2_stack_resource
+            )
             if public_subnet_2_physical_resource_id is not None:
                 public_subnets.append(public_subnet_2_physical_resource_id)
 
@@ -218,15 +256,21 @@ class CloudFormationStack(AwsResource):
             logger.error(e)
         return None
 
-    def get_security_group(self, aws_client: Optional[AwsApiClient] = None) -> Optional[str]:
+    def get_security_group(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[str]:
         try:
             client: AwsApiClient = (
                 aws_client
                 if aws_client is not None
-                else AwsApiClient(aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile())
+                else AwsApiClient(
+                    aws_region=self.get_aws_region(), aws_profile=self.get_aws_profile()
+                )
             )
 
-            security_group_stack_resource = self.get_stack_resource(client, "ControlPlaneSecurityGroup")
+            security_group_stack_resource = self.get_stack_resource(
+                client, "ControlPlaneSecurityGroup"
+            )
             security_group_physical_resource_id = (
                 security_group_stack_resource.physical_resource_id
                 if security_group_stack_resource is not None

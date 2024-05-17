@@ -25,7 +25,12 @@ class S3PDFReader(Reader):
 
             object_resource = s3_object.get_resource()
             object_body = object_resource.get()["Body"]
-            doc_name = s3_object.name.split("/")[-1].split(".")[0].replace("/", "_").replace(" ", "_")
+            doc_name = (
+                s3_object.name.split("/")[-1]
+                .split(".")[0]
+                .replace("/", "_")
+                .replace(" ", "_")
+            )
             doc_reader = DocumentReader(BytesIO(object_body.read()))
             documents = [
                 Document(

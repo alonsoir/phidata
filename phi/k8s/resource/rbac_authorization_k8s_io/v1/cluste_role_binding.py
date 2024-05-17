@@ -144,7 +144,9 @@ class ClusterRoleBinding(K8sResource):
             namespace: NOT USED.
         """
         rbac_auth_v1_api: RbacAuthorizationV1Api = k8s_client.rbac_auth_v1_api
-        crb_list: Optional[V1ClusterRoleBindingList] = rbac_auth_v1_api.list_cluster_role_binding()
+        crb_list: Optional[V1ClusterRoleBindingList] = (
+            rbac_auth_v1_api.list_cluster_role_binding()
+        )
         crbs: Optional[List[V1ClusterRoleBinding]] = None
         if crb_list:
             crbs = crb_list.items
@@ -157,10 +159,12 @@ class ClusterRoleBinding(K8sResource):
         k8s_object: V1ClusterRoleBinding = self.get_k8s_object()
 
         logger.debug("Creating: {}".format(self.get_resource_name()))
-        v1_cluster_role_binding: V1ClusterRoleBinding = rbac_auth_v1_api.create_cluster_role_binding(
-            body=k8s_object,
-            async_req=self.async_req,
-            pretty=self.pretty,
+        v1_cluster_role_binding: V1ClusterRoleBinding = (
+            rbac_auth_v1_api.create_cluster_role_binding(
+                body=k8s_object,
+                async_req=self.async_req,
+                pretty=self.pretty,
+            )
         )
         # logger.debug("Created: {}".format(v1_cluster_role_binding))
         if v1_cluster_role_binding.metadata.creation_timestamp is not None:
@@ -196,11 +200,13 @@ class ClusterRoleBinding(K8sResource):
         k8s_object: V1ClusterRoleBinding = self.get_k8s_object()
 
         logger.debug("Updating: {}".format(crb_name))
-        v1_cluster_role_binding: V1ClusterRoleBinding = rbac_auth_v1_api.patch_cluster_role_binding(
-            name=crb_name,
-            body=k8s_object,
-            async_req=self.async_req,
-            pretty=self.pretty,
+        v1_cluster_role_binding: V1ClusterRoleBinding = (
+            rbac_auth_v1_api.patch_cluster_role_binding(
+                name=crb_name,
+                body=k8s_object,
+                async_req=self.async_req,
+                pretty=self.pretty,
+            )
         )
         # logger.debug("Updated:\n{}".format(pformat(v1_cluster_role_binding.to_dict(), indent=2)))
         if v1_cluster_role_binding.metadata.creation_timestamp is not None:

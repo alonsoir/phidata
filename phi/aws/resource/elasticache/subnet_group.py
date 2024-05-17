@@ -48,12 +48,16 @@ class CacheSubnetGroup(AwsResource):
                 subnet_ids = self.subnet_ids.get_reference(aws_client=aws_client)
         if len(subnet_ids) == 0 and self.vpc_stack is not None:
             logger.debug("Getting private subnet_ids from vpc stack")
-            private_subnet_ids = self.vpc_stack.get_private_subnets(aws_client=aws_client)
+            private_subnet_ids = self.vpc_stack.get_private_subnets(
+                aws_client=aws_client
+            )
             if private_subnet_ids is not None:
                 subnet_ids.extend(private_subnet_ids)
             if len(subnet_ids) == 0:
                 logger.debug("Getting public subnet_ids from vpc stack")
-                public_subnet_ids = self.vpc_stack.get_public_subnets(aws_client=aws_client)
+                public_subnet_ids = self.vpc_stack.get_public_subnets(
+                    aws_client=aws_client
+                )
                 if public_subnet_ids is not None:
                     subnet_ids.extend(public_subnet_ids)
         return subnet_ids
@@ -79,7 +83,8 @@ class CacheSubnetGroup(AwsResource):
             service_client = self.get_service_client(aws_client)
             create_response = service_client.create_cache_subnet_group(
                 CacheSubnetGroupName=self.name,
-                CacheSubnetGroupDescription=self.description or f"Created for {self.name}",
+                CacheSubnetGroupDescription=self.description
+                or f"Created for {self.name}",
                 SubnetIds=subnet_ids,
                 **not_null_args,
             )
@@ -88,7 +93,9 @@ class CacheSubnetGroup(AwsResource):
 
             self.active_resource = create_response.get("CacheSubnetGroup", None)
             if self.active_resource is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} created")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} created"
+                )
                 logger.debug(f"CacheSubnetGroup: {self.active_resource}")
                 return True
         except Exception as e:
@@ -107,14 +114,20 @@ class CacheSubnetGroup(AwsResource):
         logger.debug(f"Reading {self.get_resource_type()}: {self.get_resource_name()}")
         try:
             service_client = self.get_service_client(aws_client)
-            describe_response = service_client.describe_cache_subnet_groups(CacheSubnetGroupName=self.name)
+            describe_response = service_client.describe_cache_subnet_groups(
+                CacheSubnetGroupName=self.name
+            )
             logger.debug(f"describe_response type: {type(describe_response)}")
             logger.debug(f"describe_response: {describe_response}")
 
             cache_subnet_group_list = describe_response.get("CacheSubnetGroups", None)
-            if cache_subnet_group_list is not None and isinstance(cache_subnet_group_list, list):
+            if cache_subnet_group_list is not None and isinstance(
+                cache_subnet_group_list, list
+            ):
                 for _cache_subnet_group in cache_subnet_group_list:
-                    _cache_sg_name = _cache_subnet_group.get("CacheSubnetGroupName", None)
+                    _cache_sg_name = _cache_subnet_group.get(
+                        "CacheSubnetGroupName", None
+                    )
                     if _cache_sg_name == self.name:
                         self.active_resource = _cache_subnet_group
                         break
@@ -143,7 +156,9 @@ class CacheSubnetGroup(AwsResource):
             service_client = self.get_service_client(aws_client)
             self.active_resource = None
 
-            delete_response = service_client.delete_cache_subnet_group(CacheSubnetGroupName=self.name)
+            delete_response = service_client.delete_cache_subnet_group(
+                CacheSubnetGroupName=self.name
+            )
             logger.debug(f"delete_response: {delete_response}")
             return True
         except Exception as e:
@@ -168,14 +183,17 @@ class CacheSubnetGroup(AwsResource):
             service_client = self.get_service_client(aws_client)
             update_response = service_client.modify_cache_subnet_group(
                 CacheSubnetGroupName=self.name,
-                CacheSubnetGroupDescription=self.description or f"Created for {self.name}",
+                CacheSubnetGroupDescription=self.description
+                or f"Created for {self.name}",
                 SubnetIds=subnet_ids,
             )
             logger.debug(f"update_response: {update_response}")
 
             self.active_resource = update_response.get("CacheSubnetGroup", None)
             if self.active_resource is not None:
-                print_info(f"{self.get_resource_type()}: {self.get_resource_name()} updated")
+                print_info(
+                    f"{self.get_resource_type()}: {self.get_resource_name()} updated"
+                )
                 return True
         except Exception as e:
             logger.error(f"{self.get_resource_type()} could not be updated.")

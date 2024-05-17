@@ -25,14 +25,18 @@ class AirflowWorker(AirflowBase):
     worker_log_host_port: Optional[int] = None
 
     def get_container_env(self, container_context: ContainerContext) -> Dict[str, str]:
-        container_env: Dict[str, str] = super().get_container_env(container_context=container_context)
+        container_env: Dict[str, str] = super().get_container_env(
+            container_context=container_context
+        )
 
         # Set the queue name
         container_env["QUEUE_NAME"] = self.queue_name
 
         # Set the worker log port
         if self.open_worker_log_port:
-            container_env["AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT"] = str(self.worker_log_port)
+            container_env["AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT"] = str(
+                self.worker_log_port
+            )
 
         return container_env
 

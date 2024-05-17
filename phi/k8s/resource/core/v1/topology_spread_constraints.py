@@ -52,7 +52,9 @@ class TopologySpreadConstraint(K8sObject):
     # It's a required field. Possible enum values: - `"DoNotSchedule"` instructs the scheduler not to schedule the
     # pod when constraints are not satisfied.
     # - `"ScheduleAnyway"` instructs the scheduler to schedule the pod even if constraints are not satisfied.
-    when_unsatisfiable: Optional[Literal["DoNotSchedule", "ScheduleAnyway"]] = Field(None, alias="whenUnsatisfiable")
+    when_unsatisfiable: Optional[Literal["DoNotSchedule", "ScheduleAnyway"]] = Field(
+        None, alias="whenUnsatisfiable"
+    )
 
     def get_k8s_object(self) -> V1TopologySpreadConstraint:
         # Return a V1TopologySpreadConstraint object

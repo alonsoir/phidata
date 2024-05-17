@@ -73,7 +73,9 @@ class Kubeconfig(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     @classmethod
-    def read_from_file(cls: Any, file_path: Path, create_if_not_exists: bool = True) -> Optional[Any]:
+    def read_from_file(
+        cls: Any, file_path: Path, create_if_not_exists: bool = True
+    ) -> Optional[Any]:
         if file_path is not None:
             if not file_path.exists():
                 if create_if_not_exists:
@@ -89,7 +91,9 @@ class Kubeconfig(BaseModel):
 
                     logger.info(f"Reading {file_path}")
                     kubeconfig_dict = yaml.safe_load(file_path.read_text())
-                    if kubeconfig_dict is not None and isinstance(kubeconfig_dict, dict):
+                    if kubeconfig_dict is not None and isinstance(
+                        kubeconfig_dict, dict
+                    ):
                         kubeconfig = cls(**kubeconfig_dict)
                         return kubeconfig
                 except Exception as e:

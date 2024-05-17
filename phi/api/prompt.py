@@ -13,7 +13,11 @@ from phi.api.schemas.prompt import (
     PromptTemplateSchema,
 )
 from phi.api.schemas.workspace import WorkspaceIdentifier
-from phi.constants import WORKSPACE_ID_ENV_VAR, WORKSPACE_HASH_ENV_VAR, WORKSPACE_KEY_ENV_VAR
+from phi.constants import (
+    WORKSPACE_ID_ENV_VAR,
+    WORKSPACE_HASH_ENV_VAR,
+    WORKSPACE_KEY_ENV_VAR,
+)
 from phi.cli.settings import phi_cli_settings
 from phi.utils.common import str_to_int
 from phi.utils.log import logger
@@ -49,11 +53,12 @@ def sync_prompt_registry_api(
                 return None, None
 
             # logger.debug(f"Response: {response_dict}")
-            registry_response: PromptRegistrySchema = PromptRegistrySchema.model_validate(
-                response_dict.get("registry", {})
+            registry_response: PromptRegistrySchema = (
+                PromptRegistrySchema.model_validate(response_dict.get("registry", {}))
             )
             templates_response: Dict[str, PromptTemplateSchema] = {
-                k: PromptTemplateSchema.model_validate(v) for k, v in response_dict.get("templates", {}).items()
+                k: PromptTemplateSchema.model_validate(v)
+                for k, v in response_dict.get("templates", {}).items()
             }
             return registry_response, templates_response
         except Exception as e:

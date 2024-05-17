@@ -129,7 +129,9 @@ class AcmCertificate(AwsResource):
         if self.wait_for_create:
             try:
                 print_info(f"Waiting for {self.get_resource_type()} to be created.")
-                waiter = self.get_service_client(aws_client).get_waiter("certificate_validated")
+                waiter = self.get_service_client(aws_client).get_waiter(
+                    "certificate_validated"
+                )
                 certificate_arn = self.get_certificate_arn(aws_client)
                 waiter.wait(
                     CertificateArn=certificate_arn,
@@ -156,10 +158,14 @@ class AcmCertificate(AwsResource):
 
                 cert_summary = CertificateSummary(**read_cert_summary)
                 if not self.certificate_summary_file.exists():
-                    self.certificate_summary_file.parent.mkdir(parents=True, exist_ok=True)
+                    self.certificate_summary_file.parent.mkdir(
+                        parents=True, exist_ok=True
+                    )
                     self.certificate_summary_file.touch(exist_ok=True)
                 self.certificate_summary_file.write_text(cert_summary.json(indent=2))
-                print_info(f"Certificate Summary stored at: {str(self.certificate_summary_file)}")
+                print_info(
+                    f"Certificate Summary stored at: {str(self.certificate_summary_file)}"
+                )
             except Exception as e:
                 logger.error("Could not writing Certificate Summary to file")
                 logger.error(e)
@@ -182,7 +188,9 @@ class AcmCertificate(AwsResource):
             # logger.debug(f"AcmCertificate: {list_certificate_response}")
 
             current_cert = None
-            certificate_summary_list = list_certificate_response.get("CertificateSummaryList", [])
+            certificate_summary_list = list_certificate_response.get(
+                "CertificateSummaryList", []
+            )
             for cert_summary in certificate_summary_list:
                 domain = cert_summary.get("DomainName", None)
                 if domain is not None and domain == self.name:

@@ -35,7 +35,9 @@ class PodSpec(K8sObject):
     # TODO: create affinity object
     affinity: Optional[Any] = None
     # AutomountServiceAccountToken indicates whether a service account token should be automatically mounted.
-    automount_service_account_token: Optional[bool] = Field(None, alias="automountServiceAccountToken")
+    automount_service_account_token: Optional[bool] = Field(
+        None, alias="automountServiceAccountToken"
+    )
     # List of containers belonging to the pod. Containers cannot currently be added or removed.
     # There must be at least one container in a Pod. Cannot be updated.
     containers: List[Container]
@@ -49,7 +51,9 @@ class PodSpec(K8sObject):
     # If specified, these secrets will be passed to individual puller implementations for them to use.
     # For example, in the case of docker, only DockerConfig type secrets are honored.
     # More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
-    image_pull_secrets: Optional[List[LocalObjectReference]] = Field(None, alias="imagePullSecrets")
+    image_pull_secrets: Optional[List[LocalObjectReference]] = Field(
+        None, alias="imagePullSecrets"
+    )
     # List of initialization containers belonging to the pod.
     # Init containers are executed in order prior to containers being started.
     # If any init container fails, the pod is considered to have failed and is
@@ -77,7 +81,9 @@ class PodSpec(K8sObject):
     # ServiceAccountName is the name of the ServiceAccount to use to run this pod.
     # More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
     service_account_name: Optional[str] = Field(None, alias="serviceAccountName")
-    termination_grace_period_seconds: Optional[int] = Field(None, alias="terminationGracePeriodSeconds")
+    termination_grace_period_seconds: Optional[int] = Field(
+        None, alias="terminationGracePeriodSeconds"
+    )
     # If specified, the pod's tolerations.
     tolerations: Optional[List[Toleration]] = None
     # TopologySpreadConstraints describes how a group of pods ought to spread across topology domains.

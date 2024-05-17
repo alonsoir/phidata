@@ -88,7 +88,9 @@ class SecretsManager(AwsResource):
             secret_dict.update(json.loads(self.secret_string))
 
         # Step 3: Build secret_string
-        secret_string: Optional[str] = json.dumps(secret_dict) if len(secret_dict) > 0 else None
+        secret_string: Optional[str] = (
+            json.dumps(secret_dict) if len(secret_dict) > 0 else None
+        )
 
         # Step 4: Build SecretsManager configuration
         # create a dict of args which are not null, otherwise aws type validation fails
@@ -108,7 +110,9 @@ class SecretsManager(AwsResource):
         if self.add_replica_regions:
             not_null_args["AddReplicaRegions"] = self.add_replica_regions
         if self.force_overwrite_replica_secret:
-            not_null_args["ForceOverwriteReplicaSecret"] = self.force_overwrite_replica_secret
+            not_null_args["ForceOverwriteReplicaSecret"] = (
+                self.force_overwrite_replica_secret
+            )
 
         # Step 3: Create SecretsManager
         service_client = self.get_service_client(aws_client)
@@ -225,7 +229,9 @@ class SecretsManager(AwsResource):
             logger.error(e)
         return False
 
-    def get_secrets_as_dict(self, aws_client: Optional[AwsApiClient] = None) -> Optional[Dict[str, Any]]:
+    def get_secrets_as_dict(
+        self, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[Dict[str, Any]]:
         """Get secret value
 
         Args:
@@ -267,7 +273,9 @@ class SecretsManager(AwsResource):
             logger.error(e)
         return None
 
-    def get_secret_value(self, secret_name: str, aws_client: Optional[AwsApiClient] = None) -> Optional[Any]:
+    def get_secret_value(
+        self, secret_name: str, aws_client: Optional[AwsApiClient] = None
+    ) -> Optional[Any]:
         secret_dict = self.get_secrets_as_dict(aws_client=aws_client)
         if secret_dict is not None:
             return secret_dict.get(secret_name, None)

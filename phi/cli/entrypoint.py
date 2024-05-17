@@ -31,14 +31,18 @@ Usage:
 
 @phi_cli.command(short_help="Initialize phidata, use -r to reset")
 def init(
-    reset: bool = typer.Option(False, "--reset", "-r", help="Reset phidata", show_default=True),
+    reset: bool = typer.Option(
+        False, "--reset", "-r", help="Reset phidata", show_default=True
+    ),
     print_debug_log: bool = typer.Option(
         False,
         "-d",
         "--debug",
         help="Print debug logs.",
     ),
-    login: bool = typer.Option(False, "--login", "-l", help="Login with phidata.com", show_default=True),
+    login: bool = typer.Option(
+        False, "--login", "-l", help="Login with phidata.com", show_default=True
+    ),
 ):
     """
     \b
@@ -215,12 +219,18 @@ def start(
         help="Path to workspace file.",
         show_default=False,
     ),
-    env_filter: Optional[str] = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to deploy"),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to deploy."),
+    env_filter: Optional[str] = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to deploy"
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to deploy."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter resource using name."),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter resource using name."
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -337,12 +347,18 @@ def stop(
         help="Path to workspace file.",
         show_default=False,
     ),
-    env_filter: Optional[str] = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to deploy"),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to deploy."),
+    env_filter: Optional[str] = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to deploy"
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to deploy."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter using resource name"),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter using resource name"
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -452,13 +468,21 @@ def patch(
         help="Path to workspace file.",
         show_default=False,
     ),
-    env_filter: Optional[str] = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to deploy"),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to deploy."),
-    config_filter: Optional[str] = typer.Option(None, "-c", "--config", metavar="", help="Filter the config to deploy"),
+    env_filter: Optional[str] = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to deploy"
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to deploy."
+    ),
+    config_filter: Optional[str] = typer.Option(
+        None, "-c", "--config", metavar="", help="Filter the config to deploy"
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter using resource name"),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter using resource name"
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
@@ -568,12 +592,18 @@ def restart(
         help="Path to workspace file.",
         show_default=False,
     ),
-    env_filter: Optional[str] = typer.Option(None, "-e", "--env", metavar="", help="Filter the environment to deploy"),
-    infra_filter: Optional[str] = typer.Option(None, "-i", "--infra", metavar="", help="Filter the infra to deploy."),
+    env_filter: Optional[str] = typer.Option(
+        None, "-e", "--env", metavar="", help="Filter the environment to deploy"
+    ),
+    infra_filter: Optional[str] = typer.Option(
+        None, "-i", "--infra", metavar="", help="Filter the infra to deploy."
+    ),
     group_filter: Optional[str] = typer.Option(
         None, "-g", "--group", metavar="", help="Filter resources using group name."
     ),
-    name_filter: Optional[str] = typer.Option(None, "-n", "--name", metavar="", help="Filter using resource name"),
+    name_filter: Optional[str] = typer.Option(
+        None, "-n", "--name", metavar="", help="Filter using resource name"
+    ),
     type_filter: Optional[str] = typer.Option(
         None,
         "-t",
