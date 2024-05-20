@@ -19,6 +19,7 @@ def get_blog_entries(filename, url):
     entries = []
     try:
         # Abrir la URL de la entrada (Open the entry URL)
+        # el dia del mes del año que sea pudo haber más de una entrada, es decir, más de un título
         entry_response = requests.get(url)
         entry_response.raise_for_status()
         if entry_response.status_code == 200:
@@ -42,15 +43,17 @@ def get_blog_entries(filename, url):
                 'content': content,
                 'date': date
             }
+            final_entry=f"{entry['link']}{entry['date']}/{entry['title']}\n"
+            print(final_entry)
             with open(filename, 'a') as f:
-                f.write(f"{entry['link']}{entry['date']}/\n")
+                f.write(final_entry)
 
             entries.append(entry)
         return entries  # Return the extracted entry dictionary
 
     except Exception as e:
         # Si no se encuentra contenido, escribe una advertencia en la consola (If no content found, print a warning)
-        print(f"La url {url} no tiene contenido disponible. {e}")
+        print(f"{url}. {e}")
         return None  # Return None on exception
 
 pattern = r"https://aironman2k\.wordpress\.com/(\d{4})/(0[1-9]|1[0-2])/([0-2][0-9]|3[01])/?$"
@@ -72,7 +75,7 @@ for year in range(2012, 2025):
             # Optional: Print only matching URLs (if desired)
             match = re.search(pattern, url)
             if match:
-                print(f"{url} is a match")
+                # print(f"{url} is a match")
 
                 entries = get_blog_entries(FILENAME,url)
 
